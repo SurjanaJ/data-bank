@@ -4,5 +4,5 @@ from . import views
 
 
 urlpatterns = [
-    path('',views.importExcel, name='importExcel')
+    path('',views.display_table, name='display_table')
 ]
