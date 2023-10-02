@@ -29,7 +29,7 @@ class Unit_meta(models.Model):
     def __str__(self):
         return self.Unit_Name
 
-class Traders_Name__Exporter_Importer_meta(models.Model):
+class TradersName_ExporterImporter_meta(models.Model):
     id = models.IntegerField(primary_key=True, unique=True, editable=False)
     Name = models.CharField(max_length=300)
 
@@ -55,9 +55,12 @@ class TradeData(models.Model):
     Amount = models.DecimalField(max_digits=100, decimal_places=3,null=True, blank=True)
     Tarrif = models.DecimalField(max_digits=100, decimal_places=3, null=True, blank=True)
     Origin_Destination = models.CharField(max_length=200, null=True, blank=True)
-    Traders_Name__Exporter_Importer = models.ForeignKey(Traders_Name__Exporter_Importer_meta, null=True, blank=True)
+    TradersName_ExporterImporter = models.ForeignKey(TradersName_ExporterImporter_meta,on_delete=models.CASCADE, null=True, blank=True)
     Documents = models.CharField(max_length=300, null=True, blank=True)
     Product_Information = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return (self.id + self.Product_Information)
 
 
 
