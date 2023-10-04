@@ -7,7 +7,8 @@ import pandas as pd
 
 
 def display_table(request):
-    return render(request, 'import_export/display_table.html')
+    data = TradeData.objects.all()
+    return render(request, 'import_export/display_table.html', {'data': data})
 
 
 def upload_trade_excel(request):
@@ -60,39 +61,4 @@ def upload_trade_excel(request):
 
     return render(request, 'import_export/upload.html', {'form':form})
         
-
-
-
-# def upload_excel(request):
-#     if request.method == 'POST':
-#         form = UploadExcelForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             excel_file = request.FILES['excel_file']
-#             if excel_file.name.endswith('.xlsx'):
-#                 df = pd.read_excel(excel_file)
-#                 for index, row in df.iterrows():
-#                     TradeData.objects.create(
-#                         id =row['id'],
-#                         Trade_Type=row['Trade_Type'],
-#                         Calender=row['Calender'],
-#                         Fiscal_Year=row['Fiscal_Year'],
-#                         Duration=row['Duration'],
-#                         Country_Name=row['Country_Name'],
-#                         HS_Code=row['HS_Code'],
-#                         Unit=row['Unit'],
-#                         Quantity=row['Quantity'],
-#                         Currency_Type=row['Currency_Type'],
-#                         Amount=row['Amount'],
-#                         Tarrif=row['Tarrif'],
-#                         Origin_Destination=row['Origin_Destination'],
-#                         TradersName_ExporterImporter=row['TradersName_ExporterImporter'],
-#                         Documents=row['Documents'],
-#                         Product_Information=row['Product_Information']
-#                     )
-#                 return redirect('success')  # Adjust the success URL as needed
-#             else:
-#                 form.add_error('excel_file', 'Only .xlsx files are allowed')
-#     else:
-#         form = UploadExcelForm()
-#     return render(request, 'import_export/upload.html', {'form': form})
 
