@@ -57,10 +57,10 @@ class TradeData(models.Model):
     Origin_Destination = models.CharField(max_length=200, null=True, blank=True)
     TradersName_ExporterImporter = models.ForeignKey(TradersName_ExporterImporter_meta,on_delete=models.CASCADE, null=True, blank=True)
     Documents = models.CharField(max_length=300, null=True, blank=True)
-    Product_Information = models.TextField(null=True, blank=True)
+    Product_Information = models.TextField()
 
     def __str__(self):
-        return (self.id + self.Product_Information)
+        return (str(self.id) + self.Product_Information)
 
 
 
