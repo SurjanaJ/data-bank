@@ -1,3 +1,4 @@
+from django import apps
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
@@ -7,8 +8,17 @@ import pandas as pd
 
 
 def display_table(request):
+    # data = TradeData.objects.all()
+    # return render(request, 'import_export/display_table.html', {'data': data })
     data = TradeData.objects.all()
-    return render(request, 'import_export/display_table.html', {'data': data})
+    title_contains_query = request.GET.get('title_contains')
+    title_or_author_query = request.GET.get('title_or_author')
+
+    if title_contains_query !='' and title_contains_query is not None:
+        data = data.filter(Currency_Type__icontains= title_contains_query)
+
+    context = {'data': data}
+    return render(request, 'import_export/display_table.html', context)
 
 
 def upload_trade_excel(request):
