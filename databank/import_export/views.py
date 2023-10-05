@@ -13,12 +13,15 @@ def is_valid_queryparam(param):
 
 def display_table(request):
     data = TradeData.objects.all()
+    categories = Country_meta.objects.all()
+    
     currency_product_originDestination_query = request.GET.get('currency_product_originDestination')
     quantity_min = request.GET.get('quantity_min')
     quantity_max = request.GET.get('quantity_max')
     # date_min = request.GET.get(date_min)
     # date_max = request.GET.get(date_max)
-
+    country_category = request.GET.get('country_category')
+    
     if is_valid_queryparam(currency_product_originDestination_query):
         data = data.filter(
             Q(Currency_Type__icontains = currency_product_originDestination_query) | Q(Product_Information__icontains = currency_product_originDestination_query) | Q(Origin_Destination__icontains = currency_product_originDestination_query) ).distinct()
@@ -28,11 +31,15 @@ def display_table(request):
 
     if is_valid_queryparam(quantity_max):
         data = data.filter(Quantity__lt=quantity_max)
-
+ 
     # if is_valid_queryparam(date_min):
     #     data = data.filter()
 
-    context = {'data': data}
+    if is_valid_queryparam(country_category) and country_category != '--':
+        # phase1 = categories.filter(Country_Name = country_category)
+        data = data.filter(Country_Name=country_category)
+
+    context = {'data': data , 'categories':categories}
     return render(request, 'import_export/display_table.html', context)
 
 
