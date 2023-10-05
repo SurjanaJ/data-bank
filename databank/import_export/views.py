@@ -20,13 +20,11 @@ def display_table(request):
     currency_product_originDestination_query = request.GET.get('currency_product_originDestination')
     quantity_min = request.GET.get('quantity_min')
     quantity_max = request.GET.get('quantity_max')
-    # date_min = request.GET.get(date_min)
-    # date_max = request.GET.get(date_max)
+    date_min = request.GET.get('date_min')
+    date_max = request.GET.get('date_max')
     country_category = request.GET.get('country_category')
     unit_category = request.GET.get('unit_category')
     hs_code = request.GET.get('hs_code')
-    
-    
     
     if is_valid_queryparam(currency_product_originDestination_query):
         data = data.filter(
@@ -38,8 +36,11 @@ def display_table(request):
     if is_valid_queryparam(quantity_max):
         data = data.filter(Quantity__lt=quantity_max)
  
-    # if is_valid_queryparam(date_min):
-    #     data = data.filter()
+    if is_valid_queryparam(date_min):
+        data = data.filter(Calender__gte = date_min)
+
+    if is_valid_queryparam(date_max):
+        data = data.filter(Calender__lt = date_max)
 
     if is_valid_queryparam(country_category) and country_category != '--':
         data = data.filter(Country_Name=country_category)
