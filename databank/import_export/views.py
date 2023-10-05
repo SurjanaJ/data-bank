@@ -16,6 +16,7 @@ def display_table(request):
     country_categories = Country_meta.objects.all()
     unit_categories = Unit_meta.objects.all()
     hs_codes = HS_Code_meta.objects.all()
+    trade_type_categories = [choice[1] for choice in TradeData.TRADE_OPTIONS]
     
     currency_product_originDestination_query = request.GET.get('currency_product_originDestination')
     quantity_min = request.GET.get('quantity_min')
@@ -25,6 +26,7 @@ def display_table(request):
     country_category = request.GET.get('country_category')
     unit_category = request.GET.get('unit_category')
     hs_code = request.GET.get('hs_code')
+    trade_type = request.GET.get('trade_type')
     
     if is_valid_queryparam(currency_product_originDestination_query):
         data = data.filter(
@@ -51,7 +53,10 @@ def display_table(request):
     if is_valid_queryparam(hs_code) and hs_code != '--':
         data = data.filter(HS_Code=hs_code)
 
-    context = {'data': data , 'country_categories':country_categories , 'unit_categories' : unit_categories, 'hs_codes':hs_codes}
+    if is_valid_queryparam(trade_type) and trade_type != '--':
+        data = data.filter(Trade_Type=trade_type) 
+
+    context = {'data': data , 'country_categories':country_categories , 'unit_categories' : unit_categories, 'hs_codes':hs_codes, 'trade_type_categories':trade_type_categories}
     return render(request, 'import_export/display_table.html', context)
 
 

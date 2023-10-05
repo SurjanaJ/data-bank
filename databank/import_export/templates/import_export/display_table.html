@@ -36,6 +36,17 @@
             <label for="date_maximum">Publish date maximum</label>
             <input type="date" class="form-control" id="date_maximum" name="date_max">
         </div>
+
+        <div class="form-group col-md-4">
+            <label for="trade_type">Trade Type</label>
+            <select id="trade_type" class="form-control" name="trade_type">
+                <option selected>--</option>
+                {% for trade_type in trade_type_categories %}
+                <option value="{{trade_type}}">{{trade_type}}</option>
+                {% endfor %}
+            </select>
+        </div>
+
         <div class="form-group col-md-4">
             <label for="country_category">Country</label>
             <select id="country_category" class="form-control" name="country_category">
@@ -67,26 +78,8 @@
         </div>
 
     </div>
-    <div class="form-group">
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="reviewed" name="reviewed">
-            <label class="form-check-label" for="reviewed">
-                Reviewed
-            </label>
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="notReviewed" name="notReviewed">
-            <label class="form-check-label" for="notReviewed">
-                Not reviewed
-            </label>
-        </div>
-    </div>
     <button type="submit" class="btn btn-primary">Search</button>
 </form>
-
-
 
 <hr>
 <div class="table-responsive">
