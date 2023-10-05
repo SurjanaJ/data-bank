@@ -13,7 +13,9 @@ def is_valid_queryparam(param):
 
 def display_table(request):
     data = TradeData.objects.all()
-    categories = Country_meta.objects.all()
+    country_categories = Country_meta.objects.all()
+    unit_categories = Unit_meta.objects.all()
+    hs_codes = HS_Code_meta.objects.all()
     
     currency_product_originDestination_query = request.GET.get('currency_product_originDestination')
     quantity_min = request.GET.get('quantity_min')
@@ -21,6 +23,10 @@ def display_table(request):
     # date_min = request.GET.get(date_min)
     # date_max = request.GET.get(date_max)
     country_category = request.GET.get('country_category')
+    unit_category = request.GET.get('unit_category')
+    hs_code = request.GET.get('hs_code')
+    
+    
     
     if is_valid_queryparam(currency_product_originDestination_query):
         data = data.filter(
@@ -36,10 +42,15 @@ def display_table(request):
     #     data = data.filter()
 
     if is_valid_queryparam(country_category) and country_category != '--':
-        # phase1 = categories.filter(Country_Name = country_category)
         data = data.filter(Country_Name=country_category)
+    
+    if is_valid_queryparam(unit_category) and unit_category != '--':
+        data = data.filter(Unit=unit_category)
 
-    context = {'data': data , 'categories':categories}
+    if is_valid_queryparam(hs_code) and hs_code != '--':
+        data = data.filter(HS_Code=hs_code)
+
+    context = {'data': data , 'country_categories':country_categories , 'unit_categories' : unit_categories, 'hs_codes':hs_codes}
     return render(request, 'import_export/display_table.html', context)
 
 

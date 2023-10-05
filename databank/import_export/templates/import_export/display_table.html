@@ -40,11 +40,32 @@
             <label for="country_category">Country</label>
             <select id="country_category" class="form-control" name="country_category">
                 <option selected>--</option>
-                {% for category in categories %}
-                <option value="{{category.id }}">{{category}}</option>
+                {% for country_category in country_categories %}
+                <option value="{{country_category.id }}">{{country_category}}</option>
                 {% endfor %}
             </select>
         </div>
+
+        <div class="form-group col-md-4">
+            <label for="unit_category">Unit</label>
+            <select id="unit_category" class="form-control" name="unit_category">
+                <option selected>--</option>
+                {% for unit_category in unit_categories %}
+                <option value="{{unit_category.id }}">{{unit_category}}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group col-md-4">
+            <label for="hs_code">HS Code</label>
+            <select id="hs_code" class="form-control" name="hs_code">
+                <option selected>--</option>
+                {% for hs_code in hs_codes %}
+                <option value="{{hs_code.id }}">{{hs_code}}</option>
+                {% endfor %}
+            </select>
+        </div>
+
     </div>
     <div class="form-group">
         <div class="form-check">
