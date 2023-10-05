@@ -2,6 +2,8 @@ from django import apps
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.db.models import Q
+from django.core.paginator import Paginator, Page
+
 
 from .forms import UploadTradeForm
 from .models import HS_Code_meta, TradeData, Country_meta, TradersName_ExporterImporter_meta, Unit_meta
@@ -56,7 +58,12 @@ def display_table(request):
     if is_valid_queryparam(trade_type) and trade_type != '--':
         data = data.filter(Trade_Type=trade_type) 
 
-    context = {'data': data , 'country_categories':country_categories , 'unit_categories' : unit_categories, 'hs_codes':hs_codes, 'trade_type_categories':trade_type_categories}
+
+    paginator = Paginator(data, 7)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+
+    context = {'data': data , 'country_categories':country_categories , 'unit_categories' : unit_categories, 'hs_codes':hs_codes, 'trade_type_categories':trade_type_categories, 'page':page}
     return render(request, 'import_export/display_table.html', context)
 
 

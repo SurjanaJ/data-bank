@@ -2,18 +2,26 @@
 
 {% block content %}
 
-<form class="row g-3" method="GET" action=".">
+<div class="more-info-btns">
+    <p class="d-inline-flex gap-1">
+        <button class="btn btn-outline-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
+          Show Filters
+        </button>
+        <button class="btn btn-outline-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUpload" aria-expanded="false" aria-controls="collapseUpload">
+            Upload Excel
+          </button>
+    </p>
+</div>
 
+  <div class="collapse" id="collapseFilter">
+    <form class="row g-3" method="GET" action=".">
+        {% csrf_token %}
     <div class="form-group col-12">
         <div class="input-group">
             <input class="form-control py-2 border-right-0 border" type="search"
                 name="currency_product_originDestination"
                 placeholder="Search by Currency Type, Product Information or Origin/Destination" />
-            <!-- <span class="input-group-append">
-                <div class="input-group-text bg-transparent">
-                    <i class="fa fa-search"></i>
-                </div>
-            </span> -->
+           
         </div>
     </div>
 
@@ -80,6 +88,9 @@
 
     <button type="submit" class=" col-1 btn btn-primary">Search</button>
 </form>
+  </div>
+  
+
 
 <hr>
 <div class="table-responsive">
@@ -104,7 +115,8 @@
             </tr>
         </thead>
         <tbody class="table-hover">
-            {% for record in data %}
+            
+            {% for record in page %}
             <tr>
                 <td>{{ record.Trade_Type }}</td>
                 <td>{{ record.Calender }}</td>
@@ -127,5 +139,21 @@
     </table>
 </div>
 
-
+<div class="pagination  m-3 d-flex justify-content-center ">
+    <span class="step-links bg-light  rounded-1 d-flex justify-content-center gap-3 p-3 ">
+        {% if page.has_previous %}
+        <a href="?page=1" >&laquo; First</a>
+        <a  href="?page={{ page.previous_page_number }}">Previous</a>
+        {% endif %}
+        
+        <span class="current-page ">
+            Page {{ page.number }} of {{ page.paginator.num_pages }}.
+        </span>
+        
+        {% if page.has_next %}
+        <a  href="?page={{ page.next_page_number }}">Next</a>
+        <a  href="?page={{ page.paginator.num_pages }}">Last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
 {% endblock  %}
