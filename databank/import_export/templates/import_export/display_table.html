@@ -2,83 +2,83 @@
 
 {% block content %}
 
-<form method="GET" action=".">
-    <div class="form-row  d-flex justify-content-center">
-        <div class="form-group col-9">
-            <div class="input-group">
-                <input class="form-control py-2 border-right-0 border" type="search"
-                    name="currency_product_originDestination"
-                    placeholder="Search by Currency Type, Product Information or Origin/Destination" />
-                <span class="input-group-append">
-                    <div class="input-group-text bg-transparent">
-                        <i class="fa fa-search"></i>
-                    </div>
-                </span>
-            </div>
+<form class="row g-3" method="GET" action=".">
+
+    <div class="form-group col-12">
+        <div class="input-group">
+            <input class="form-control py-2 border-right-0 border" type="search"
+                name="currency_product_originDestination"
+                placeholder="Search by Currency Type, Product Information or Origin/Destination" />
+            <!-- <span class="input-group-append">
+                <div class="input-group-text bg-transparent">
+                    <i class="fa fa-search"></i>
+                </div>
+            </span> -->
         </div>
     </div>
 
+    <div class="col-md-3">
+        <label for="date_minimum">Publish date minimum</label>
+        <input type="date" class="form-control" id="date_minimum" name="date_min">
+    </div>
+    <div class="col-md-3">
+        <label for="date_maximum">Publish date maximum</label>
+        <input type="date" class="form-control" id="date_maximum" name="date_max">
+    </div>
 
-    <div class="form-row">
-        <div class="form-group col-md-2 col-lg-2">
+        <div class="col-md-3 ">
             <label for="viewCountMin">Minimum Quantity</label>
             <input type="number" min=0 class="form-control" id="viewCountMin" placeholder="0" name="quantity_min">
         </div>
-        <div class="form-group col-md-2 col-lg-2">
+        <div class="col-md-3 ">
             <label for="viewCountMax">Maximum Quantity</label>
             <input type="number" min=0 class="form-control" id="viewCountMax" placeholder="10000?" name="quantity_max">
         </div>
-        <div class="form-group col-md-2 col-lg-2">
-            <label for="date_minimum">Publish date minimum</label>
-            <input type="date" class="form-control" id="date_minimum"  name="date_min">
-        </div>
-        <div class="form-group col-md-2 col-lg-2">
-            <label for="date_maximum">Publish date maximum</label>
-            <input type="date" class="form-control" id="date_maximum" name="date_max">
-        </div>
+    
 
-        <div class="form-group col-md-4">
-            <label for="trade_type">Trade Type</label>
-            <select id="trade_type" class="form-control" name="trade_type">
-                <option selected>--</option>
-                {% for trade_type in trade_type_categories %}
-                <option value="{{trade_type}}">{{trade_type}}</option>
-                {% endfor %}
-            </select>
-        </div>
+    
 
-        <div class="form-group col-md-4">
-            <label for="country_category">Country</label>
-            <select id="country_category" class="form-control" name="country_category">
-                <option selected>--</option>
-                {% for country_category in country_categories %}
-                <option value="{{country_category.id }}">{{country_category}}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div class="form-group col-md-4">
-            <label for="unit_category">Unit</label>
-            <select id="unit_category" class="form-control" name="unit_category">
-                <option selected>--</option>
-                {% for unit_category in unit_categories %}
-                <option value="{{unit_category.id }}">{{unit_category}}</option>
-                {% endfor %}
-            </select>
-        </div>
-
-        <div class="form-group col-md-4">
-            <label for="hs_code">HS Code</label>
-            <select id="hs_code" class="form-control" name="hs_code">
-                <option selected>--</option>
-                {% for hs_code in hs_codes %}
-                <option value="{{hs_code.id }}">{{hs_code}}</option>
-                {% endfor %}
-            </select>
-        </div>
-
+    <div class="form-group col-md-3">
+        <label for="trade_type">Trade Type</label>
+        <select id="trade_type" class="form-control" name="trade_type">
+            <option selected>--</option>
+            {% for trade_type in trade_type_categories %}
+            <option value="{{trade_type}}">{{trade_type}}</option>
+            {% endfor %}
+        </select>
     </div>
-    <button type="submit" class="btn btn-primary">Search</button>
+
+    <div class="form-group col-md-3">
+        <label for="country_category">Country</label>
+        <select id="country_category" class="form-control" name="country_category">
+            <option selected>--</option>
+            {% for country_category in country_categories %}
+            <option value="{{country_category.id }}">{{country_category}}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="form-group col-md-3">
+        <label for="unit_category">Unit</label>
+        <select id="unit_category" class="form-control" name="unit_category">
+            <option selected>--</option>
+            {% for unit_category in unit_categories %}
+            <option value="{{unit_category.id }}">{{unit_category}}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="form-group col-md-3">
+        <label for="hs_code">HS Code</label>
+        <select id="hs_code" class="form-control" name="hs_code">
+            <option selected>--</option>
+            {% for hs_code in hs_codes %}
+            <option value="{{hs_code.id }}">{{hs_code}}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <button type="submit" class=" col-1 btn btn-primary">Search</button>
 </form>
 
 <hr>
