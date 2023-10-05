@@ -1,21 +1,36 @@
 from django import apps
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
+from django.db.models import Q
 
 from .forms import UploadTradeForm
 from .models import HS_Code_meta, TradeData, Country_meta, TradersName_ExporterImporter_meta, Unit_meta
 import pandas as pd
 
 
-def display_table(request):
-    # data = TradeData.objects.all()
-    # return render(request, 'import_export/display_table.html', {'data': data })
-    data = TradeData.objects.all()
-    title_contains_query = request.GET.get('title_contains')
-    title_or_author_query = request.GET.get('title_or_author')
+def is_valid_queryparam(param):
+    return param !='' and param is not None
 
-    if title_contains_query !='' and title_contains_query is not None:
-        data = data.filter(Currency_Type__icontains= title_contains_query)
+def display_table(request):
+    data = TradeData.objects.all()
+    currency_product_originDestination_query = request.GET.get('currency_product_originDestination')
+    quantity_min = request.GET.get('quantity_min')
+    quantity_max = request.GET.get('quantity_max')
+    # date_min = request.GET.get(date_min)
+    # date_max = request.GET.get(date_max)
+
+    if is_valid_queryparam(currency_product_originDestination_query):
+        data = data.filter(
+            Q(Currency_Type__icontains = currency_product_originDestination_query) | Q(Product_Information__icontains = currency_product_originDestination_query) | Q(Origin_Destination__icontains = currency_product_originDestination_query) ).distinct()
+        
+    if is_valid_queryparam(quantity_min):
+        data = data.filter(Quantity__gte=quantity_min)
+
+    if is_valid_queryparam(quantity_max):
+        data = data.filter(Quantity__lt=quantity_max)
+
+    # if is_valid_queryparam(date_min):
+    #     data = data.filter()
 
     context = {'data': data}
     return render(request, 'import_export/display_table.html', context)
