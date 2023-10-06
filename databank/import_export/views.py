@@ -142,3 +142,12 @@ def update_trade_record(request, pk):
         
     context = {'form':form}
     return render(request, 'import_export/upload_trade_record.html', context)
+
+
+def delete_trade_record(request, pk):
+    trade_record = TradeData.objects.get(id = pk)
+    if request.method == 'POST':
+        trade_record.delete()
+        return redirect('display_table')
+    context={'object': trade_record}
+    return render(request, 'import_export/delete_template.html', context)

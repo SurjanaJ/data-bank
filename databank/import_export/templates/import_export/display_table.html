@@ -8,10 +8,11 @@
             aria-expanded="false" aria-controls="collapseFilter">
             Show Filters
         </button>
+        <a href="{% url 'upload_trade_excel' %}">
         <button class="btn btn-outline-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUpload"
             aria-expanded="false" aria-controls="collapseUpload">
-            Upload Excel
-        </button>
+           Upload Excel
+        </button></a>
 
         <a class="styled-link" href="{% url 'upload_trade_record' %}">
             <button class="btn btn-outline-dark">Add Trade Data</button>
@@ -119,6 +120,7 @@
                 <th scope="col">TradersName_ExporterImporter</th>
                 <th scope="col">Documents</th>
                 <th scope="col">Product_Information</th>
+                <th scope="col"></th>
             </tr>
         </thead>
         <tbody class="table-hover">
@@ -140,6 +142,17 @@
                 <td><a class="styled-link" href="{% url 'update_trade_record' record.id%}">{{ record.TradersName_ExporterImporter }}</a></td>
                 <td><a class="styled-link" href="{% url 'update_trade_record' record.id%}">{{ record.Documents }}</a></td>
                 <td><a class="styled-link" href="{% url 'update_trade_record' record.id%}">{{ record.Product_Information }}</a></td>
+                <td class="d-flex"> 
+                    <div class="btn btn-outline-danger "> 
+                        <a class="styled-link" href="{% url 'delete_trade_record' record.id %}">Delete</a> 
+                    </div> 
+                    
+                    
+                    <div class="btn btn-outline-primary">
+                        <a class="styled-link" href="{% url 'update_trade_record' record.id %}">Edit</a> 
+
+                    </div>
+                </td>
             </tr>
 
             {% endfor %}
