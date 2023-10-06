@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.core.paginator import Paginator, Page
 
 
-from .forms import UploadTradeForm
+from .forms import UploadTradeData, UploadTradeForm
 from .models import HS_Code_meta, TradeData, Country_meta, TradersName_ExporterImporter_meta, Unit_meta
 import pandas as pd
 
@@ -118,3 +118,14 @@ def upload_trade_excel(request):
     return render(request, 'import_export/upload.html', {'form':form})
         
 
+def upload_trade_record(request):
+    form = UploadTradeData()
+
+    if request.method == 'POST':
+        form = UploadTradeData(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('display_table')
+
+    context={'form': form}
+    return render(request, 'import_export/upload_trade_record.html', context)

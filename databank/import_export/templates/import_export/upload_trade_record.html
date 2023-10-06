@@ -1,0 +1,84 @@
+{% extends 'main.html' %}
+{% block content %}
+
+<!-- <form action="" class="row g-3" method="POST">
+    {% csrf_token %}
+    {{form}}
+    <input type="submit">
+</form> -->
+
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="row">
+      <div class="col-md-6">
+        <div class="mb-3">
+          {{ form.Trade_Type.label_tag }}
+          {{ form.Trade_Type }}
+        </div>
+        <div class="mb-3">
+          {{ form.Calender.label_tag }}
+          {{ form.Calender }}
+        </div>
+        <div class="mb-3">
+          {{ form.Fiscal_Year.label_tag }}
+          {{ form.Fiscal_Year }}
+        </div>
+        <div class="mb-3">
+            {{ form.Duration.label_tag }}
+            {{ form.Duration }}
+          </div>
+      </div>
+      <div class="col-md-6">
+        <div class="mb-3">
+          {{ form.Country_Name.label_tag }}
+          {{ form.Country_Name }}
+        </div>
+        <div class="mb-3">
+          {{ form.HS_Code.label_tag }}
+          {{ form.HS_Code }}
+        </div>
+        <div class="mb-3">
+          {{ form.Unit.label_tag }}
+          {{ form.Unit }}
+        </div>
+        <div class="mb-3">
+            {{ form.Quantity.label_tag }}
+            {{ form.Quantity }}
+          </div>
+          <div class="mb-3">
+            {{ form.Currency_Type.label_tag }}
+            {{ form.Currency_Type }}
+          </div>
+          <div class="mb-3">
+            {{ form.Amount.label_tag }}
+            {{ form.Amount }}
+          </div>
+          <div class="mb-3">
+            {{ form.Tarrif.label_tag }}
+            {{ form.Tarrif }}
+          </div>
+          <div class="mb-3">
+            {{ form.Origin_Destination.label_tag }}
+            {{ form.Origin_Destination }}
+          </div>
+          <div class="mb-3">
+            {{ form.TradersName_ExporterImporter.label_tag }}
+            {{ form.TradersName_ExporterImporter }}
+          </div>
+          <div class="mb-3">
+            {{ form.Documents.label_tag }}
+            {{ form.Documents }}
+          </div>
+        
+      </div>
+    </div>
+    <div class="mb-3">
+      {{ form.Product_Information.label_tag }}
+      {{ form.Product_Information }}
+    </div>
+    
+  
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+{% endblock %}

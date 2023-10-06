@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Country_meta
+from .models import Country_meta, TradeData
 
 # class upload_country_Form(ModelForm):
 #     excel_file = forms.FileField(required=False)
@@ -22,3 +22,8 @@ from .models import Country_meta
 
 class UploadTradeForm(forms.Form):
     trade_file = forms.FileField()
+
+class UploadTradeData(ModelForm):
+    class Meta:
+        model = TradeData
+        fields = '__all__'
