@@ -129,3 +129,16 @@ def upload_trade_record(request):
 
     context={'form': form}
     return render(request, 'import_export/upload_trade_record.html', context)
+
+def update_trade_record(request, pk):
+    trade_record = TradeData.objects.get(id = pk)
+    form = UploadTradeData(instance= trade_record)
+
+    if request.method == 'POST':
+        form = UploadTradeData(request.POST, instance=trade_record)
+        if form.is_valid():
+            form.save()
+            return redirect('display_table') 
+        
+    context = {'form':form}
+    return render(request, 'import_export/upload_trade_record.html', context)
