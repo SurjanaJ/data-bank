@@ -2,7 +2,10 @@
 from django.contrib import admin
 from django.urls import include, path
 
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',include('import_export.urls'))
+    path('import_export/',include('import_export.urls')),
+    path('', include('import.urls'))
 ]

@@ -76,14 +76,14 @@ def upload_trade_excel(request):
 
             for index, row in df.iterrows():
 
-                Country_Name = row['Country_Name']
+                Country = row['Country']
                 HS_Code = row['HS_Code']
                 Unit = row['Unit']
                 TradersName_ExporterImporter = row['TradersName_ExporterImporter']
                 excel_year = row['Calender']
 
                 try:
-                    Country_Name = Country_meta.objects.get(Country_Name=Country_Name)
+                    Country = Country_meta.objects.get(Country_Name=Country)
                     HS_Code = HS_Code_meta.objects.get(HS_Code= HS_Code)
                     Unit = Unit_meta.objects.get(Unit_Name = Unit)
                     TradersName_ExporterImporter = TradersName_ExporterImporter_meta.objects.get(Name = TradersName_ExporterImporter)
@@ -97,7 +97,7 @@ def upload_trade_excel(request):
                     Calender = datetime(excel_year, 1, 1),
                     Fiscal_Year = row['Fiscal_Year'],
                     Month_Duration = row['Duration'],
-                    Country=Country_Name,
+                    Country=Country,
                     HS_Code=HS_Code,
                     Product_Information = row['Product_Information'],
                     Unit=Unit,
@@ -106,8 +106,8 @@ def upload_trade_excel(request):
                     Amount =row['Amount'],
                     Tarrif= row['Tarrif'],
                     Origin_Destination= row['Origin_Destination'],
-                    TradersName_ExporterImporter = TradersName_ExporterImporter,
-                    DocumentsLegalProcedural = row['Documents'],
+                    TradersName_ExporterImporter = row['TradersName_ExporterImporter'],
+                    DocumentsLegalProcedural = row['DocumentsLegalProcedural'],
                     
                 )
                 trade_data.save()
