@@ -119,6 +119,8 @@ def upload_trade_excel(request):
         
 
 def upload_trade_record(request):
+    trade_type_categories = [choice[1] for choice in TradeData.TRADE_OPTIONS]
+
     form = UploadTradeData()
 
     if request.method == 'POST':
@@ -127,7 +129,7 @@ def upload_trade_record(request):
             form.save()
             return redirect('display_table')
 
-    context={'form': form}
+    context={'form': form,'trade_type_categories': trade_type_categories}
     return render(request, 'import_export/upload_trade_record.html', context)
 
 def update_trade_record(request, pk):
@@ -145,6 +147,7 @@ def update_trade_record(request, pk):
 
 
 def delete_trade_record(request, pk):
+
     trade_record = TradeData.objects.get(id = pk)
     if request.method == 'POST':
         trade_record.delete()
