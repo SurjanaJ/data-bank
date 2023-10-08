@@ -1,12 +1,5 @@
-from os import path
-
-from django.http import HttpResponse
+from django.urls import include, path
 from . import views
-
-
-def display_tables(request):
-    return HttpResponse('success')
-
 urlpatterns = [
-    path('',views.display_tables,name='display_tables'),
+    path('', views.view_trade_table, name='view_trade_table')
 ]

@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.db.models import Q
 from django.core.paginator import Paginator, Page
-from datetime import datetime
+
 
 from .forms import UploadTradeData, UploadTradeForm
 from .models import HS_Code_meta, TradeData, Country_meta, TradersName_ExporterImporter_meta, Unit_meta
@@ -80,7 +80,6 @@ def upload_trade_excel(request):
                 HS_Code = row['HS_Code']
                 Unit = row['Unit']
                 TradersName_ExporterImporter = row['TradersName_ExporterImporter']
-                excel_year = row['Calender']
 
                 try:
                     Country = Country_meta.objects.get(Country_Name=Country)
@@ -94,21 +93,20 @@ def upload_trade_excel(request):
                 # Create a TradeData instance and set the 'Country_Name' field
                 trade_data = TradeData(
                     Trade_Type=row['Trade_Type'],
-                    Calender = datetime(excel_year, 1, 1),
+                    Calender = row['Calender'],
                     Fiscal_Year = row['Fiscal_Year'],
-                    Month_Duration = row['Duration'],
-                    Country=Country,
+                    Duration = row['Duration'],
+                    Country_Name=Country_Name,
                     HS_Code=HS_Code,
-                    Product_Information = row['Product_Information'],
                     Unit=Unit,
                     Quantity=row['Quantity'],
                     Currency_Type = row['Currency_Type'],
                     Amount =row['Amount'],
                     Tarrif= row['Tarrif'],
                     Origin_Destination= row['Origin_Destination'],
-                    TradersName_ExporterImporter = row['TradersName_ExporterImporter'],
-                    DocumentsLegalProcedural = row['DocumentsLegalProcedural'],
-                    
+                    TradersName_ExporterImporter = TradersName_ExporterImporter,
+                    Documents = row['Documents'],
+                    Product_Information = row['Product_Information'],
                 )
                 trade_data.save()
         
