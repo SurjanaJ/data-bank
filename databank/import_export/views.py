@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.db.models import Q
 from django.core.paginator import Paginator, Page
-
+from datetime import datetime
 
 from .forms import UploadTradeData, UploadTradeForm
 from .models import HS_Code_meta, TradeData, Country_meta, TradersName_ExporterImporter_meta, Unit_meta
@@ -80,6 +80,7 @@ def upload_trade_excel(request):
                 HS_Code = row['HS_Code']
                 Unit = row['Unit']
                 TradersName_ExporterImporter = row['TradersName_ExporterImporter']
+                excel_year = row['Calender']
 
                 try:
                     Country_Name = Country_meta.objects.get(Country_Name=Country_Name)
@@ -93,11 +94,12 @@ def upload_trade_excel(request):
                 # Create a TradeData instance and set the 'Country_Name' field
                 trade_data = TradeData(
                     Trade_Type=row['Trade_Type'],
-                    Calender = row['Calender'],
+                    Calender = datetime(excel_year, 1, 1),
                     Fiscal_Year = row['Fiscal_Year'],
-                    Duration = row['Duration'],
-                    Country_Name=Country_Name,
+                    Month_Duration = row['Duration'],
+                    Country=Country_Name,
                     HS_Code=HS_Code,
+                    Product_Information = row['Product_Information'],
                     Unit=Unit,
                     Quantity=row['Quantity'],
                     Currency_Type = row['Currency_Type'],
@@ -105,8 +107,8 @@ def upload_trade_excel(request):
                     Tarrif= row['Tarrif'],
                     Origin_Destination= row['Origin_Destination'],
                     TradersName_ExporterImporter = TradersName_ExporterImporter,
-                    Documents = row['Documents'],
-                    Product_Information = row['Product_Information'],
+                    DocumentsLegalProcedural = row['Documents'],
+                    
                 )
                 trade_data.save()
         
