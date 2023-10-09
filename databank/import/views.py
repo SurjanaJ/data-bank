@@ -4,6 +4,7 @@ from .forms import UploadCountryMetaForm, UploadTradeDataForm, UploadUnitMetaFor
 import pandas as pd
 from .models import Country_meta, TradeData, Unit_meta, HS_Code_meta
 
+# Create your views here.
 def display_trade_table(request):
     return render(request,'import/display_trade_table.html')
 
