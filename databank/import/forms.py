@@ -10,6 +10,3 @@ class UploadUnitMetaForm(forms.Form):
 
 class UploadHSCodeMetaForm(forms.Form):
     hs_code_meta_file = forms.FileField()
-
-class UploadTradeDataForm(forms.Form):
-    tradeData_file = forms.FileField()
