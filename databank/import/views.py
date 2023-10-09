@@ -1,8 +1,5 @@
 from django.http import HttpResponse
 from django.shortcuts import render
-from .forms import UploadCountryMetaForm, UploadTradeDataForm, UploadUnitMetaForm, UploadHSCodeMetaForm
-import pandas as pd
-from .models import Country_meta, TradeData, Unit_meta, HS_Code_meta
 
 # Create your views here.
 def display_trade_table(request):
