@@ -96,7 +96,7 @@ def upload_trade_excel(request):
                     Calender = row['Calender'],
                     Fiscal_Year = row['Fiscal_Year'],
                     Duration = row['Duration'],
-                    Country_Name=Country_Name,
+                    Country_Name=Country,
                     HS_Code=HS_Code,
                     Unit=Unit,
                     Quantity=row['Quantity'],
