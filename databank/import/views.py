@@ -1,8 +1,8 @@
 from django.http import HttpResponse
 from django.shortcuts import render
-from .forms import UploadCountryMetaForm, UploadUnitMetaForm
+from .forms import UploadCountryMetaForm, UploadUnitMetaForm, UploadHSCodeMetaForm
 import pandas as pd
-from .models import Country_meta, Unit_meta
+from .models import Country_meta, Unit_meta, HS_Code_meta
 
 def display_trade_table(request):
     return render(request,'import/display_trade_table.html')
@@ -47,4 +47,24 @@ def upload_unit_meta_excel(request):
             return HttpResponse('success')
     else:
         form = UploadUnitMetaForm()
+    return render(request, 'import/upload_form.html', {'form':form})
+
+def upload_hs_code_meta_excel(request):
+    if request.method =='POST':
+        form = UploadHSCodeMetaForm(request.POST, request.FILES)
+        if form.is_valid():
+            excel_data = request.FILES['hs_code_meta_file']
+            df = pd.read_excel(excel_data)
+
+            for index,row in df.iterrows():
+                hs_code_meta = HS_Code_meta(
+                    HS_Code = row['HS_Code'],
+                    Product_Information = row['Product_Information']
+                )
+
+                hs_code_meta.save()
+
+            return HttpResponse('success')
+    else:
+        form = UploadHSCodeMetaForm()
     return render(request, 'import/upload_form.html', {'form':form})

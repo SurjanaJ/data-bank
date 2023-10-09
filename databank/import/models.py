@@ -21,11 +21,11 @@ class HS_Code_meta(models.Model):
 
 class Unit_meta(models.Model):
     id = models.IntegerField(primary_key=True, unique=True, editable=False)
-    Unit_Code = models.CharField(max_length=50, null=True, blank=True)
-    Unit_Name = models.CharField(max_length=200)
+    Unit_Code = models.CharField(max_length=50)
+    Unit_Name = models.CharField(max_length=200, null=True, blank=True)
 
     def __str__(self):
-        return self.Unit_Name
+        return self.Unit_Code
     
 class TradersName_ExporterImporter_meta(models.Model):
     id = models.IntegerField(primary_key=True, unique=True, editable=False)
@@ -33,3 +33,5 @@ class TradersName_ExporterImporter_meta(models.Model):
 
     def __str__(self):
         return self.Name
+    
+
