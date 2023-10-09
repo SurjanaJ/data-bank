@@ -1,4 +1,9 @@
 {% extends 'main.html' %}
 {% block content %}
 <div class="display-5">Hello</div>
+
+<a href="{% url 'upload_country_meta_excel' %}">Upload Country Meta</a>
+<br>
+<a href="{% url 'upload_unit_meta_excel' %}">Upload Unit Meta</a>
+
 {% endblock  %}
