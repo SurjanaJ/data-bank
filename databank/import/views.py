@@ -10,7 +10,20 @@ from .forms import UploadCountryMetaForm, UploadHSCodeMetaForm, UploadTradeDataF
 # Create your views here.
 def display_trade_table(request):
     data = TradeData.objects.all()
-    return render(request, 'import/display_trade_table.html',{'data':data})
+    country_categories = Country_meta.objects.all()
+    unit_categories = Unit_meta.objects.all()
+    hs_codes = HS_Code_meta.objects.all()
+    trade_type_categories = [choice[1] for choice in TradeData.TRADE_OPTIONS]
+    
+    country_category = request.GET.get('country_category')
+    unit_category = request.GET.get('unit_category')
+    hs_code = request.GET.get('hs_code')
+    trade_type = request.GET.get('trade_type')
+    
+
+    context = {'data':data, 'country_categories':country_categories, 'unit_categories':unit_categories,'hs_codes':hs_codes, 'trade_type_categories':trade_type_categories}
+
+    return render(request, 'import/display_trade_table.html',context)
 
 def upload_country_meta_excel(request):
     if request.method =='POST':
@@ -122,3 +135,13 @@ def upload_trade_excel(request):
 
     return render(request, 'import/upload_form.html', {'form':form})
         
+def time_series_analysis(request):
+    data = TradeData.objects.all()
+    country_categories = Country_meta.objects.all()
+    unit_categories = Unit_meta.objects.all()
+    hs_codes = HS_Code_meta.objects.all()
+    trade_type_categories = [choice[1] for choice in TradeData.TRADE_OPTIONS]
+
+    context = {'data':data, 'country_categories':country_categories, 'unit_categories':unit_categories,'hs_codes':hs_codes, 'trade_type_categories':trade_type_categories}
+
+    return render(request, 'import/time_series.html',context)

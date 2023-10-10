@@ -1,0 +1,119 @@
+{% extends 'main.html' %}
+{% block content %}
+
+<button class="btn btn-primary btn-sm px-4" data-bs-toggle="collapse" data-bs-target="#collapseFilter"
+aria-expanded="false" aria-controls="collapseFilter">Filters</button>
+
+
+<div class="bg-light mt-2">
+<div class="collapse shadow rounded-2 p-3 " id="collapseFilter">
+    <form action="." class="row px-3  fw-normal" method="GET">
+
+        <div class="row col-6">
+            <label class="col-form-label text-end  col-sm-3" for="hs_code">HS Code</label>
+            <div class="col-md-9">
+                <select id="hs_code" class="form-select form-select-sm" name="hs_code">
+                    <option selected>--</option>
+                    {% for hs_code in hs_codes %}
+                    <option value="{{hs_code.id }}">{{hs_code}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="row col-6">
+            <label class="col-form-label text-end  col-sm-3" for="country_category">Country</label>
+            <div class="col-md-9">
+                <select id="country_category" class="form-select form-select-sm" name="country_category">
+                    <option selected>--</option>
+                    {% for country_category in country_categories %}
+                    <option value="{{country_category.id }}">{{country_category}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="row col-6">
+            <label class="col-form-label text-end col-sm-3" for="trade_type">Trade Type</label>
+            <div class="col-md-9"><select id="trade_type" class="form-select form-select-sm" name="trade_type">
+                    <option selected>--</option>
+                    {% for trade_type in trade_type_categories %}
+                    <option value="{{trade_type}}">{{trade_type}}</option>
+                    {% endfor %}
+                </select></div>
+        </div>
+        <button type="submit" class="btn btn-primary col-1 btn-sm ">Search</button>
+    </form>
+
+</div>
+</div>
+
+<div class="fs-5 mt-4 fw-bold text-center">List of products exported by Nepal in 2022</div>
+
+<div class="table-responsive mt-4 bg-light p-3">
+    <table class="table table-striped table-bordered table-sm ">
+        <thead>
+            <tr>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Trade_Types</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Calender</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Fiscal_Year</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Duration</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Country_Name</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">HS_Code</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Unit</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Quantity</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Currency_Type</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Amount</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Tarrif</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Origin_Destination</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">TradersName_ExporterImporter</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Documents</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Product_Information</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody class="table-hover">
+            {% for record in data %}
+            <tr>
+
+                <td> {{ record.Trade_Type }}
+                </td>
+                <td> {{ record.Calender }}
+                </td>
+                <td>{{ record.Fiscal_Year }}
+                </td>
+                <td>{{ record.Duration }}
+                </td>
+                <td>{{ record.Country }}
+                </td>
+                <td>{{ record.HS_Code }}</td>
+                <td>{{ record.Unit }}</td>
+                <td>{{ record.Quantity }}
+                </td>
+                <td>{{ record.Currency_Type }}</td>
+                <td>{{ record.Amount }}</td>
+                <td>{{ record.Tarrif }}</td>
+                <td>{{ record.Origin_Destination }}</td>
+                <td>{{ record.TradersName_ExporterImporter }}
+                </td>
+                <td>{{ record.DocumentsLegalProcedural }}
+                </td>
+                <td class="d-flex">
+                    <div class="btn btn-outline-danger ">
+                        <a class="styled-link" href="{% url 'delete_trade_record' record.id %}">Delete</a>
+                    </div>
+
+
+                    <div class="btn btn-outline-primary">
+                        <a class="styled-link" href="{% url 'update_trade_record' record.id %}">Edit</a>
+
+                    </div>
+                </td>
+            </tr>
+
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock content %}
