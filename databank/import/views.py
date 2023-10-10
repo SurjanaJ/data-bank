@@ -9,7 +9,8 @@ from .forms import UploadCountryMetaForm, UploadHSCodeMetaForm, UploadTradeDataF
 
 # Create your views here.
 def display_trade_table(request):
-    return render(request,'import/display_trade_table.html')
+    data = TradeData.objects.all()
+    return render(request, 'import/display_trade_table.html',{'data':data})
 
 def upload_country_meta_excel(request):
     if request.method =='POST':
@@ -95,6 +96,7 @@ def upload_trade_excel(request):
                 except (Country_meta.DoesNotExist, HS_Code_meta.DoesNotExist, Unit_meta.DoesNotExist):
                     return HttpResponse('could not upload the file.')
                 
+
                 trade_data = TradeData(
                     Trade_Type=row['Trade_Type'],
                     Calender = datetime.date(Calender,1,1),

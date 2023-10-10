@@ -1,12 +1,72 @@
 {% extends 'main.html' %}
 {% block content %}
 
-<a href="{% url 'upload_country_meta_excel' %}">Upload Country Meta</a>
-<br>
-<a href="{% url 'upload_unit_meta_excel' %}">Upload Unit Meta</a>
-<br>
-<a href="{% url 'upload_hs_code_meta_excel' %}">Upload HS Code Meta</a>
-<br>
-<a href="{% url 'upload_trade_excel' %}">Upload Trade Data</a>
+
+
+<div class="table-responsive mt-4 bg-light p-3">
+    <table class="table table-striped table-bordered table-sm ">
+        <thead>
+            <tr>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Trade_Types</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Calender</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Fiscal_Year</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Duration</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Country_Name</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">HS_Code</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Unit</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Quantity</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Currency_Type</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Amount</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Tarrif</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Origin_Destination</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">TradersName_ExporterImporter</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Documents</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Product_Information</th>
+                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody class="table-hover">
+            {% for record in data %}
+            <tr>
+
+                <td> {{ record.Trade_Type }}
+                </td>
+                <td> {{ record.Calender }}
+                </td>
+                <td>{{ record.Fiscal_Year }}
+                </td>
+                <td>{{ record.Duration }}
+                </td>
+                <td>{{ record.Country }}
+                </td>
+                <td>{{ record.HS_Code }}</td>
+                <td>{{ record.Unit }}</td>
+                <td>{{ record.Quantity }}
+                </td>
+                <td>{{ record.Currency_Type }}</td>
+                <td>{{ record.Amount }}</td>
+                <td>{{ record.Tarrif }}</td>
+                <td>{{ record.Origin_Destination }}</td>
+                <td>{{ record.TradersName_ExporterImporter }}
+                </td>
+                <td>{{ record.DocumentsLegalProcedural }}
+                </td>
+                <td class="d-flex">
+                    <div class="btn btn-outline-danger ">
+                        <a class="styled-link" href="{% url 'delete_trade_record' record.id %}">Delete</a>
+                    </div>
+
+
+                    <div class="btn btn-outline-primary">
+                        <a class="styled-link" href="{% url 'update_trade_record' record.id %}">Edit</a>
+
+                    </div>
+                </td>
+            </tr>
+
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 {% endblock  %}
