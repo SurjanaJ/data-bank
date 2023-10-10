@@ -1,9 +1,11 @@
+
+import datetime
 from django.http import HttpResponse
 from django.shortcuts import render
 import pandas as pd
 
-from .models import Country_meta, HS_Code_meta,  Unit_meta
-from .forms import UploadCountryMetaForm, UploadHSCodeMetaForm, UploadUnitMetaForm
+from .models import Country_meta, HS_Code_meta, TradeData,  Unit_meta
+from .forms import UploadCountryMetaForm, UploadHSCodeMetaForm, UploadTradeDataForm, UploadUnitMetaForm
 
 # Create your views here.
 def display_trade_table(request):
@@ -70,52 +72,51 @@ def upload_hs_code_meta_excel(request):
         form = UploadHSCodeMetaForm()
     return render(request, 'import/upload_form.html', {'form':form})
 
-# def upload_trade_excel(request):
-#     if request.method == 'POST':
-#         form = UploadTradeDataForm(request.POST, request.FILES )
-#         if form.is_valid():
-#             excel_data = request.FILES['tradeData_file']
-#             df = pd.read_excel(excel_data)
+def upload_trade_excel(request):
+    if request.method == 'POST':
+        form = UploadTradeDataForm(request.POST, request.FILES )
+        if form.is_valid():
+            excel_data = request.FILES['trade_data_file']
+            df = pd.read_excel(excel_data)
 
-#             for index, row in df.iterrows():
-#                 Country = row['Country']
-#                 HS_Code = row['HS_Code']
-#                 Unit = row['Unit']
-#                 Origin_Destination = row['Origin_Destination']
-
-#                 try:
-#                     Country = Country_meta.objects.get(Country_Name=Country)
-#                     HS_Code = HS_Code_meta.objects.get(HS_Code= HS_Code)
-#                     Unit = Unit_meta.objects.get(Unit_Name = Unit)
-#                     Origin_Destination = Country_meta.objects.get(Country_Name = Origin_Destination)
+            for index, row in df.iterrows():
+                Country = row['Country']
+                HS_Code = row['HS_Code']
+                Unit = row['Unit']
+                Origin_Destination = row['Origin_Destination']
+                Calender = row['Calender']
                 
-#                 except (Country_meta.DoesNotExist and HS_Code_meta.DoesNotExist  and Unit_meta.DoesNotExist ):
-#                     return HttpResponse('could not upload the file.')
-
-#                 # Create a TradeData instance and set the 'Country_Name' field
-#                 trade_data = TradeData(
-#                     Trade_Type=row['Trade_Type'],
-#                     Calender = row['Calender'],
-#                     Fiscal_Year = row['Fiscal_Year'],
-#                     Month_Duration = row['Month_Duration'],
-#                     Country=Country,
-#                     HS_Code=HS_Code,
-#                     Unit=Unit,
-#                     Quantity=row['Quantity'],
-#                     Currency_Type = row['Currency_Type'],
-#                     Amount =row['Amount'],
-#                     Tarrif= row['Tarrif'],
-#                     Origin_Destination= Origin_Destination,
-#                     TradersName_ExporterImporter = row['TradersName_ExporterImporter'],
-#                     DocumentsLegalProcedural = row['DocumentsLegalProcedural'],
-#                     Product_Information = row['Product_Information'],
-#                 )
-#                 trade_data.save()
+                try:
+                    Country = Country_meta.objects.get(Country_Name=Country)
+                    HS_Code = HS_Code_meta.objects.get(HS_Code= HS_Code)
+                    Unit = Unit_meta.objects.get(Unit_Code = Unit)
+                    Origin_Destination = Country_meta.objects.get(Country_Name = Origin_Destination)
+                
+                except (Country_meta.DoesNotExist, HS_Code_meta.DoesNotExist, Unit_meta.DoesNotExist):
+                    return HttpResponse('could not upload the file.')
+                
+                trade_data = TradeData(
+                    Trade_Type=row['Trade_Type'],
+                    Calender = datetime.date(Calender,1,1),
+                    Fiscal_Year = row['Fiscal_Year'],
+                    Duration = row['Duration'],
+                    Country=Country,
+                    HS_Code=HS_Code,
+                    Unit=Unit,
+                    Quantity=row['Quantity'],
+                    Currency_Type = row['Currency_Type'],
+                    Amount =row['Amount'],
+                    Tarrif= row['Tarrif'],
+                    Origin_Destination= Origin_Destination,
+                    TradersName_ExporterImporter = row['TradersName_ExporterImporter'],
+                    DocumentsLegalProcedural = row['DocumentsLegalProcedural']
+                )
+                trade_data.save()
         
-#             return HttpResponse('success')
+            return HttpResponse('success')
 
-#     else:
-#         form= UploadTradeDataForm()
+    else:
+        form= UploadTradeDataForm()
 
-#     return render(request, 'import/upload_form.html', {'form':form})
+    return render(request, 'import/upload_form.html', {'form':form})
         

@@ -37,7 +37,7 @@ class TradeData(models.Model):
     Trade_Type = models.CharField(max_length=100, choices=TRADE_OPTIONS, null=True, blank=True) 
     Calender = models.DateField(null=True, blank=True)
     Fiscal_Year = models.CharField(max_length=10, null=True, blank=True)
-    Month_Duration = models.CharField(max_length=100, null=True, blank=True)
+    Duration = models.CharField(max_length=100, null=True, blank=True)
     Country = models.ForeignKey(Country_meta, on_delete=models.CASCADE, related_name='tradedata_country')
     HS_Code = models.ForeignKey(HS_Code_meta, on_delete=models.CASCADE)
     Unit = models.ForeignKey(Unit_meta, on_delete=models.CASCADE)
@@ -51,4 +51,4 @@ class TradeData(models.Model):
     
 
     def __str__(self):
-        return (str(self.id) + self.Product_Information)
+        return (str(self.id))
