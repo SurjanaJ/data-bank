@@ -3,6 +3,7 @@ import datetime
 from django.http import HttpResponse
 from django.shortcuts import render
 import pandas as pd
+from django.db.models import Sum
 
 from .models import Country_meta, HS_Code_meta, TradeData,  Unit_meta
 from .forms import UploadCountryMetaForm, UploadHSCodeMetaForm, UploadTradeDataForm, UploadUnitMetaForm
@@ -136,12 +137,50 @@ def upload_trade_excel(request):
     return render(request, 'import/upload_form.html', {'form':form})
         
 def time_series_analysis(request):
+
+    # Filter categories
     data = TradeData.objects.all()
     country_categories = Country_meta.objects.all()
     unit_categories = Unit_meta.objects.all()
     hs_codes = HS_Code_meta.objects.all()
     trade_type_categories = [choice[1] for choice in TradeData.TRADE_OPTIONS]
 
-    context = {'data':data, 'country_categories':country_categories, 'unit_categories':unit_categories,'hs_codes':hs_codes, 'trade_type_categories':trade_type_categories}
+# get filter categories set by user
+    country_category = request.GET.get('country_category')
+    hs_code = request.GET.get('hs_code')
+    trade_type = request.GET.get('trade_type')
+
+
+    # Group by Origin_Destination and year, and calculate the total amount
+    total_amount_by_origin_destination = TradeData.objects.values(
+        'Origin_Destination__Country_Name',
+        'Calender__year'
+    ).annotate(
+        total_amount=Sum('Amount')
+    )
+    years = set()
+    result_dict = {}
+
+
+    for item in total_amount_by_origin_destination:
+        origin_destination = item['Origin_Destination__Country_Name']
+        year = item['Calender__year']
+        total_amount = item['total_amount']
+
+        if origin_destination not in result_dict:
+            result_dict[origin_destination] = {}
+
+        result_dict[origin_destination][year] = total_amount
+        years.add(year)
+
+    sorted_years = sorted(list(years), reverse=True)
+
+
+    for origin_destination, year_data in result_dict.items():
+        result_dict[origin_destination] = dict(sorted(year_data.items(), key=lambda x: x[0], reverse=True))
+
+
+    context = {'data':data, 'country_categories':country_categories, 'unit_categories':unit_categories,'hs_codes':hs_codes, 'trade_type_categories':trade_type_categories, 'total_amount_by_origin_destination': result_dict,
+               'years':sorted_years}
 
     return render(request, 'import/time_series.html',context)
