@@ -30,6 +30,8 @@ def display_table(request):
     hs_code = request.GET.get('hs_code')
     trade_type = request.GET.get('trade_type')
     
+   
+
     if is_valid_queryparam(currency_product_originDestination_query):
         data = data.filter(
             Q(Currency_Type__icontains = currency_product_originDestination_query) | Q(Product_Information__icontains = currency_product_originDestination_query) | Q(Origin_Destination__icontains = currency_product_originDestination_query) ).distinct()
