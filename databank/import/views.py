@@ -178,11 +178,13 @@ def time_series_analysis(request):
     result_country = {}
 
     for item in total_amount_by_origin_destination:
+        year = item['Calender__year']
+        years.add(year)
+
+    for item in total_amount_by_origin_destination:
         origin_destination = item['Origin_Destination__Country_Name']
         year = item['Calender__year']
         total_amount = item['total_amount']
-        years.add(year)
-
         
         if origin_destination not in result_country:
             result_country[origin_destination] = {}
