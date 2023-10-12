@@ -145,7 +145,6 @@ def upload_trade_excel(request):
 
 
 def time_series_analysis(request):
-
     # Filter categories
     data = TradeData.objects.all()
     country_categories = Country_meta.objects.all()
@@ -153,6 +152,7 @@ def time_series_analysis(request):
     hs_codes = HS_Code_meta.objects.all()
     trade_type_categories = [choice[1] for choice in TradeData.TRADE_OPTIONS]
 
+    print('!!!!!!!!!!!!!!!!!!',request.GET.get('country_category') )
     # get filter categories set by user
     country_category = request.GET.get('country_category')
     hs_code = request.GET.get('hs_code')
@@ -215,3 +215,78 @@ def time_series_analysis(request):
                'years':sorted_years}
 
     return render(request, 'import/time_series.html', context)
+
+# def time_series_analysis_commodity(request):
+#     data = TradeData.objects.all()
+#     country_categories = Country_meta.objects.all()
+#     unit_categories = Unit_meta.objects.all()
+#     hs_codes = HS_Code_meta.objects.all()
+#     trade_type_categories = [choice[1] for choice in TradeData.TRADE_OPTIONS]
+
+#      # get filter categories set by user
+#     country_category = request.GET.get('country_category')
+#     hs_code = request.GET.get('hs_code')
+#     trade_type = request.GET.get('trade_type')
+
+#     if is_valid_queryparam(country_category) and country_category != '--':
+#         data = data.filter(Origin_Destination_id=country_category)
+
+#     if is_valid_queryparam(hs_code) and hs_code != '--':
+#         data = data.filter(HS_Code_id=hs_code)
+
+#     if is_valid_queryparam(trade_type) and trade_type != '--':
+#         data = data.filter(Trade_Type=trade_type)
+
+
+#     total_amount_by_commodity = data.values(
+#         'Origin_Destination__Country_Name',
+#         'Calender__year',
+#         'HS_Code_id__HS_Code'
+#     ).annotate(
+#         total_amount = Sum('Amount')
+#     )
+
+#     years = set()
+#     result = {}
+
+#     for item in total_amount_by_commodity:
+#         year = item['Calender__year']
+#         years.add(year)
+
+#     for item in total_amount_by_commodity:
+#         origin_destination = item['Origin_Destination__Country_Name']
+#         hs_code = item['HS_Code_id__HS_Code']
+#         year = item['Calender__year']
+#         total_amount = item['total_amount']
+#         years.add(year)
+
+#         if hs_code not in result:
+#             result[hs_code] = {}
+
+#         if origin_destination not in result:
+#             result[origin_destination] ={}
+        
+#         for y in years:
+#             result[origin_destination][hs_code][y] = 0
+        
+       
+
+#     for item in total_amount_by_commodity:
+#         origin_destination = item['Origin_Destination__Country_Name']
+#         hs_code = item['HS_Code_id__HS_Code']
+#         year = item['Calender__year']
+#         total_amount = item['total_amount']
+#         result[origin_destination][year] = total_amount
+
+#     sorted_years = sorted(list(years), reverse=True)
+
+    
+
+#     for origin_destination, year_data in result.items():
+#         result[origin_destination] = dict(
+#             sorted(year_data.items(), key=lambda x: x[0], reverse=True))
+   
+
+#     context = {'data':data, 'country_categories':country_categories, 'unit_categories':unit_categories,'hs_codes':hs_codes, 'trade_type_categories':trade_type_categories, 'result': result,
+#                'years':sorted_years}
+#     return render(request, 'import/time_series_commodity.html', context)
