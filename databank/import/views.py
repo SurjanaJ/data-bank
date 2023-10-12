@@ -155,6 +155,18 @@ def find_country_name(country_category):
         else:
             country_instance = 'All Countries'
         return country_instance
+    
+def find_hs_code(hs_code):
+    if hs_code == '--':
+        return("All Commodities")
+    else:
+        hs_codes = HS_Code_meta.objects.all()
+        hs_code_instance = hs_codes.filter(id = hs_code).first()
+        if hs_code_instance:
+            hs_code_instance = hs_code_instance.HS_Code
+        else:
+            hs_code_instance = 'All Commodities'
+        return hs_code_instance
 
 def time_series_analysis(request):
     # Filter categories
@@ -170,7 +182,7 @@ def time_series_analysis(request):
     trade_type = request.GET.get('trade_type')
 
     display_country = find_country_name(country_category)
-    
+    display_hs_code = find_hs_code(hs_code)
 
     if is_valid_queryparam(country_category) and country_category != '--':
         data = data.filter(Origin_Destination_id=country_category)
@@ -235,7 +247,7 @@ def time_series_analysis(request):
         
 
     context = {'data':data, 'country_categories':country_categories, 'unit_categories':unit_categories,'hs_codes':hs_codes, 'trade_type_categories':trade_type_categories, 'result_country': result_country,'result_hs_code': result_hs_code,
-               'years':sorted_years, 'display_country':display_country }
+               'years':sorted_years, 'display_country':display_country, 'display_hs_code':display_hs_code }
 
     return render(request, 'import/time_series.html', context)
 
