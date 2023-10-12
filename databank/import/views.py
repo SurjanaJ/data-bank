@@ -8,11 +8,7 @@ from django.db.models import Sum
 from .models import Country_meta, HS_Code_meta, TradeData,  Unit_meta
 from .forms import UploadCountryMetaForm, UploadHSCodeMetaForm, UploadTradeDataForm, UploadUnitMetaForm
 
-
-def is_valid_queryparam(param):
-    return param != '' and param is not None
-
-
+# Create your views here.
 def display_trade_table(request):
     data = TradeData.objects.all()
     country_categories = Country_meta.objects.all()
@@ -150,6 +146,7 @@ def time_series_analysis(request):
     # Filter categories
     data = TradeData.objects.all()
     country_categories = Country_meta.objects.all()
+    unit_categories = Unit_meta.objects.all()
     hs_codes = HS_Code_meta.objects.all()
     trade_type_categories = [choice[1] for choice in TradeData.TRADE_OPTIONS]
 
@@ -168,7 +165,7 @@ def time_series_analysis(request):
         data = data.filter(Trade_Type=trade_type)
 
     # Group by Origin_Destination and year, and calculate the total amount
-    total_amount_by_origin_destination = data.values(
+    total_amount_by_origin_destination = TradeData.objects.values(
         'Origin_Destination__Country_Name',
         'Calender__year',
     ).annotate(
@@ -238,13 +235,7 @@ def time_series_analysis(request):
             sorted(year_data.items(), key=lambda x: x[0], reverse=True))
 
 
-    context = {
-        'data': data,
-        'country_categories': country_categories,
-        'hs_codes': hs_codes, 
-        'trade_type_categories': trade_type_categories, 'result_country': result_country, 
-        'result_hs_code': result_hs_code,
-        'years': sorted_years, 
-        'hs_code': hs_code}
+    context = {'data':data, 'country_categories':country_categories, 'unit_categories':unit_categories,'hs_codes':hs_codes, 'trade_type_categories':trade_type_categories, 'total_amount_by_origin_destination': result_dict,
+               'years':sorted_years}
 
     return render(request, 'import/time_series.html', context)
