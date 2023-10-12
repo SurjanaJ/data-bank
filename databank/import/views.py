@@ -144,6 +144,18 @@ def upload_trade_excel(request):
     return render(request, 'import/upload_form.html', {'form': form})
 
 
+def find_country_name(country_category):
+    if country_category == '--':
+        return('All Countries')
+    else:
+        country_categories = Country_meta.objects.all()
+        country_instance = country_categories.filter(id  = country_category).first()
+        if country_instance:
+            country_instance = country_instance.Country_Name
+        else:
+            country_instance = 'All Countries'
+        return country_instance
+
 def time_series_analysis(request):
     # Filter categories
     data = TradeData.objects.all()
@@ -156,6 +168,9 @@ def time_series_analysis(request):
     country_category = request.GET.get('country_category')
     hs_code = request.GET.get('hs_code')
     trade_type = request.GET.get('trade_type')
+
+    display_country = find_country_name(country_category)
+    
 
     if is_valid_queryparam(country_category) and country_category != '--':
         data = data.filter(Origin_Destination_id=country_category)
@@ -220,7 +235,7 @@ def time_series_analysis(request):
         
 
     context = {'data':data, 'country_categories':country_categories, 'unit_categories':unit_categories,'hs_codes':hs_codes, 'trade_type_categories':trade_type_categories, 'result_country': result_country,'result_hs_code': result_hs_code,
-               'years':sorted_years}
+               'years':sorted_years, 'display_country':display_country }
 
     return render(request, 'import/time_series.html', context)
 
