@@ -152,8 +152,7 @@ def time_series_analysis(request):
     hs_codes = HS_Code_meta.objects.all()
     trade_type_categories = [choice[1] for choice in TradeData.TRADE_OPTIONS]
 
-    print('!!!!!!!!!!!!!!!!!!',request.GET.get('country_category') )
-    # get filter categories set by user
+# get filter categories set by user
     country_category = request.GET.get('country_category')
     hs_code = request.GET.get('hs_code')
     trade_type = request.GET.get('trade_type')
@@ -177,12 +176,7 @@ def time_series_analysis(request):
 
     years = set()
     result_country = {}
-   
-    for item in total_amount_by_origin_destination:
-        year = item['Calender__year']
-        years.add(year)
 
-    
     for item in total_amount_by_origin_destination:
         origin_destination = item['Origin_Destination__Country_Name']
         year = item['Calender__year']
