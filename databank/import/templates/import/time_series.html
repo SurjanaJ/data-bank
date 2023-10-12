@@ -2,22 +2,20 @@
 {% block content %}
 
 
-{{result_country}}
-
 <button class="btn btn-primary btn-sm px-4" data-bs-toggle="collapse" data-bs-target="#collapseFilter"
     aria-expanded="false" aria-controls="collapseFilter">Filters</button>
 
 
 <div class="bg-light mt-2">
     <div class="collapse shadow rounded-2 p-3 " id="collapseFilter">
-        <form action="." class="row px-3  fw-normal" method="GET">
+        <form action="./time_series_analysis" class="row px-3  fw-normal" method="GET">
             <div class="row col-6">
                 <label class="col-form-label text-end  col-sm-3" for="hs_code">HS Code</label>
                 <div class="col-md-9">
                     <select id="hs_code" class="form-select form-select-sm" name="hs_code">
                         <option selected>--</option>
                         {% for hs_code in hs_codes %}
-                        <option value="{{hs_code }}">{{hs_code}}</option>
+                        <option value="{{hs_code.id }}">{{hs_code}}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -50,7 +48,7 @@
     </div>
 </div>
 
-<div class="fs-5 my-4 fw-bold text-center">List </div>
+<div class="fs-5 my-4 fw-bold text-center">List for  </div>
 
 
 
