@@ -169,6 +169,7 @@ def time_series_analysis(request):
     # Group by Origin_Destination and year, and calculate the total amount
     total_amount_by_origin_destination = data.values(
         'Origin_Destination__Country_Name',
+        'HS_Code_id__HS_Code',
         'Calender__year',
     ).annotate(
         total_amount=Sum('Amount')
@@ -176,6 +177,7 @@ def time_series_analysis(request):
 
     years = set()
     result_country = {}
+    result_hs_code = {}
 
     for item in total_amount_by_origin_destination:
         year = item['Calender__year']
@@ -183,21 +185,28 @@ def time_series_analysis(request):
 
     for item in total_amount_by_origin_destination:
         origin_destination = item['Origin_Destination__Country_Name']
+        hs_code = item['HS_Code_id__HS_Code']
         year = item['Calender__year']
         total_amount = item['total_amount']
         
         if origin_destination not in result_country:
             result_country[origin_destination] = {}
         
+        if hs_code not in result_hs_code:
+            result_hs_code[hs_code] = {}
+        
         for y in years:
             result_country[origin_destination][y] = 0
+            result_hs_code[hs_code][y] = 0
         
     
     for item in total_amount_by_origin_destination:
         origin_destination = item['Origin_Destination__Country_Name']
+        hs_code = item['HS_Code_id__HS_Code']
         year = item['Calender__year']
         total_amount = item['total_amount']
         result_country[origin_destination][year] = total_amount
+        result_hs_code[hs_code][year] =total_amount
         
 
     sorted_years = sorted(list(years), reverse=True)
@@ -206,8 +215,11 @@ def time_series_analysis(request):
         result_country[origin_destination] = dict(
             sorted(year_data.items(), key=lambda x: x[0], reverse=True))
         
+    for hs_code, year_data in result_hs_code.items():
+        result_hs_code[hs_code] = dict(sorted(year_data.items(), key=lambda x: x[0], reverse=True))
+        
 
-    context = {'data':data, 'country_categories':country_categories, 'unit_categories':unit_categories,'hs_codes':hs_codes, 'trade_type_categories':trade_type_categories, 'result_country': result_country,
+    context = {'data':data, 'country_categories':country_categories, 'unit_categories':unit_categories,'hs_codes':hs_codes, 'trade_type_categories':trade_type_categories, 'result_country': result_country,'result_hs_code': result_hs_code,
                'years':sorted_years}
 
     return render(request, 'import/time_series.html', context)
