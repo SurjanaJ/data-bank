@@ -2,6 +2,7 @@
 {% block content %}
 
 
+{{result_country}}
 
 <button class="btn btn-primary btn-sm px-4" data-bs-toggle="collapse" data-bs-target="#collapseFilter"
     aria-expanded="false" aria-controls="collapseFilter">Filters</button>
@@ -52,34 +53,7 @@
 <div class="fs-5 my-4 fw-bold text-center">List </div>
 
 
-{% if request.GET.hs_code != '--' and request.GET.hs_code != None %}
-<div class="table-responsive mt- bg-light p-3">
-    <table class="table table-striped table-bordered table-sm">
-        <thead class="">
-            <tr>
-                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
-                    Importers
-                </th>
-                {% for year in years %}
-                <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Amount in Year {{year}} </th>
-                {% endfor %}
-            </tr>
-        </thead>
-        <tbody class="table-hover">
-            {% for hs_code, year_data in result_hs_code.items %}
-            <tr>
-                <td>{{ hs_code }}</td>
-                {% for year, total_amount in year_data.items %}
-                <td>{{ total_amount }}</td>
-                {% endfor %}
-            </tr>
-            {% endfor %}
 
-            
-        </tbody>
-    </table>
-</div>
-{% else %}
 <div class="table-responsive mt- bg-light p-3">
     <table class="table table-striped table-bordered table-sm">
         <thead class="">
@@ -106,7 +80,7 @@
         </tbody>
     </table>
 </div>
-{% endif %}
+
 
 
 

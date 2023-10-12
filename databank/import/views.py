@@ -9,6 +9,9 @@ from .models import Country_meta, HS_Code_meta, TradeData,  Unit_meta
 from .forms import UploadCountryMetaForm, UploadHSCodeMetaForm, UploadTradeDataForm, UploadUnitMetaForm
 
 # Create your views here.
+
+def is_valid_queryparam(param):
+    return param !='' and param is not None
 def display_trade_table(request):
     data = TradeData.objects.all()
     country_categories = Country_meta.objects.all()
@@ -165,77 +168,45 @@ def time_series_analysis(request):
         data = data.filter(Trade_Type=trade_type)
 
     # Group by Origin_Destination and year, and calculate the total amount
-    total_amount_by_origin_destination = TradeData.objects.values(
+    total_amount_by_origin_destination = data.values(
         'Origin_Destination__Country_Name',
         'Calender__year',
     ).annotate(
         total_amount=Sum('Amount')
     )
 
-    total_amount_by_hs_code = data.values(
-        'Origin_Destination__Country_Name',
-        'HS_Code_id__HS_Code',
-        'Calender__year'
-    ).annotate(total_amount=Sum('Amount'))
-
     years = set()
     result_country = {}
-    result_hs_code = {}
 
     for item in total_amount_by_origin_destination:
         origin_destination = item['Origin_Destination__Country_Name']
         year = item['Calender__year']
         total_amount = item['total_amount']
+        years.add(year)
 
+        
         if origin_destination not in result_country:
             result_country[origin_destination] = {}
-
-        result_country[origin_destination][year] = total_amount
-        years.add(year)
-
-    # if hs_code !='--' or hs_code !=None:
-    #     for item in total_amount_by_hs_code:
-    #         origin_destination = item['Origin_Destination__Country_Name']
-    #         year = item['Calender__year']
-    #         total_amount = item['total_amount']
-
-    #     if origin_destination not in result_hs_code:
-    #         result_hs_code[origin_destination] = {}
-
-    #     result_hs_code[origin_destination][year]= total_amount
-    #     years.add(year)
-
-    #     for origin_destination, year_data in result_hs_code.items():
-    #         result_hs_code[origin_destination] = dict(sorted(year_data.items(), key=lambda x: x[0], reverse=True))
-
-    for item in total_amount_by_hs_code:
+        
+        for y in years:
+            result_country[origin_destination][y] = 0
+        
+    
+    for item in total_amount_by_origin_destination:
         origin_destination = item['Origin_Destination__Country_Name']
-        hs_code = item['HS_Code_id__HS_Code']
         year = item['Calender__year']
         total_amount = item['total_amount']
-
-        if hs_code not in result_hs_code:
-            result_hs_code[hs_code] = {}
-
-        result_hs_code[hs_code][origin_destination] = {}
-        result_hs_code[hs_code][origin_destination][year] = total_amount
-        years.add(year)
+        result_country[origin_destination][year] = total_amount
+        
 
     sorted_years = sorted(list(years), reverse=True)
-
-    print(result_hs_code)
-
+    
     for origin_destination, year_data in result_country.items():
         result_country[origin_destination] = dict(
             sorted(year_data.items(), key=lambda x: x[0], reverse=True))
         
-    for hs_code, origin_data in result_hs_code.items():
-        for origin_destination, year_data in origin_data.items():
-            result_hs_code[hs_code][origin_destination] = dict(
-            sorted(year_data.items(), key=lambda x: x[0], reverse=True))
 
-
-    context = {'data':data, 'country_categories':country_categories, 'unit_categories':unit_categories,'hs_codes':hs_codes, 'trade_type_categories':trade_type_categories, 'total_amount_by_origin_destination': result_dict,
+    context = {'data':data, 'country_categories':country_categories, 'unit_categories':unit_categories,'hs_codes':hs_codes, 'trade_type_categories':trade_type_categories, 'result_country': result_country,
                'years':sorted_years}
 
     return render(request, 'import/time_series.html', context)
