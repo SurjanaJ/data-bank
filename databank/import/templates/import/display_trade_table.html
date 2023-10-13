@@ -70,7 +70,7 @@
                 <select id="hs_code" class="form-control" name="hs_code">
                     <option selected>--</option>
                     {% for hs_code in hs_codes %}
-                    <option value="{{hs_code.id }}">{{hs_code}}</option>
+                    <option value="{{hs_code.id }}">{{hs_code}} -  {{hs_code.Product_Information}}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -98,6 +98,7 @@
                     <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Duration</th>
                     <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Country_Name</th>
                     <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">HS_Code</th>
+                    <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Product_Information</th>
                     <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Unit</th>
                     <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Quantity</th>
                     <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Currency_Type</th>
@@ -124,6 +125,7 @@
                     <td>{{ record.Country }}
                     </td>
                     <td>{{ record.HS_Code }}</td>
+                    <td>{{ record.HS_Code.Product_Information }}</td>
                     <td>{{ record.Unit }}</td>
                     <td>{{ record.Quantity }}
                     </td>

@@ -206,7 +206,7 @@ def find_hs_code(hs_code):
         hs_codes = HS_Code_meta.objects.all()
         hs_code_instance = hs_codes.filter(id = hs_code).first()
         if hs_code_instance:
-            hs_code_instance = hs_code_instance.HS_Code
+            hs_code_instance = hs_code_instance.HS_Code + ' - ' + hs_code_instance.Product_Information
         else:
             hs_code_instance = 'All Commodities'
         return hs_code_instance

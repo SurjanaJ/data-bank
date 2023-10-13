@@ -14,7 +14,7 @@
                     <select id="hs_code" class="form-select form-select-sm" name="hs_code">
                         <option selected>--</option>
                         {% for hs_code in hs_codes %}
-                        <option value="{{hs_code.id }}">{{hs_code}}</option>
+                        <option value="{{hs_code.id }}">{{hs_code}}-{{hs_code.Product_Information}} </option>
                         {% endfor %}
                     </select>
                 </div>
