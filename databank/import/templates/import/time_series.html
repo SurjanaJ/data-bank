@@ -71,14 +71,14 @@
         </thead>
         <tbody class="table-hover">
             {% if request.GET.country_category != '--' and  request.GET.country_category != None %}
-            <tr>
-                <th>Total Amount</th>
+            <tr class="fst-italic fw-light">
+                <td>Total Amount</td>
                 {% for item in total_amount_year %}
-                   <th> {{item.total_amount}}</th>
+                   <td> {{item.total_amount}}</td>
                 {% endfor %}
             </tr>
                 {% for hs_code, year_data in result_hs_code.items %}
-                    <tr>
+                    <tr class="text-end">
                         <td>{{ hs_code }}</td>
                         {% for year, total_amount in year_data.items %}
                         <td>{{ total_amount }}</td>
@@ -87,14 +87,14 @@
                 {% endfor %}
             
             {% else %}
-            <tr>
-                <th>Total Amount</th>
+            <tr class="fst-italic fw-light">
+                <td>Total Amount</td>
                 {% for item in total_amount_year %}
-                   <th> {{item.total_amount}}</th>
+                   <td> {{item.total_amount}}</td>
                 {% endfor %}
             </tr>
                 {% for origin_destination, year_data in result_country.items %}
-                    <tr>
+                    <tr >
                         <td>{{ origin_destination }}</td>
                         {% for year, total_amount in year_data.items %}
                         <td>{{ total_amount }}</td>
