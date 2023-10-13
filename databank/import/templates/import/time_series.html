@@ -71,6 +71,12 @@
         </thead>
         <tbody class="table-hover">
             {% if request.GET.country_category != '--' and  request.GET.country_category != None %}
+            <tr>
+                <th>Total Amount</th>
+                {% for item in total_amount_year %}
+                   <th> {{item.total_amount}}</th>
+                {% endfor %}
+            </tr>
                 {% for hs_code, year_data in result_hs_code.items %}
                     <tr>
                         <td>{{ hs_code }}</td>
@@ -81,6 +87,12 @@
                 {% endfor %}
             
             {% else %}
+            <tr>
+                <th>Total Amount</th>
+                {% for item in total_amount_year %}
+                   <th> {{item.total_amount}}</th>
+                {% endfor %}
+            </tr>
                 {% for origin_destination, year_data in result_country.items %}
                     <tr>
                         <td>{{ origin_destination }}</td>

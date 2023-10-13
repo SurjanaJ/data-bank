@@ -23,7 +23,6 @@ def display_trade_table(request):
     hs_codes = HS_Code_meta.objects.all()
     trade_type_categories = [choice[1] for choice in TradeData.TRADE_OPTIONS]
 
-    
     currency_product_originDestination_query = request.GET.get('currency_product_originDestination')
     quantity_min = request.GET.get('quantity_min')
     quantity_max = request.GET.get('quantity_max')
@@ -245,6 +244,16 @@ def time_series_analysis(request):
         total_amount=Sum('Amount')
     )
 
+# ********************Find total amount of each year*******************
+    total_amount_year = data.values(
+        'Calender__year'
+    ).annotate(
+        total_amount = Sum('Amount')
+    )
+
+    total_amount_year = total_amount_year.order_by('-Calender__year')
+# *******************************************************************
+    
     years = set()
     result_country = {}
     result_hs_code = {}
@@ -287,10 +296,10 @@ def time_series_analysis(request):
         
     for hs_code, year_data in result_hs_code.items():
         result_hs_code[hs_code] = dict(sorted(year_data.items(), key=lambda x: x[0], reverse=True))
-        
+
 
     context = {'data':data, 'country_categories':country_categories, 'unit_categories':unit_categories,'hs_codes':hs_codes, 'trade_type_categories':trade_type_categories, 'result_country': result_country,'result_hs_code': result_hs_code,
-               'years':sorted_years, 'display_country':display_country, 'display_hs_code':display_hs_code, 'queryset_length':len(total_amount_by_origin_destination) }
+               'years':sorted_years, 'display_country':display_country, 'display_hs_code':display_hs_code, 'queryset_length':len(total_amount_by_origin_destination), 'total_amount_year':total_amount_year}
 
     return render(request, 'import/time_series.html', context)
 
