@@ -1,9 +1,11 @@
-
 import datetime
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.db.models import Q
 import pandas as pd
 from django.db.models import Sum
+from django.core.paginator import Paginator, Page
+
 
 from .models import Country_meta, HS_Code_meta, TradeData,  Unit_meta
 from .forms import UploadCountryMetaForm, UploadHSCodeMetaForm, UploadTradeDataForm, UploadUnitMetaForm
@@ -12,6 +14,8 @@ from .forms import UploadCountryMetaForm, UploadHSCodeMetaForm, UploadTradeDataF
 
 def is_valid_queryparam(param):
     return param !='' and param is not None
+
+
 def display_trade_table(request):
     data = TradeData.objects.all()
     country_categories = Country_meta.objects.all()
@@ -19,13 +23,52 @@ def display_trade_table(request):
     hs_codes = HS_Code_meta.objects.all()
     trade_type_categories = [choice[1] for choice in TradeData.TRADE_OPTIONS]
 
+    
+    currency_product_originDestination_query = request.GET.get('currency_product_originDestination')
+    quantity_min = request.GET.get('quantity_min')
+    quantity_max = request.GET.get('quantity_max')
+    date_min = request.GET.get('date_min')
+    date_max = request.GET.get('date_max')
     country_category = request.GET.get('country_category')
     unit_category = request.GET.get('unit_category')
     hs_code = request.GET.get('hs_code')
     trade_type = request.GET.get('trade_type')
 
-    context = {'data': data, 'country_categories': country_categories, 'unit_categories': unit_categories,
-               'hs_codes': hs_codes, 'trade_type_categories': trade_type_categories}
+    if is_valid_queryparam(currency_product_originDestination_query):
+        data = data.filter(
+            Q(Currency_Type__icontains = currency_product_originDestination_query)  | Q(Origin_Destination__icontains = currency_product_originDestination_query) ).distinct()
+        
+    if is_valid_queryparam(quantity_min):
+        data = data.filter(Quantity__gte=quantity_min)
+
+    if is_valid_queryparam(quantity_max):
+        data = data.filter(Quantity__lt=quantity_max)
+ 
+    if is_valid_queryparam(date_min):
+        data = data.filter(Calender__gte = date_min)
+
+    if is_valid_queryparam(date_max):
+        data = data.filter(Calender__lt = date_max)
+
+    if is_valid_queryparam(country_category) and country_category != '--':
+        data = data.filter(Country=country_category)
+    
+    if is_valid_queryparam(unit_category) and unit_category != '--':
+        data = data.filter(Unit=unit_category)
+
+    if is_valid_queryparam(hs_code) and hs_code != '--':
+        data = data.filter(HS_Code=hs_code)
+
+    if is_valid_queryparam(trade_type) and trade_type != '--':
+        data = data.filter(Trade_Type=trade_type) 
+
+    paginator = Paginator(data, 7)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+
+    
+    context = { 'country_categories': country_categories, 'unit_categories': unit_categories,
+               'hs_codes': hs_codes, 'page':page,'trade_type_categories': trade_type_categories , 'data_len': len(page)}
 
     return render(request, 'import/display_trade_table.html', context)
 
