@@ -81,12 +81,15 @@
         
     </div>
 </div>
+<div class="fs-4 fw-bold text-center mt-4">Trade Data</div>
 
-{% if data_len == 0 %}
+{% if query_len == 0 %}
 <div class="bg-light p-4 text-center fw-normal mt-4 text-danger">No Records</div>
 {% else %}
 <div>
+    
     <div class="table-responsive mt-4 bg-light p-3">
+        <span class="text-danger fs-6 fw-lighter mb-1"> * {{data_len}} records found. </span>
         <table class="table table-striped table-bordered table-sm ">
             <thead>
                 <tr>

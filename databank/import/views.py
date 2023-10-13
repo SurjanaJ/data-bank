@@ -67,8 +67,8 @@ def display_trade_table(request):
     page = paginator.get_page(page_number)
 
     
-    context = { 'country_categories': country_categories, 'unit_categories': unit_categories,
-               'hs_codes': hs_codes, 'page':page,'trade_type_categories': trade_type_categories , 'data_len': len(page)}
+    context = { 'data_len': len(data), 'country_categories': country_categories, 'unit_categories': unit_categories,
+               'hs_codes': hs_codes, 'page':page,'trade_type_categories': trade_type_categories , 'query_len': len(page)}
 
     return render(request, 'import/display_trade_table.html', context)
 
