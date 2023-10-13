@@ -2,7 +2,6 @@
 {% block content %}
 
 
-
 <button class="btn btn-primary btn-sm px-4" data-bs-toggle="collapse" data-bs-target="#collapseFilter"
     aria-expanded="false" aria-controls="collapseFilter">Filters</button>
     
@@ -47,11 +46,11 @@
             </div>
     
             <div class="form-group col-md-3">
-                <label for="country_category">Country</label>
+                <label for="country_category">Origin Destination</label>
                 <select id="country_category" class="form-control" name="country_category">
                     <option selected>--</option>
                     {% for country_category in country_categories %}
-                    <option value="{{country_category.id }}">{{country_category}}</option>
+                    <option value="{{country_category.id}}">{{country_category}}</option>
                     {% endfor %}
                 </select>
             </div>

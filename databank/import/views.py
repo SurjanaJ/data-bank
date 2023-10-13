@@ -51,7 +51,7 @@ def display_trade_table(request):
         data = data.filter(Calender__lt = date_max)
 
     if is_valid_queryparam(country_category) and country_category != '--':
-        data = data.filter(Country=country_category)
+        data = data.filter(Origin_Destination_id=country_category)
     
     if is_valid_queryparam(unit_category) and unit_category != '--':
         data = data.filter(Unit=unit_category)
