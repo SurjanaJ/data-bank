@@ -247,7 +247,7 @@ def time_series_analysis(request):
         
 
     context = {'data':data, 'country_categories':country_categories, 'unit_categories':unit_categories,'hs_codes':hs_codes, 'trade_type_categories':trade_type_categories, 'result_country': result_country,'result_hs_code': result_hs_code,
-               'years':sorted_years, 'display_country':display_country, 'display_hs_code':display_hs_code }
+               'years':sorted_years, 'display_country':display_country, 'display_hs_code':display_hs_code, 'queryset_length':len(total_amount_by_origin_destination) }
 
     return render(request, 'import/time_series.html', context)
 

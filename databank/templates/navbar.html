@@ -14,6 +14,9 @@
             <li class="nav-item">
               <a class="nav-link active" aria-current="page" href="{% url 'display_trade_table' %}">Home</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="{% url 'time_series_analysis' %}">Time Series Analysis</a>
+            </li>
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Upload Excel File
@@ -23,14 +26,6 @@
                 <li><a class="dropdown-item" href="{% url 'upload_unit_meta_excel' %}">Upload Unit Meta File</a></li>
                 <li><a class="dropdown-item" href="{% url 'upload_hs_code_meta_excel' %}">Upload HS Code Meta File</a></li>
                 <li><a class="dropdown-item" href="{% url 'upload_trade_excel' %}">Upload Trade Data File</a></li>
-              </ul>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Time Series Analysis
-              </a>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="{% url 'time_series_analysis' %}">By Country</a></li>
               </ul>
             </li>
           </ul>
