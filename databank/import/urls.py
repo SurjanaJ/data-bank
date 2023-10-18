@@ -8,5 +8,6 @@ urlpatterns = [
     path('upload_hs_code_meta_excel',views.upload_hs_code_meta_excel, name='upload_hs_code_meta_excel'),
     path('upload_trade_excel', views.upload_trade_excel, name='upload_trade_excel'),
     path('time_series_analysis', views.time_series_analysis, name='time_series_analysis'),
-    path('export_to_excel', export_views.export_to_excel, name='export_to_excel')
+    path('export_to_excel', export_views.export_to_excel, name='export_to_excel'),
+    path('trade_record_to_excel', export_views.trade_record_to_excel, name='trade_record_to_excel')
 ]
