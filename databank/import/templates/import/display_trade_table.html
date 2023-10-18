@@ -1,14 +1,19 @@
-{% extends 'main.html' %}
-{% block content %}
+{% extends 'main.html' %} {% block content %}
 
+<button
+  class="btn btn-primary btn-sm px-4"
+  data-bs-toggle="collapse"
+  data-bs-target="#collapseFilter"
+  aria-expanded="false"
+  aria-controls="collapseFilter"
+>
+  Filters
+</button>
 
-<button class="btn btn-primary btn-sm px-4" data-bs-toggle="collapse" data-bs-target="#collapseFilter"
-    aria-expanded="false" aria-controls="collapseFilter">Filters</button>
-    
 <div class="bg-light mt-2">
-    <div class="collapse  shadow rounded-2 p-4" id="collapseFilter">
-         <form class="row g-3" method="GET" action=".">
-            <!-- <div class="form-group col-12">
+  <div class="collapse shadow rounded-2 p-4" id="collapseFilter">
+    <form class="row g-3" method="GET" action=".">
+      <!-- <div class="form-group col-12">
                 <div class="input-group">
                     <input class="form-control py-2 border-right-0 border" type="search"
                         name="currency_product_originDestination"
@@ -16,178 +21,248 @@
     
                 </div>
             </div> -->
-    
-            <div class="col-md-3">
-                <label for="date_minimum">Calender Date Minimum</label>
-                <input type="date" class="form-control" id="date_minimum" name="date_min">
-            </div>
-            <div class="col-md-3">
-                <label for="date_maximum">Calender Date Maximum</label>
-                <input type="date" class="form-control" id="date_maximum" name="date_max">
-            </div>
-    
-            <div class="col-md-3 ">
-                <label for="viewCountMin">Minimum Quantity</label>
-                <input type="number" min=0 class="form-control" id="viewCountMin" placeholder="0" name="quantity_min">
-            </div>
-            <div class="col-md-3 ">
-                <label for="viewCountMax">Maximum Quantity</label>
-                <input type="number" min=0 class="form-control" id="viewCountMax" placeholder="1000" name="quantity_max">
-            </div>
-    
-            <div class="form-group col-md-3">
-                <label for="trade_type">Trade Type</label>
-                <select id="trade_type" class="form-control" name="trade_type">
-                    <option selected>--</option>
-                    {% for trade_type in trade_type_categories %}
-                    <option value="{{trade_type}}">{{trade_type}}</option>
-                    {% endfor %}
-                </select>
-            </div>
-    
-            <div class="form-group col-md-3">
-                <label for="country_category">Origin Destination</label>
-                <select id="country_category" class="form-control" name="country_category">
-                    <option selected>--</option>
-                    {% for country_category in country_categories %}
-                    <option value="{{country_category.id}}">{{country_category}}</option>
-                    {% endfor %}
-                </select>
-            </div>
-    
-            <div class="form-group col-md-3">
-                <label for="unit_category">Unit</label>
-                <select id="unit_category" class="form-control" name="unit_category">
-                    <option selected>--</option>
-                    {% for unit_category in unit_categories %}
-                    <option value="{{unit_category.id }}">{{unit_category}}</option>
-                    {% endfor %}
-                </select>
-            </div>
-    
-            <div class="form-group col-md-3">
-                <label for="hs_code">HS Code</label>
-                <select id="hs_code" class="form-control" name="hs_code">
-                    <option selected>--</option>
-                    {% for hs_code in hs_codes %}
-                    <option value="{{hs_code.id }}">{{hs_code}} -  {{hs_code.Product_Information}}</option>
-                    {% endfor %}
-                </select>
-            </div>
-    
-            <button type="submit" class="col-md-1  btn btn-sm btn-primary">Search</button>
-        </form> 
-        
-    </div>
+
+      <div class="col-md-3">
+        <label for="date_minimum">Calender Date Minimum</label>
+        <input
+          type="date"
+          class="form-control"
+          id="date_minimum"
+          name="date_min"
+        />
+      </div>
+      <div class="col-md-3">
+        <label for="date_maximum">Calender Date Maximum</label>
+        <input
+          type="date"
+          class="form-control"
+          id="date_maximum"
+          name="date_max"
+        />
+      </div>
+
+      <div class="col-md-3">
+        <label for="viewCountMin">Minimum Quantity</label>
+        <input
+          type="number"
+          min="0"
+          class="form-control"
+          id="viewCountMin"
+          placeholder="0"
+          name="quantity_min"
+        />
+      </div>
+      <div class="col-md-3">
+        <label for="viewCountMax">Maximum Quantity</label>
+        <input
+          type="number"
+          min="0"
+          class="form-control"
+          id="viewCountMax"
+          placeholder="1000"
+          name="quantity_max"
+        />
+      </div>
+
+      <div class="form-group col-md-3">
+        <label for="trade_type">Trade Type</label>
+        <select id="trade_type" class="form-control" name="trade_type">
+          <option selected>--</option>
+          {% for trade_type in trade_type_categories %}
+          <option value="{{trade_type}}">{{trade_type}}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group col-md-3">
+        <label for="country_category">Origin Destination</label>
+        <select
+          id="country_category"
+          class="form-control"
+          name="country_category"
+        >
+          <option selected>--</option>
+          {% for country_category in country_categories %}
+          <option value="{{country_category.id}}">{{country_category}}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group col-md-3">
+        <label for="unit_category">Unit</label>
+        <select id="unit_category" class="form-control" name="unit_category">
+          <option selected>--</option>
+          {% for unit_category in unit_categories %}
+          <option value="{{unit_category.id }}">{{unit_category}}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group col-md-3">
+        <label for="hs_code">HS Code</label>
+        <select id="hs_code" class="form-control" name="hs_code">
+          <option selected>--</option>
+          {% for hs_code in hs_codes %}
+          <option value="{{hs_code.id }}">
+            {{hs_code}} - {{hs_code.Product_Information}}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <button type="submit" class="col-md-1 btn btn-sm btn-primary">
+        Search
+      </button>
+    </form>
+  </div>
 </div>
 <div class="fs-4 fw-bold text-center mt-4">Trade Data</div>
 
 {% if query_len == 0 %}
-<div class="bg-light p-4 text-center fw-normal mt-4 text-danger">No Records</div>
+<div class="bg-light p-4 text-center fw-normal mt-4 text-danger">
+  No Records
+</div>
 {% else %}
 <div>
-    
-    <div class="table-responsive mt-4 bg-light p-3">
-        <span class="text-danger fs-6 fw-lighter mb-1"> * {{data_len}} records found. </span>
-        <table class="table table-striped table-bordered table-sm ">
-            <thead>
-                <tr>
-                    <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Trade_Types</th>
-                    <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Calender</th>
-                    <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Fiscal_Year</th>
-                    <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Duration</th>
-                    <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Country_Name</th>
-                    <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">HS_Code</th>
-                    <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Product_Information</th>
-                    <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Unit</th>
-                    <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Quantity</th>
-                    <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Currency_Type</th>
-                    <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Amount</th>
-                    <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Tarrif</th>
-                    <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Origin_Destination</th>
-                    <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">TradersName_ExporterImporter</th>
-                    <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Documents</th>
-                    <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Action</th>
-                </tr>
-            </thead>
-            <tbody class="table-hover">
-                {% for record in page %}
-                <tr>
-    
-                    <td> {{ record.Trade_Type }}
-                    </td>
-                    <td> {{ record.Calender }}
-                    </td>
-                    <td>{{ record.Fiscal_Year }}
-                    </td>
-                    <td>{{ record.Duration }}
-                    </td>
-                    <td>{{ record.Country }}
-                    </td>
-                    <td>{{ record.HS_Code }}</td>
-                    <td>{{ record.HS_Code.Product_Information }}</td>
-                    <td>{{ record.Unit }}</td>
-                    <td>{{ record.Quantity }}
-                    </td>
-                    <td>{{ record.Currency_Type }}</td>
-                    <td>{{ record.Amount }}</td>
-                    <td>{{ record.Tarrif }}</td>
-                    <td>{{ record.Origin_Destination }}</td>
-                    <td>{{ record.TradersName_ExporterImporter }}
-                    </td>
-                    <td>{{ record.DocumentsLegalProcedural }}
-                    </td>
-                    <td class="d-flex">
-                        <div class="btn btn-outline-danger ">
-                            <a class="styled-link" href="{% url 'delete_trade_record' record.id %}">Delete</a>
-                        </div>
-    
-    
-                        <div class="btn btn-outline-primary">
-                            <a class="styled-link" href="{% url 'update_trade_record' record.id %}">Edit</a>
-    
-                        </div>
-                    </td>
-                </tr>
-    
-                {% endfor %}
-            </tbody>
-        </table>
+  <div class="table-responsive mt-4 bg-light p-3">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <span class="text-danger fs-6 fw-lighter mb-1">
+        * {{data_len}} records found.
+      </span>
+
+      <a href="{% url 'export_to_excel' %}" class="border p-2 styled-link"
+        ><i class="fa-solid fa-table "></i> <span>Export to Excel</span></a
+      >
     </div>
-    <div class="pagination m-3 d-flex justify-content-center">
-        <span class="step-links bg-light rounded-1 d-flex justify-content-center gap-3 p-3">
-            {% if page.has_previous %}
-            <a
-                href="?page=1{% if request.GET.currency_product_originDestination %}&currency_product_originDestination={{ request.GET.currency_product_originDestination }}{% endif %}{% if request.GET.quantity_min %}&quantity_min={{ request.GET.quantity_min }}{% endif %}{% if request.GET.quantity_max %}&quantity_max={{ request.GET.quantity_max }}{% endif %}{% if request.GET.date_min %}&date_min={{ request.GET.date_min }}{% endif %}{% if request.GET.date_max %}&date_max={{ request.GET.date_max }}{% endif %}{% if request.GET.country_category %}&country_category={{ request.GET.country_category }}{% endif %}{% if request.GET.unit_category %}&unit_category={{ request.GET.unit_category }}{% endif %}{% if request.GET.hs_code %}&hs_code={{ request.GET.hs_code }}{% endif %}{% if request.GET.trade_type %}&trade_type={{ request.GET.trade_type }}{% endif %}">
-                &laquo; First
-            </a>
-            <a
-                href="?page={{ page.previous_page_number }}{% if request.GET.currency_product_originDestination %}&currency_product_originDestination={{ request.GET.currency_product_originDestination }}{% endif %}{% if request.GET.quantity_min %}&quantity_min={{ request.GET.quantity_min }}{% endif %}{% if request.GET.quantity_max %}&quantity_max={{ request.GET.quantity_max }}{% endif %}{% if request.GET.date_min %}&date_min={{ request.GET.date_min }}{% endif %}{% if request.GET.date_max %}&date_max={{ request.GET.date_max }}{% endif %}{% if request.GET.country_category %}&country_category={{ request.GET.country_category }}{% endif %}{% if request.GET.unit_category %}&unit_category={{ request.GET.unit_category }}{% endif %}{% if request.GET.hs_code %}&hs_code={{ request.GET.hs_code }}{% endif %}{% if request.GET.trade_type %}&trade_type={{ request.GET.trade_type }}{% endif %}">
-                Previous
-            </a>
-            {% endif %}
-    
-            <span class="current-page">
-                Page {{ page.number }} of {{ page.paginator.num_pages }}.
-            </span>
-    
-            {% if page.has_next %}
-            <a
-                href="?page={{ page.next_page_number }}{% if request.GET.currency_product_originDestination %}&currency_product_originDestination={{ request.GET.currency_product_originDestination }}{% endif %}{% if request.GET.quantity_min %}&quantity_min={{ request.GET.quantity_min }}{% endif %}{% if request.GET.quantity_max %}&quantity_max={{ request.GET.quantity_max }}{% endif %}{% if request.GET.date_min %}&date_min={{ request.GET.date_min }}{% endif %}{% if request.GET.date_max %}&date_max={{ request.GET.date_max }}{% endif %}{% if request.GET.country_category %}&country_category={{ request.GET.country_category }}{% endif %}{% if request.GET.unit_category %}&unit_category={{ request.GET.unit_category }}{% endif %}{% if request.GET.hs_code %}&hs_code={{ request.GET.hs_code }}{% endif %}{% if request.GET.trade_type %}&trade_type={{ request.GET.trade_type }}{% endif %}">
-                Next
-            </a>
-            <a
-                href="?page={{ page.paginator.num_pages }}{% if request.GET.currency_product_originDestination %}&currency_product_originDestination={{ request.GET.currency_product_originDestination }}{% endif %}{% if request.GET.quantity_min %}&quantity_min={{ request.GET.quantity_min }}{% endif %}{% if request.GET.quantity_max %}&quantity_max={{ request.GET.quantity_max }}{% endif %}{% if request.GET.date_min %}&date_min={{ request.GET.date_min }}{% endif %}{% if request.GET.date_max %}&date_max={{ request.GET.date_max }}{% endif %}{% if request.GET.country_category %}&country_category={{ request.GET.country_category }}{% endif %}{% if request.GET.unit_category %}&unit_category={{ request.GET.unit_category }}{% endif %}{% if request.GET.hs_code %}&hs_code={{ request.GET.hs_code }}{% endif %}{% if request.GET.trade_type %}&trade_type={{ request.GET.trade_type }}{% endif %}">
-                Last &raquo;
-            </a>
-            {% endif %}
-        </span>
-    </div>
+
+    <table class="table table-striped table-bordered table-sm">
+      <thead>
+        <tr>
+          <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
+            Trade_Types
+          </th>
+          <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
+            Calender
+          </th>
+          <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
+            Fiscal_Year
+          </th>
+          <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
+            Duration
+          </th>
+          <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
+            Country_Name
+          </th>
+          <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
+            HS_Code
+          </th>
+          <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
+            Product_Information
+          </th>
+          <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
+            Unit
+          </th>
+          <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
+            Quantity
+          </th>
+          <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
+            Currency_Type
+          </th>
+          <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
+            Amount
+          </th>
+          <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
+            Tarrif
+          </th>
+          <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
+            Origin_Destination
+          </th>
+          <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
+            TradersName_ExporterImporter
+          </th>
+          <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
+            Documents
+          </th>
+          <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
+            Action
+          </th>
+        </tr>
+      </thead>
+      <tbody class="table-hover">
+        {% for record in page %}
+        <tr>
+          <td>{{ record.Trade_Type }}</td>
+          <td>{{ record.Calender }}</td>
+          <td>{{ record.Fiscal_Year }}</td>
+          <td>{{ record.Duration }}</td>
+          <td>{{ record.Country }}</td>
+          <td>{{ record.HS_Code }}</td>
+          <td>{{ record.HS_Code.Product_Information }}</td>
+          <td>{{ record.Unit }}</td>
+          <td>{{ record.Quantity }}</td>
+          <td>{{ record.Currency_Type }}</td>
+          <td>{{ record.Amount }}</td>
+          <td>{{ record.Tarrif }}</td>
+          <td>{{ record.Origin_Destination }}</td>
+          <td>{{ record.TradersName_ExporterImporter }}</td>
+          <td>{{ record.DocumentsLegalProcedural }}</td>
+          <td class="d-flex">
+            <div class="btn btn-outline-danger">
+              <a
+                class="styled-link"
+                href="{% url 'delete_trade_record' record.id %}"
+                >Delete</a
+              >
+            </div>
+
+            <div class="btn btn-outline-primary">
+              <a
+                class="styled-link"
+                href="{% url 'update_trade_record' record.id %}"
+                >Edit</a
+              >
+            </div>
+          </td>
+        </tr>
+
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="pagination m-3 d-flex justify-content-center">
+    <span
+      class="step-links bg-light rounded-1 d-flex justify-content-center gap-3 p-3"
+    >
+      {% if page.has_previous %}
+      <a
+        href="?page=1{% if request.GET.currency_product_originDestination %}&currency_product_originDestination={{ request.GET.currency_product_originDestination }}{% endif %}{% if request.GET.quantity_min %}&quantity_min={{ request.GET.quantity_min }}{% endif %}{% if request.GET.quantity_max %}&quantity_max={{ request.GET.quantity_max }}{% endif %}{% if request.GET.date_min %}&date_min={{ request.GET.date_min }}{% endif %}{% if request.GET.date_max %}&date_max={{ request.GET.date_max }}{% endif %}{% if request.GET.country_category %}&country_category={{ request.GET.country_category }}{% endif %}{% if request.GET.unit_category %}&unit_category={{ request.GET.unit_category }}{% endif %}{% if request.GET.hs_code %}&hs_code={{ request.GET.hs_code }}{% endif %}{% if request.GET.trade_type %}&trade_type={{ request.GET.trade_type }}{% endif %}"
+      >
+        &laquo; First
+      </a>
+      <a
+        href="?page={{ page.previous_page_number }}{% if request.GET.currency_product_originDestination %}&currency_product_originDestination={{ request.GET.currency_product_originDestination }}{% endif %}{% if request.GET.quantity_min %}&quantity_min={{ request.GET.quantity_min }}{% endif %}{% if request.GET.quantity_max %}&quantity_max={{ request.GET.quantity_max }}{% endif %}{% if request.GET.date_min %}&date_min={{ request.GET.date_min }}{% endif %}{% if request.GET.date_max %}&date_max={{ request.GET.date_max }}{% endif %}{% if request.GET.country_category %}&country_category={{ request.GET.country_category }}{% endif %}{% if request.GET.unit_category %}&unit_category={{ request.GET.unit_category }}{% endif %}{% if request.GET.hs_code %}&hs_code={{ request.GET.hs_code }}{% endif %}{% if request.GET.trade_type %}&trade_type={{ request.GET.trade_type }}{% endif %}"
+      >
+        Previous
+      </a>
+      {% endif %}
+
+      <span class="current-page">
+        Page {{ page.number }} of {{ page.paginator.num_pages }}.
+      </span>
+
+      {% if page.has_next %}
+      <a
+        href="?page={{ page.next_page_number }}{% if request.GET.currency_product_originDestination %}&currency_product_originDestination={{ request.GET.currency_product_originDestination }}{% endif %}{% if request.GET.quantity_min %}&quantity_min={{ request.GET.quantity_min }}{% endif %}{% if request.GET.quantity_max %}&quantity_max={{ request.GET.quantity_max }}{% endif %}{% if request.GET.date_min %}&date_min={{ request.GET.date_min }}{% endif %}{% if request.GET.date_max %}&date_max={{ request.GET.date_max }}{% endif %}{% if request.GET.country_category %}&country_category={{ request.GET.country_category }}{% endif %}{% if request.GET.unit_category %}&unit_category={{ request.GET.unit_category }}{% endif %}{% if request.GET.hs_code %}&hs_code={{ request.GET.hs_code }}{% endif %}{% if request.GET.trade_type %}&trade_type={{ request.GET.trade_type }}{% endif %}"
+      >
+        Next
+      </a>
+      <a
+        href="?page={{ page.paginator.num_pages }}{% if request.GET.currency_product_originDestination %}&currency_product_originDestination={{ request.GET.currency_product_originDestination }}{% endif %}{% if request.GET.quantity_min %}&quantity_min={{ request.GET.quantity_min }}{% endif %}{% if request.GET.quantity_max %}&quantity_max={{ request.GET.quantity_max }}{% endif %}{% if request.GET.date_min %}&date_min={{ request.GET.date_min }}{% endif %}{% if request.GET.date_max %}&date_max={{ request.GET.date_max }}{% endif %}{% if request.GET.country_category %}&country_category={{ request.GET.country_category }}{% endif %}{% if request.GET.unit_category %}&unit_category={{ request.GET.unit_category }}{% endif %}{% if request.GET.hs_code %}&hs_code={{ request.GET.hs_code }}{% endif %}{% if request.GET.trade_type %}&trade_type={{ request.GET.trade_type }}{% endif %}"
+      >
+        Last &raquo;
+      </a>
+      {% endif %}
+    </span>
+  </div>
 </div>
-{% endif %}
-
-
-
-
-
-{% endblock  %}
+{% endif %} {% endblock %}
