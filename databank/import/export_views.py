@@ -136,6 +136,15 @@ def trade_record_to_excel(request):
     df.fillna(0, inplace=True)
     df.columns = ["Exported value in {}".format(col) for col in df.columns]
 
+
+    sums = df.iloc[:, 1:].sum()
+    # Create a new DataFrame for the sums
+    sums = pd.DataFrame(sums).transpose()  # Transpose the DataFrame to match column names
+    sums.index = ["Total"]  # Optional: Rename the index to "Total"
+
+    # Concatenate the sums DataFrame to the original DataFrame
+    df = pd.concat([df, sums], ignore_index=True)
+
     output = BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
     df.to_excel(writer, sheet_name='Sheet1', index=False)
