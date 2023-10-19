@@ -4,6 +4,7 @@ from django.http import HttpResponse
 import xlsxwriter  # Import the XlsxWriter library
 from django.db.models import Q
 from django.db.models import F
+from django.db.models import Sum
 
 from . import views
 from .models import TradeData  
@@ -82,6 +83,65 @@ def export_to_excel(request):
     output.seek(0)
 
     # Create the HttpResponse object with appropriate header
+    response = HttpResponse(
+        output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
+    return response
+
+
+def trade_record_to_excel(request):
+    country_category = request.GET.get('country_category')
+    hs_code = request.GET.get('hs_code')
+    trade_type = request.GET.get('trade_type')
+
+    # Filter and retrieve the data based on the selected parameters
+    data = TradeData.objects.all()
+    if views.is_valid_queryparam(country_category) and country_category != '--':
+        data = data.filter(Origin_Destination_id=country_category)
+
+    if views.is_valid_queryparam(hs_code) and hs_code != '--':
+        data = data.filter(HS_Code_id=hs_code)
+
+    if views.is_valid_queryparam(trade_type) and trade_type != '--':
+        data = data.filter(Trade_Type=trade_type)
+
+    
+    if not data.exists():
+        return HttpResponse("No data to export")
+
+    # Retrieve the years and data for the table
+    years = set(data.values_list('Calender__year', flat=True).distinct())
+
+    if country_category != '--' and country_category is not None:
+        # Filter for the specific case where 'country_category' is selected
+        df = data.values('HS_Code_id__HS_Code', 'Calender__year', 'Amount').annotate(
+            year_amount=Sum('Amount')
+        ).order_by('HS_Code_id', 'Calender__year')
+    else:
+        # Filter for the case where 'country_category' is not selected
+        df = data.values('Origin_Destination__Country_Name', 'Calender__year', 'Amount').annotate(
+            year_amount=Sum('Amount')
+        ).order_by('Origin_Destination__Country_Name', 'Calender__year')
+
+    # Convert QuerySet to a Pandas DataFrame
+    df = pd.DataFrame.from_records(data.values('HS_Code_id__HS_Code','Origin_Destination__Country_Name', 'Calender__year', 'Amount'))
+   
+    df['year_amount'] = df['Amount']  # Create a column to hold the aggregated amounts
+   
+    # Determine the index column based on 'country_category' parameter
+    index_col = 'HS_Code_id__HS_Code' if (country_category != '--' and country_category is not None) else 'Origin_Destination__Country_Name'
+
+    df = df.groupby([index_col, 'Calender__year'])['year_amount'].sum().unstack().reset_index()
+    df.fillna(0, inplace=True)
+    df.columns = ["Exported value in {}".format(col) for col in df.columns]
+
+    output = BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+    df.to_excel(writer, sheet_name='Sheet1', index=False)
+    writer.close()
+    output.seek(0)
+
     response = HttpResponse(
         output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
