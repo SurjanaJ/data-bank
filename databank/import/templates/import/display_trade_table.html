@@ -133,6 +133,13 @@
       <a href="{% url 'export_to_excel' %}?{{ request.GET.urlencode }}" class="border p-2 styled-link"
         ><i class="fa-solid fa-table "></i> <span>Export to Excel</span></a
       >
+
+      <!-- <form method="GET" action="{% url 'export_to_excel'  %}">
+        <button type="submit">
+          <i class="fa-solid fa-table"></i> 
+          <span>Export to Excel</span>
+        </button>
+      </form> -->
     </div>
 
     <table class="table table-striped table-bordered table-sm">
