@@ -126,8 +126,16 @@ def trade_record_to_excel(request):
     # Convert QuerySet to a Pandas DataFrame
     df = pd.DataFrame.from_records(df)
 
+    print()
+    print()
+    print('DATAFRAME:  !!!!', df)
+    print()
+    print()
+    print()
+
     # Pivot the DataFrame
-    df = df.pivot(index='HS_Code_id__HS_Code' if country_category != '--' else 'Origin_Destination__Country_Name',
+   
+    df = df.pivot(index='HS_Code_id__HS_Code' if country_category != '--' and country_category is not None else 'Origin_Destination__Country_Name',
                   columns='Calender__year', values='year_amount')
 
     df = df.reset_index()
