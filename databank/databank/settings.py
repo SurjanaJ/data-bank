@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'import_export.apps.ImportExportConfig',
-    'trade_data.apps.Trade_DataConfig'
+    'trade_data.apps.Trade_DataConfig',
+    'general_data.apps.GeneralDataConfig'
 ]
 
 MIDDLEWARE = [
