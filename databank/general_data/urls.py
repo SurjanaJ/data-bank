@@ -2,5 +2,5 @@ from django.urls import include, path
 from . import views
 
 urlpatterns = [
-    path('forest/', views.display_forest_table, name='forest')
+    path('forest/', views.upload_forest_excel, name='upload_forest_excel')
 ]
