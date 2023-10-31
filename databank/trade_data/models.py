@@ -2,16 +2,17 @@ from django.db import models
 
 # Create your models here.
 class Country_meta(models.Model):
-    id = models.IntegerField(primary_key=True, unique=True, editable=False)
+    # id = models.IntegerField(primary_key=True, unique=True, editable=False)
+    id = models.AutoField(primary_key=True)
     Country_Name = models.CharField(max_length=200)
-    Country_Code_2 = models.CharField(max_length=2, null=True, blank=True)
+    Country_Code_2 = models.CharField(max_length=3, null=True, blank=True)
     Country_Code_3 = models.CharField(max_length=3, null=True, blank=True)
 
     def __str__(self):
         return self.Country_Name
     
 class HS_Code_meta(models.Model):
-    id = models.IntegerField(primary_key=True, unique=True, editable=False)
+    id = models.AutoField(primary_key=True)
     HS_Code = models.CharField(max_length=100)
     Product_Information = models.TextField(null=True, blank=True)
 
@@ -20,7 +21,7 @@ class HS_Code_meta(models.Model):
     
 
 class Unit_meta(models.Model):
-    id = models.IntegerField(primary_key=True, unique=True, editable=False)
+    id = models.AutoField(primary_key=True)
     Unit_Code = models.CharField(max_length=50)
     Unit_Name = models.CharField(max_length=200, null=True, blank=True)
 
@@ -33,7 +34,7 @@ class TradeData(models.Model):
         ('Import', 'Import'),
         ('Export', 'Export')
     )
-    id = models.IntegerField(primary_key=True, unique=True, editable=False)
+    id = models.AutoField(primary_key=True)
     Trade_Type = models.CharField(max_length=100, choices=TRADE_OPTIONS, null=True, blank=True) 
     Calender = models.DateField(null=True, blank=True)
     Fiscal_Year = models.CharField(max_length=10, null=True, blank=True)

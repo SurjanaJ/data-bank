@@ -5,6 +5,7 @@ from django.db.models import Q
 import pandas as pd
 from django.db.models import Sum
 from django.core.paginator import Paginator, Page
+from django.db.utils import DataError
 
 
 from .models import Country_meta, HS_Code_meta, TradeData,  Unit_meta
@@ -80,13 +81,16 @@ def upload_country_meta_excel(request):
             df = pd.read_excel(excel_data)
 
             for index, row in df.iterrows():
-                country_meta = Country_meta(
+                try:
+                    country_meta = Country_meta(
                     Country_Name=row['Country_Name'],
                     Country_Code_2=row['Country_Code_2'],
                     Country_Code_3=row['Country_Code_3']
                 )
-
-                country_meta.save()
+                    country_meta.save()
+                except DataError as e:
+                    print(f"Error inserting row {index}: {e}")
+                    print(f"Problematic row data: {row}")
 
             return HttpResponse('success')
     else:
@@ -157,8 +161,11 @@ def upload_trade_excel(request):
                     Origin_Destination = Country_meta.objects.get(
                         Country_Name=Origin_Destination)
 
-                except (Country_meta.DoesNotExist, HS_Code_meta.DoesNotExist, Unit_meta.DoesNotExist):
-                    return HttpResponse('could not upload the file.')
+                # except (Country_meta.DoesNotExist, HS_Code_meta.DoesNotExist, Unit_meta.DoesNotExist):
+                #     return HttpResponse('could not upload the file.')
+                except DataError as e:
+                    print(f"Error inserting row {index}: {e}")
+                    print(f"Problematic row data: {row}")
 
                 trade_data = TradeData(
                     Trade_Type=row['Trade_Type'],
