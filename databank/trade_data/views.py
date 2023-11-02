@@ -16,7 +16,7 @@ from .forms import UploadCountryMetaForm, UploadHSCodeMetaForm, UploadTradeDataF
 tables =[
     {
         "name":"Forest Data",
-        "url":"https://www.youtube.com/watch?v=MBhZCx_EUwI&list=RD56hhDndCQ4o&index=12"
+        "url":"others/forest_table"
     },
     {
         "name":"Population Data",

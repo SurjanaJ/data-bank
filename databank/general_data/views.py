@@ -7,8 +7,8 @@ from .models import ForestData, Country_meta
 from .forms import UploadForestDataForm
 
 # Create your views here.
-def display_forest_table(request):
-    return HttpResponse('Forest Table')
+def forest_table(request):
+    return render(request, 'general_data/forest_table.html')
 
 def upload_forest_excel(request):
     if request.method == 'POST':
