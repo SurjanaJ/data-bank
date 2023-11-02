@@ -13,7 +13,48 @@ from django.db.utils import DataError
 from .models import Country_meta, HS_Code_meta, TradeData,  Unit_meta
 from .forms import UploadCountryMetaForm, UploadHSCodeMetaForm, UploadTradeDataForm, UploadUnitMetaForm
 
-# Create your views here.
+tables =[
+    {
+        "name":"Forest Data",
+        "url":"https://www.youtube.com/watch?v=MBhZCx_EUwI&list=RD56hhDndCQ4o&index=12"
+    },
+    {
+        "name":"Population Data",
+        "url":"#"
+    },
+    {
+        "name":"Mining Data",
+        "url":"#"
+    },
+    {
+        "name":"Land Data",
+        "url":"#"
+    },
+    {
+        "name":"Hotel Data",
+        "url":"#"
+    },
+    {
+        "name":"Tourism Data",
+        "url":"#"
+    },
+    {
+        "name":"Transport Data",
+        "url":"#"
+    },
+    {
+        "name":"water Data",
+        "url":"#"
+    },
+    {
+        "name":"Forest Data",
+        "url":"#"
+    },
+    {
+        "name":"Educational Data",
+        "url":"#"
+    },
+    ]
 
 def is_valid_queryparam(param):
     return param !='' and param is not None
@@ -70,7 +111,7 @@ def display_trade_table(request):
 
     
     context = { 'data_len': len(data), 'country_categories': country_categories, 'unit_categories': unit_categories,
-               'hs_codes': hs_codes, 'page':page,'trade_type_categories': trade_type_categories , 'query_len': len(page)}
+               'hs_codes': hs_codes, 'page':page,'trade_type_categories': trade_type_categories , 'query_len': len(page), 'tables':tables}
 
     return render(request, 'import/display_trade_table.html', context)
 
