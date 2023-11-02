@@ -1,0 +1,11 @@
+{% extends 'main.html' %}
+{% block content %}
+
+<div class="list-group">
+{% for error in errors %}
+    <div class="list-group-item"> {{error}} </div>
+{% endfor %}
+</div>
+
+
+{% endblock content %}
