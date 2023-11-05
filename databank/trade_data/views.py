@@ -156,7 +156,7 @@ def upload_country_meta_excel(request):
                 return HttpResponse('success')
     else:
         form = UploadCountryMetaForm()
-    return render(request, 'import/upload_form.html', {'form': form})
+    return render(request, 'import/upload_form.html', {'form': form, 'tables':tables})
 
 
 def upload_unit_meta_excel(request):
@@ -194,7 +194,7 @@ def upload_unit_meta_excel(request):
                 return HttpResponse('success')
     else:
         form = UploadUnitMetaForm()
-    return render(request, 'import/upload_form.html', {'form': form})
+    return render(request, 'import/upload_form.html', {'form': form, 'tables':tables})
 
 
 def upload_hs_code_meta_excel(request):
@@ -215,8 +215,7 @@ def upload_hs_code_meta_excel(request):
             return HttpResponse('success')
     else:
         form = UploadHSCodeMetaForm()
-    return render(request, 'import/upload_form.html', {'form': form})
-
+    return render(request, 'import/upload_form.html', {'form': form, 'tables':tables})
 
 def upload_trade_excel(request):
     if request.method == 'POST':
@@ -239,8 +238,6 @@ def upload_trade_excel(request):
                     Origin_Destination = Country_meta.objects.get(
                         Country_Name=Origin_Destination)
 
-                # except (Country_meta.DoesNotExist, HS_Code_meta.DoesNotExist, Unit_meta.DoesNotExist):
-                #     return HttpResponse('could not upload the file.')
                 except DataError as e:
                     print(f"Error inserting row {index}: {e}")
                     print(f"Problematic row data: {row}")
@@ -268,7 +265,7 @@ def upload_trade_excel(request):
     else:
         form = UploadTradeDataForm()
 
-    return render(request, 'import/upload_form.html', {'form': form})
+    return render(request, 'import/upload_form.html', {'form': form, 'tables':tables})
 
 
 def find_country_name(country_category):
@@ -384,7 +381,7 @@ def time_series_analysis(request):
 
 
     context = {'data':data, 'country_categories':country_categories, 'unit_categories':unit_categories,'hs_codes':hs_codes, 'trade_type_categories':trade_type_categories, 'result_country': result_country,'result_hs_code': result_hs_code,
-               'years':sorted_years, 'display_country':display_country, 'display_hs_code':display_hs_code, 'queryset_length':len(total_amount_by_origin_destination), 'total_amount_year':total_amount_year}
+               'years':sorted_years, 'display_country':display_country, 'display_hs_code':display_hs_code, 'queryset_length':len(total_amount_by_origin_destination), 'total_amount_year':total_amount_year, 'tables':tables}
 
     return render(request, 'import/time_series.html', context)
 
