@@ -21,17 +21,6 @@
 <body class="bg-body-secondary  ">
     {% include 'navbar.html' %}
     
-    <div class="btn-group">
-        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-         select table
-        </button>
-        
-        <ul class="dropdown-menu">
-            {% for table in tables %}
-          <li><a class="dropdown-item" href={{table.url}}> {{table.url}}  {{table.name}} </a></li>
-          {% endfor %}
-        </ul>
-      </div>
 
     <div class="container  fw-light  pt-3  ">
         {% block content %}

@@ -5,10 +5,12 @@ from django.shortcuts import render
 import pandas as pd
 from .models import ForestData, Country_meta
 from .forms import UploadForestDataForm
+from trade_data.views import tables
 
 # Create your views here.
 def forest_table(request):
-    return render(request, 'general_data/forest_table.html')
+    context = {'tables': tables}
+    return render(request, 'general_data/forest_table.html', context)
 
 def upload_forest_excel(request):
     if request.method == 'POST':
@@ -47,4 +49,4 @@ def upload_forest_excel(request):
     else:
         form = UploadForestDataForm()
 
-    return render(request, 'general_data/upload_form.html', {'form': form})
+    return render(request, 'general_data/upload_form.html', {'form': form, 'tables':tables})
