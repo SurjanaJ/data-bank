@@ -113,7 +113,7 @@ def display_trade_table(request):
     context = { 'data_len': len(data), 'country_categories': country_categories, 'unit_categories': unit_categories,
                'hs_codes': hs_codes, 'page':page,'trade_type_categories': trade_type_categories , 'query_len': len(page), 'tables':tables}
 
-    return render(request, 'import/display_trade_table.html', context)
+    return render(request, 'trade_data/display_trade_table.html', context)
 
 def upload_country_meta_excel(request):
     errors = [] 
@@ -151,12 +151,12 @@ def upload_country_meta_excel(request):
                     errors.append(f"Could not add duplicate row {index}: {country_data}")
             if errors:
                 # If there are errors, return them as a response
-                return render(request, 'import/error_template.html', {'errors': errors})
+                return render(request, 'trade_data/error_template.html', {'errors': errors})
             else:
                 return HttpResponse('success')
     else:
         form = UploadCountryMetaForm()
-    return render(request, 'import/upload_form.html', {'form': form, 'tables':tables})
+    return render(request, 'trade_data/upload_form.html', {'form': form, 'tables':tables})
 
 
 def upload_unit_meta_excel(request):
@@ -180,7 +180,7 @@ def upload_unit_meta_excel(request):
                 if not is_duplicate:
                     # Insert the non-duplicate record
                     try:
-                        unit_meta = Country_meta(**unit_data)
+                        unit_meta = Unit_meta(**unit_data)
                         unit_meta.save()
                     except IntegrityError as e:
                         print(f"Error inserting row {index}: {e}")
@@ -189,12 +189,12 @@ def upload_unit_meta_excel(request):
                     errors.append(f"Could not add duplicate row {index}: {unit_data}")
             if errors:
                 # If there are errors, return them as a response
-                return render(request, 'import/error_template.html', {'errors': errors})
+                return render(request, 'trade_data/error_template.html', {'errors': errors})
             else:
                 return HttpResponse('success')
     else:
         form = UploadUnitMetaForm()
-    return render(request, 'import/upload_form.html', {'form': form, 'tables':tables})
+    return render(request, 'trade_data/upload_form.html', {'form': form, 'tables':tables})
 
 
 def upload_hs_code_meta_excel(request):
@@ -215,7 +215,7 @@ def upload_hs_code_meta_excel(request):
             return HttpResponse('success')
     else:
         form = UploadHSCodeMetaForm()
-    return render(request, 'import/upload_form.html', {'form': form, 'tables':tables})
+    return render(request, 'trade_data/upload_form.html', {'form': form, 'tables':tables})
 
 def upload_trade_excel(request):
     if request.method == 'POST':
@@ -265,7 +265,7 @@ def upload_trade_excel(request):
     else:
         form = UploadTradeDataForm()
 
-    return render(request, 'import/upload_form.html', {'form': form, 'tables':tables})
+    return render(request, 'trade_data/upload_form.html', {'form': form, 'tables':tables})
 
 
 def find_country_name(country_category):
@@ -383,5 +383,5 @@ def time_series_analysis(request):
     context = {'data':data, 'country_categories':country_categories, 'unit_categories':unit_categories,'hs_codes':hs_codes, 'trade_type_categories':trade_type_categories, 'result_country': result_country,'result_hs_code': result_hs_code,
                'years':sorted_years, 'display_country':display_country, 'display_hs_code':display_hs_code, 'queryset_length':len(total_amount_by_origin_destination), 'total_amount_year':total_amount_year, 'tables':tables}
 
-    return render(request, 'import/time_series.html', context)
+    return render(request, 'trade_data/time_series.html', context)
 

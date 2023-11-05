@@ -1,0 +1,12 @@
+{% extends 'main.html' %}
+{% block content %}
+
+<div class="bg-light p-3 w-50">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-primary" type="submit">Upload</button>
+    </form>
+</div>
+<br>
+{% endblock content %}
