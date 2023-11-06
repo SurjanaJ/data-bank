@@ -124,9 +124,6 @@ def upload_country_meta_excel(request):
         if form.is_valid():
             excel_data = request.FILES['country_meta_file']
 
-            # Read existing data from the database
-            db_data_list = list(Country_meta.objects.values('Country_Name', 'Country_Code_2', 'Country_Code_3'))
-
             df = pd.read_excel(excel_data)
             df.replace('NaN', 'nan', inplace=True)
 
