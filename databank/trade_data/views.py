@@ -177,7 +177,7 @@ def upload_unit_meta_excel(request):
             db_data_list = list(Unit_meta.objects.values('Unit_Code', 'Unit_Name'))
 
             df = pd.read_excel(excel_data)
-            df.replace( NaN, 'nan', inplace=True)
+            df.replace( NaN, ' ', inplace=True)
 
             for index, row in df.iterrows():
                 unit_data = {
