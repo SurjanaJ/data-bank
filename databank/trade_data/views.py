@@ -116,19 +116,20 @@ def display_trade_table(request):
     return render(request, 'trade_data/display_trade_table.html', context)
 
 def upload_country_meta_excel(request):
-    errors = [] 
+    errors = []
+    
     if request.method == 'POST':
         form = UploadCountryMetaForm(request.POST, request.FILES)
+        
         if form.is_valid():
             excel_data = request.FILES['country_meta_file']
 
             # Read existing data from the database
             db_data_list = list(Country_meta.objects.values('Country_Name', 'Country_Code_2', 'Country_Code_3'))
-            
-            df = pd.read_excel(excel_data)
-            df.replace( NaN, 'nan', inplace=True)
 
-            # records_to_insert = []
+            df = pd.read_excel(excel_data)
+            df.replace('NaN', 'nan', inplace=True)
+
             for index, row in df.iterrows():
                 country_data = {
                     'Country_Name': row['Country_Name'],
@@ -136,28 +137,39 @@ def upload_country_meta_excel(request):
                     'Country_Code_3': row['Country_Code_3']
                 }
 
-                # Check for duplicates
-                is_duplicate = country_data in db_data_list
+                # Check for duplicates based on the 'Country_Name' column
+                existing_record = Country_meta.objects.filter(Q(Country_Name=country_data['Country_Name'])).first()
 
-                if not is_duplicate:
+                if existing_record:
+                    # If a duplicate record is found, check if all columns are identical
+                    if all(getattr(existing_record, key) == value for key, value in country_data.items()):
+                        errors.append(f"Cannot add duplicate data at row {index}.")
+                    else:
+                        # Update the row with non-duplicate data
+                        for key, value in country_data.items():
+                            setattr(existing_record, key, value)
+                        try:
+                            existing_record.save()
+                        except IntegrityError as e:
+                            errors.append(f"Error updating row {index}: {e}")
+                else:
                     # Insert the non-duplicate record
                     try:
                         country_meta = Country_meta(**country_data)
                         country_meta.save()
                     except IntegrityError as e:
-                        print(f"Error inserting row {index}: {e}")
-                        print(f"Problematic row data: {country_data}")
-                else:
-                    errors.append(f"Could not add duplicate row {index}: {country_data}")
+                        errors.append(f"Error inserting row {index}: {e}")
+
             if errors:
                 # If there are errors, return them as a response
                 return render(request, 'trade_data/error_template.html', {'errors': errors})
             else:
                 return HttpResponse('success')
+    
     else:
         form = UploadCountryMetaForm()
-    return render(request, 'trade_data/upload_form.html', {'form': form, 'tables':tables})
-
+    
+    return render(request, 'trade_data/upload_form.html', {'form': form, 'tables': tables})
 
 def upload_unit_meta_excel(request):
     errors = [] 
