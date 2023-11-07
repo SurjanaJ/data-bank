@@ -16,44 +16,44 @@ from .forms import UploadCountryMetaForm, UploadHSCodeMetaForm, UploadTradeDataF
 tables =[
     {
         "name":"Forest Data",
-        "url":"others/forest_table"
-    },
-    {
-        "name":"Population Data",
-        "url":"#"
-    },
-    {
-        "name":"Mining Data",
-        "url":"#"
-    },
-    {
-        "name":"Land Data",
-        "url":"#"
-    },
-    {
-        "name":"Hotel Data",
-        "url":"#"
-    },
-    {
-        "name":"Tourism Data",
-        "url":"#"
-    },
-    {
-        "name":"Transport Data",
-        "url":"#"
-    },
-    {
-        "name":"water Data",
-        "url":"#"
-    },
-    {
-        "name":"Forest Data",
-        "url":"#"
-    },
-    {
-        "name":"Educational Data",
-        "url":"#"
-    },
+        "url":"forest_table"
+    }
+    # {
+    #     "name":"Population Data",
+    #     "url":"#"
+    # },
+    # {
+    #     "name":"Mining Data",
+    #     "url":"#"
+    # },
+    # {
+    #     "name":"Land Data",
+    #     "url":"#"
+    # },
+    # {
+    #     "name":"Hotel Data",
+    #     "url":"#"
+    # },
+    # {
+    #     "name":"Tourism Data",
+    #     "url":"#"
+    # },
+    # {
+    #     "name":"Transport Data",
+    #     "url":"#"
+    # },
+    # {
+    #     "name":"water Data",
+    #     "url":"#"
+    # },
+    # {
+    #     "name":"Forest Data",
+    #     "url":"#"
+    # },
+    # {
+    #     "name":"Educational Data",
+    #     "url":"#"
+    # },
     ]
 
 def is_valid_queryparam(param):
