@@ -4,11 +4,15 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.urls import reverse
+from django.db.models import Q
 import pandas as pd
 from .models import ForestData, Country_meta
 from .forms import UploadForestDataForm
 from trade_data.views import tables
 
+def is_valid_queryparam(param):
+    return param !='' and param is not None
+    
 
 def upload_forest_excel(request):
     if request.method == 'POST':
@@ -55,6 +59,36 @@ def display_forest_table(request):
     country_categories=Country_meta.objects.all()
     stock_unit_categories=[choice[1] for choice in ForestData.Stock_Unit_Options]
     area_unit_categories=[choice[1] for choice in ForestData.Area_Unit_Options]
+
+
+    date_min = request.GET.get('date_min')
+    date_max = request.GET.get('date_max')
+
+    country_category = request.GET.get('country_category')
+    name_of_the_plant=request.GET.get('name_of_the_plant')
+    area_unit=request.GET.get('area_unit')  
+    stock_available=request.GET.get('stock_available')
+
+    if is_valid_queryparam(date_min):
+        data=data.filter(Year__gte=date_min)
+
+    if is_valid_queryparam(date_max):
+        data=data.filter(Year__lt=date_max)
+
+    if is_valid_queryparam(name_of_the_plant):
+        data=data.filter(Q(Name_Of_The_Plant__icontains=name_of_the_plant)).distinct()
+
+    if is_valid_queryparam(country_category) and country_category != '--':
+        data = data.filter(Country_id=country_category)
+
+    if is_valid_queryparam(area_unit)  and area_unit != '--':
+        data=data.filter(Area_Unit=area_unit)
+
+    if is_valid_queryparam(stock_available):
+        data=data.filter(Stock_Available__gte=stock_available)
+        
+    
+
 
     #get form data for filteration
 

@@ -21,4 +21,4 @@ class ForestData(models.Model):
     Area_Covered = models.DecimalField(max_digits=100, decimal_places=3,blank=True, null=True)
 
     def __str__(self):
-        return (self.Name_Of_The_Plant) + ' ' + (str(self.id))
+        return (self.Name_Of_The_Plant) + ' ' + (str(self.id))      
