@@ -175,7 +175,7 @@ def upload_unit_meta_excel(request):
         if form.is_valid():
             excel_data = request.FILES['unit_meta_file']
             db_data_list = list(Unit_meta.objects.values('Unit_Code', 'Unit_Name'))
-
+            print(db_data_list)
             df = pd.read_excel(excel_data)
             df.replace( NaN, ' ', inplace=True)
 

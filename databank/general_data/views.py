@@ -23,7 +23,9 @@ def upload_forest_excel(request):
 
             for index, row in df.iterrows():
                 Country = row['Country']
-                Year = row['Year']
+                Year = str(row['Year'])
+                Name_Of_The_Plant=row['Name_Of_The_Plant']
+
                 try:
                     Country = Country_meta.objects.get(Country_Name=Country)
                     
@@ -32,9 +34,32 @@ def upload_forest_excel(request):
                 except DataError as e:
                     print(f"Error inserting row {index}: {e}")
                     print(f"Problematic row data: {row}")
+                
+                try:
+                    if len(Year) == 4:
+                        Year = datetime.date(int(Year), 1, 1)
+                    else:
+                        Year = pd.to_datetime(Year).date()
+                except ValueError as e:
+                    print(f"Error converting date in row {index}: {e}")
+                    print(f"Problematic row data: {row}")
+                    # Handle the date conversion error, such as logging a message or skipping the row
+                    continue
 
+                existing_forest_data = ForestData.objects.filter(
+                    Year=Year,
+                    Country=Country,
+                    Name_Of_The_Plant=Name_Of_The_Plant
+                ).first()
+
+                if existing_forest_data:
+                    update_existing_record(existing_forest_data, row)
+                    # Handle duplicate data, such as logging a message or skipping the row
+                    print(request, f"updated data found for Year '{Year}', Country '{Country}', Name_Of_The_Plant '{Name_Of_The_Plant}'")
+                    continue
+                
                 forest_data = ForestData (
-                    Year = datetime.date(Year,1,1),
+                    Year = Year,
                     Country = Country,
                     Name_Of_The_Plant=row['Name_Of_The_Plant'],
                     Scientific_Name=row['Scientific_Name'],
@@ -52,6 +77,15 @@ def upload_forest_excel(request):
         form = UploadForestDataForm()
 
     return render(request, 'general_data/upload_form.html', {'form': form, 'tables':tables})
+
+def update_existing_record(existing_record, row):
+    existing_record.Scientific_Name = row['Scientific_Name']
+    existing_record.Local_Name = row['Local_Name']
+    existing_record.Stock_Unit = row['Stock_Unit']
+    existing_record.Stock_Available = row['Stock_Available']
+    existing_record.Area_Unit = row['Area_Unit']
+    existing_record.Area_Covered = row['Area_Covered']
+    existing_record.save()
 
 def display_forest_table(request):
     url=reverse('forest_table')
