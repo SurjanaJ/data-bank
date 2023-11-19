@@ -83,8 +83,11 @@ def display_trade_table(request):
 def upload_country_meta_excel(request):
     errors = []
     
+    errors = []
+    
     if request.method == 'POST':
         form = UploadCountryMetaForm(request.POST, request.FILES)
+        
         
         if form.is_valid():
             excel_data = request.FILES['country_meta_file']
