@@ -1,0 +1,11 @@
+{% extends 'main.html' %}
+{% block content %}
+
+<div class="list-group">
+{% for message in success_messages %}
+    <div class="list-group-item"> {{message}} </div>
+{% endfor %}
+</div>
+
+
+{% endblock content %}
