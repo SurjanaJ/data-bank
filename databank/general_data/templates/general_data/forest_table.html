@@ -11,7 +11,7 @@
 
 <div class="bg-light mt-2">
   <div class="collapse shadow rounded-2 p-4" id="collapseFilter">
-    <form class="row g-3" method="GET" action=".">
+    <form class="row g-3" method="GET" action="./forest_table">
       <!-- <div class="form-group col-12">
                 <div class="input-group">
                     <input class="form-control py-2 border-right-0 border" type="search"
@@ -91,76 +91,87 @@
     </form>
   </div>
 </div>
+<form method="post" action="{% url 'delete_selected_records' %}">
+  {% csrf_token %}
+  <button type="submit">Delete Selected</button>
+  <div class="table-responsive ">
+    <table class="table table-striped table-bordered table-sm">
+      <thead>
+        <tr>
+          <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
+            <input type="checkbox" name="record.id" value="record.id" id="prodect_delete">
+          </th>
+          <th class="bg-primary text-white fst-normal fw-normal fs-6 p-2 px-5" scope="col">
+            Year
+          </th>
+          <th class="bg-primary text-white fst-normal fw-normal fs-6 p-2 px-5" scope="col">
+            Country
+          </th>
+          <th class="bg-primary text-white fst-normal fw-normal fs-6 p-2 px-5" scope="col">
+              Name_Of_The_Plant
+          </th>
+          <th class="bg-primary text-white fst-normal fw-normal fs-6 p-2 px-5" scope="col">
+              Scientific_Name
+          </th>
+          <th class="bg-primary text-white fst-normal fw-normal fs-6 p-2" scope="col">
+              Local_Name
+          </th>
+          <th class="bg-primary text-white fst-normal fw-normal fs-6 p-2" scope="col">
+              Stock_Unit
+          </th>
+          <th class="bg-primary text-white fst-normal fw-normal fs-6 p-2" scope="col">
+              Stock_Available
+          </th>
+          <th class="bg-primary text-white fst-normal fw-normal fs-6 p-2" scope="col">
+              Area_Unit
+          </th>
+          <th class="bg-primary text-white fst-normal fw-normal fs-6 p-2" scope="col">
+              Area_Covered
+          </th>
+          <th class="bg-primary text-white fst-normal fw-normal fs-6 p-2" scope="col">
+              Action
+          </th>
+        </tr>
+      </thead>
+  
+      <tbody class="table-hover">
+        {% for record in page %}
+        <tr>
+          <td class=" text-white fw-semibold fs-6 p-2" scope="col">
+            <input type="checkbox" name="selected_records" value="{{ record.id }}" id="delete_selected">
+          </td>
+          <td>{{ record.Year }}</td>
+          <td>{{ record.Country }}</td>
+          <td>{{ record.Name_Of_The_Plant }}</td>
+          <td>{{ record.Scientific_Name }}</td>
+          <td>{{ record.Local_Name }}</td>
+          <td>{{ record.Stock_Unit }}</td>
+          <td>{{ record.Stock_Available }}</td>
+          <td>{{ record.Area_Unit }}</td>
+          <td>{{ record.Area_Covered }}</td>
+          <td class="d-flex">
+            <div class="btn btn-outline-danger">
+              <a
+                class="styled-link"
+                href="{% url 'delete_trade_record' record.id %}"
+                >Delete</a>
+            </div>
+  
+            <div class="btn btn-outline-primary">
+              <a
+                class="styled-link"
+                href="{% url 'update_forest_record' record.id %}"
+                >Edit</a>
+            </div>
+          </td>
+        </tr>
+  
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</form>
 
-<table class="table table-striped table-bordered table-sm">
-    <thead>
-      <tr>
-        <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
-          Year
-        </th>
-        <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
-          Country
-        </th>
-        <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
-            Name_Of_The_Plant
-        </th>
-        <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
-            Scientific_Name
-        </th>
-        <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
-            Local_Name
-        </th>
-        <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
-            Stock_Unit
-        </th>
-        <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
-            Stock_Available
-        </th>
-        <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
-            Area_Unit
-        </th>
-        <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
-            Area_Covered
-        </th>
-        <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
-            Action
-        </th>
-      </tr>
-    </thead>
-    <tbody class="table-hover">
-      {% for record in page %}
-      <tr>
-        <td>{{ record.Year }}</td>
-        <td>{{ record.Country }}</td>
-        <td>{{ record.Name_Of_The_Plant }}</td>
-        <td>{{ record.Scientific_Name }}</td>
-        <td>{{ record.Local_Name }}</td>
-        <td>{{ record.Stock_Unit }}</td>
-        <td>{{ record.Stock_Available }}</td>
-        <td>{{ record.Area_Unit }}</td>
-        <td>{{ record.Area_Covered }}</td>
-        <td class="d-flex">
-          <div class="btn btn-outline-danger">
-            <a
-              class="styled-link"
-              href="{% url 'delete_trade_record' record.id %}"
-              >Delete</a
-            >
-          </div>
-
-          <div class="btn btn-outline-primary">
-            <a
-              class="styled-link"
-              href="{% url 'update_trade_record' record.id %}"
-              >Edit</a
-            >
-          </div>
-        </td>
-      </tr>
-
-      {% endfor %}
-    </tbody>
-  </table>
   
   
 {% endblock %}
