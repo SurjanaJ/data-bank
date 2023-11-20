@@ -130,9 +130,19 @@
         * {{data_len}} records found.
       </span>
 
-      <a href="{% url 'export_to_excel' %}?{{ request.GET.urlencode }}" class="border p-2 styled-link"
-        ><i class="fa-solid fa-table "></i> <span>Export to Excel</span></a
-      >
+      <div class="d-flex align-items-center">
+        <a href="" class="border p-2 styled-link mx-3 hover-shadow" 
+          ><i class="fa-regular fa-trash-can" style="color: #ff0000"></i>
+          <span>Delete Selected</span>
+        </a>
+        <a
+          href="{% url 'export_to_excel' %}?{{ request.GET.urlencode }}"
+          class="border p-2 styled-link"
+        >
+          <i class="fa-solid fa-table"></i>
+          <span>Export to Excel</span>
+        </a>
+      </div>
 
       <!-- <form method="GET" action="{% url 'export_to_excel'  %}">
         <button type="submit">
@@ -145,6 +155,13 @@
     <table class="table table-striped table-bordered table-sm">
       <thead>
         <tr>
+          <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
+            <input
+              type="checkbox"
+              id="select-all"
+              onclick="toggleSelectAll()"
+            />
+          </th>
           <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">
             Trade_Types
           </th>
@@ -198,6 +215,14 @@
       <tbody class="table-hover">
         {% for record in page %}
         <tr>
+          <td>
+            <input
+              type="checkbox"
+              class="item-checkbox"
+              name="selected_items"
+              value="{{ record.id }}"
+            />
+          </td>
           <td>{{ record.Trade_Type }}</td>
           <td>{{ record.Calender }}</td>
           <td>{{ record.Fiscal_Year }}</td>

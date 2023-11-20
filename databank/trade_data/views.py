@@ -9,6 +9,8 @@ import pandas as pd
 from django.db.models import Sum
 from django.core.paginator import Paginator, Page
 from django.db.utils import DataError
+from django.db import IntegrityError, transaction
+
 
 
 from .models import Country_meta, HS_Code_meta, TradeData,  Unit_meta
@@ -177,26 +179,54 @@ def upload_unit_meta_excel(request):
         form = UploadUnitMetaForm()
     return render(request, 'trade_data/upload_form.html', {'form': form, 'tables':tables})
 
-
 def upload_hs_code_meta_excel(request):
+    errors = []
+    success_messages = []
+
     if request.method == 'POST':
         form = UploadHSCodeMetaForm(request.POST, request.FILES)
+
         if form.is_valid():
             excel_data = request.FILES['hs_code_meta_file']
             df = pd.read_excel(excel_data)
 
-            for index, row in df.iterrows():
-                hs_code_meta = HS_Code_meta(
-                    HS_Code=row['HS_Code'],
-                    Product_Information=row['Product_Information']
-                )
+            try:
+                with transaction.atomic():
+                    for index, row in df.iterrows():
+                        data = {
+                            'HS_Code': row['HS_Code'],
+                            'Product_Information': row['Product_Information']
+                        }
 
-                hs_code_meta.save()
+                        existing_record = HS_Code_meta.objects.filter(HS_Code=data['HS_Code']).first()
 
-            return HttpResponse('success')
+                        if existing_record:
+                            if existing_record == HS_Code_meta(**data):
+                                errors.append(f"Cannot add duplicate data at row {index}.")
+                            else:
+                                HS_Code_meta.objects.update_or_create(
+                                    HS_Code=data['HS_Code'],
+                                    defaults={'Product_Information': data['Product_Information']}
+                                )
+                                success_messages.append(f"{'Updated' if existing_record else 'Inserted'} record at row {index}.")
+
+                        else:
+                            HS_Code_meta.objects.create(**data)
+                            success_messages.append(f"Inserted new record at row {index}.")
+
+            except IntegrityError as e:
+                errors.append(f"Error during database operation: {e}")
+
+            if errors:
+                return render(request, 'trade_data/error_template.html', {'errors': errors})
+            elif success_messages:
+                return render(request, 'trade_data/success_template.html', {'success_messages': success_messages})
+            else:
+                return HttpResponse('success')
     else:
         form = UploadHSCodeMetaForm()
-    return render(request, 'trade_data/upload_form.html', {'form': form, 'tables':tables})
+
+    return render(request, 'trade_data/upload_form.html', {'form': form})
 
 def upload_trade_excel(request):
     if request.method == 'POST':
