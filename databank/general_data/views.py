@@ -2,15 +2,13 @@ import datetime
 from django.db import DataError
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.core.paginator import Paginator
+from django.urls import reverse
 import pandas as pd
 from .models import ForestData, Country_meta
 from .forms import UploadForestDataForm
 from trade_data.views import tables
 
-# Create your views here.
-def forest_table(request):
-    context = {'tables': tables}
-    return render(request, 'general_data/forest_table.html', context)
 
 def upload_forest_excel(request):
     if request.method == 'POST':
@@ -50,3 +48,26 @@ def upload_forest_excel(request):
         form = UploadForestDataForm()
 
     return render(request, 'general_data/upload_form.html', {'form': form, 'tables':tables})
+
+def display_forest_table(request):
+    url=reverse('forest_table')
+    data=ForestData.objects.all()
+    country_categories=Country_meta.objects.all()
+    stock_unit_categories=[choice[1] for choice in ForestData.Stock_Unit_Options]
+    area_unit_categories=[choice[1] for choice in ForestData.Area_Unit_Options]
+
+    #get form data for filteration
+
+    paginator = Paginator(data, 10)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+    context={
+        'query_len': len(page),
+        'page':page,
+        'country_categories':country_categories,
+        'stock_unit_categories':stock_unit_categories,
+        'area_unit_categories':area_unit_categories,
+        'tables':tables
+    }
+
+    return render(request, 'general_data/forest_table.html', context)
