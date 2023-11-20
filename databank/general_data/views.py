@@ -1,13 +1,13 @@
 import datetime
 from django.db import DataError
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.core.paginator import Paginator
 from django.urls import reverse
 from django.db.models import Q
 import pandas as pd
 from .models import ForestData, Country_meta
-from .forms import UploadForestDataForm
+from .forms import UploadForestDataForm,UpdateForestData
 from trade_data.views import tables
 
 def is_valid_queryparam(param):
@@ -86,6 +86,28 @@ def update_existing_record(existing_record, row):
     existing_record.Area_Unit = row['Area_Unit']
     existing_record.Area_Covered = row['Area_Covered']
     existing_record.save()
+
+
+def update_forest_record(request,pk):
+    forest_record = ForestData.objects.get(id=pk)
+    form = UpdateForestData(instance=forest_record)
+
+    if request.method == 'POST':
+        form = UpdateForestData(request.POST, instance=forest_record)
+        if form.is_valid():
+            form.save()
+            return redirect('forest_table')
+        
+    context={'form':form,}
+    return render(request,'general_data/update_forest_record.html',context)
+
+def delete_selected_records(request):
+    if request.method == 'POST':
+        selected_record_ids = request.POST.getlist('selected_records')
+        ForestData.objects.filter(id__in=selected_record_ids).delete()
+
+    return redirect('forest_table')
+
 
 def display_forest_table(request):
     url=reverse('forest_table')
