@@ -115,17 +115,19 @@ def display_trade_table(request):
 
     return render(request, 'trade_data/display_trade_table.html', context)
 
+
 def upload_country_meta_excel(request):
     errors = []
-    
+    success_messages = []
+
     if request.method == 'POST':
         form = UploadCountryMetaForm(request.POST, request.FILES)
-        
+
         if form.is_valid():
             excel_data = request.FILES['country_meta_file']
 
             df = pd.read_excel(excel_data)
-            df.replace('NaN', 'nan', inplace=True)
+            df.replace(NaN, '', inplace=True)
 
             for index, row in df.iterrows():
                 country_data = {
@@ -147,6 +149,7 @@ def upload_country_meta_excel(request):
                             setattr(existing_record, key, value)
                         try:
                             existing_record.save()
+                            success_messages.append(f"Updated the record at row {index}.")
                         except IntegrityError as e:
                             errors.append(f"Error updating row {index}: {e}")
                 else:
@@ -154,19 +157,23 @@ def upload_country_meta_excel(request):
                     try:
                         country_meta = Country_meta(**country_data)
                         country_meta.save()
+                        success_messages.append(f"Inserted new record at row {index}.")
                     except IntegrityError as e:
                         errors.append(f"Error inserting row {index}: {e}")
 
             if errors:
                 # If there are errors, return them as a response
                 return render(request, 'trade_data/error_template.html', {'errors': errors})
+            elif success_messages:
+                return render(request,'trade_data/success_template.html' ,{'success_messages':success_messages})
             else:
                 return HttpResponse('success')
-    
+
     else:
         form = UploadCountryMetaForm()
-    
+
     return render(request, 'trade_data/upload_form.html', {'form': form, 'tables': tables})
+
 
 def upload_unit_meta_excel(request):
     errors = [] 
