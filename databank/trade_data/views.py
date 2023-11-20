@@ -1,4 +1,5 @@
 import datetime
+from math import isnan
 from django.db import IntegrityError
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -18,42 +19,6 @@ tables =[
         "name":"Forest Data",
         "url":"forest_table"
     }
-    # {
-    #     "name":"Population Data",
-    #     "url":"#"
-    # },
-    # {
-    #     "name":"Mining Data",
-    #     "url":"#"
-    # },
-    # {
-    #     "name":"Land Data",
-    #     "url":"#"
-    # },
-    # {
-    #     "name":"Hotel Data",
-    #     "url":"#"
-    # },
-    # {
-    #     "name":"Tourism Data",
-    #     "url":"#"
-    # },
-    # {
-    #     "name":"Transport Data",
-    #     "url":"#"
-    # },
-    # {
-    #     "name":"water Data",
-    #     "url":"#"
-    # },
-    # {
-    #     "name":"Forest Data",
-    #     "url":"#"
-    # },
-    # {
-    #     "name":"Educational Data",
-    #     "url":"#"
-    # },
     ]
 
 def is_valid_queryparam(param):
@@ -115,17 +80,19 @@ def display_trade_table(request):
 
     return render(request, 'trade_data/display_trade_table.html', context)
 
+
 def upload_country_meta_excel(request):
     errors = []
-    
+    success_messages = []
+
     if request.method == 'POST':
         form = UploadCountryMetaForm(request.POST, request.FILES)
-        
+
         if form.is_valid():
             excel_data = request.FILES['country_meta_file']
 
             df = pd.read_excel(excel_data)
-            df.replace('NaN', 'nan', inplace=True)
+            df.replace(NaN, '', inplace=True)
 
             for index, row in df.iterrows():
                 country_data = {
@@ -147,6 +114,7 @@ def upload_country_meta_excel(request):
                             setattr(existing_record, key, value)
                         try:
                             existing_record.save()
+                            success_messages.append(f"Updated the record at row {index}.")
                         except IntegrityError as e:
                             errors.append(f"Error updating row {index}: {e}")
                 else:
@@ -154,19 +122,23 @@ def upload_country_meta_excel(request):
                     try:
                         country_meta = Country_meta(**country_data)
                         country_meta.save()
+                        success_messages.append(f"Inserted new record at row {index}.")
                     except IntegrityError as e:
                         errors.append(f"Error inserting row {index}: {e}")
 
             if errors:
                 # If there are errors, return them as a response
                 return render(request, 'trade_data/error_template.html', {'errors': errors})
+            elif success_messages:
+                return render(request,'trade_data/success_template.html' ,{'success_messages':success_messages})
             else:
                 return HttpResponse('success')
-    
+
     else:
         form = UploadCountryMetaForm()
-    
+
     return render(request, 'trade_data/upload_form.html', {'form': form, 'tables': tables})
+
 
 def upload_unit_meta_excel(request):
     errors = [] 
@@ -177,7 +149,7 @@ def upload_unit_meta_excel(request):
             db_data_list = list(Unit_meta.objects.values('Unit_Code', 'Unit_Name'))
             print(db_data_list)
             df = pd.read_excel(excel_data)
-            df.replace( NaN, ' ', inplace=True)
+            df.replace( NaN, 'nan', inplace=True)
 
             for index, row in df.iterrows():
                 unit_data = {
@@ -239,6 +211,7 @@ def upload_trade_excel(request):
                 Unit = row['Unit']
                 Origin_Destination = row['Origin_Destination']
                 Calender = row['Calender']
+                tarrif_value = row['Tarrif']
 
                 try:
                     Country = Country_meta.objects.get(Country_Name=Country)
@@ -246,6 +219,7 @@ def upload_trade_excel(request):
                     Unit = Unit_meta.objects.get(Unit_Code=Unit)
                     Origin_Destination = Country_meta.objects.get(
                         Country_Name=Origin_Destination)
+                    
 
                 except DataError as e:
                     print(f"Error inserting row {index}: {e}")
@@ -262,7 +236,7 @@ def upload_trade_excel(request):
                     Quantity=row['Quantity'],
                     Currency_Type=row['Currency_Type'],
                     Amount=row['Amount'],
-                    Tarrif=row['Tarrif'],
+                    Tarrif = None if tarrif_value == 'nan' or isnan(tarrif_value) else tarrif_value,
                     Origin_Destination=Origin_Destination,
                     TradersName_ExporterImporter=row['TradersName_ExporterImporter'],
                     DocumentsLegalProcedural=row['DocumentsLegalProcedural']
