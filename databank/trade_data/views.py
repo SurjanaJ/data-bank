@@ -2,7 +2,7 @@ import datetime
 from math import isnan
 from django.db import IntegrityError
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.db.models import Q
 from numpy import NaN
 import pandas as pd
@@ -10,8 +10,8 @@ from django.db.models import Sum
 from django.core.paginator import Paginator, Page
 from django.db.utils import DataError
 from django.db import IntegrityError, transaction
-
-
+from django.contrib import messages
+from django.views.decorators.http import require_POST
 
 from .models import Country_meta, HS_Code_meta, TradeData,  Unit_meta
 from .forms import UploadCountryMetaForm, UploadHSCodeMetaForm, UploadTradeDataForm, UploadUnitMetaForm
@@ -398,3 +398,16 @@ def time_series_analysis(request):
 
     return render(request, 'trade_data/time_series.html', context)
 
+@require_POST
+def delete_selected(request):
+    selected_ids = request.POST.getlist('selected_items')
+    if not selected_ids:
+        messages.error(request, 'No items selected for deletion.')
+        return redirect('display_trade_table')
+    try:
+        TradeData.objects.filter(id__in=selected_ids).delete()
+        messages.success(request, 'Selected items deleted successfully.')
+    except Exception as e:
+        messages.error(request, f'Error deleting items: {e}')
+
+    return redirect('display_trade_table') 
