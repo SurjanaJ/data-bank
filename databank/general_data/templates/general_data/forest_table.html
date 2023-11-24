@@ -11,6 +11,12 @@
   Filters
 </button>
 
+{% if messages %}
+  {% for m in messages %}
+    <h1 class="m.tags">{{m}}</h1>
+  {% endfor %}
+{% endif %}
+
 <div class="bg-light mt-2">
   <div class="collapse shadow rounded-2 p-4" id="collapseFilter">
     <form class="row g-3" method="GET" action="./forest_table">

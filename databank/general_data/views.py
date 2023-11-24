@@ -13,6 +13,11 @@ from django.db import IntegrityError, transaction
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 
+
+MESSAGE_TAGS = {
+    messages.SUCCESS: 'alert-success',
+}
+
 def is_valid_queryparam(param):
     return param !='' and param is not None
     
@@ -170,6 +175,7 @@ def delete_forest_record(request, item_id):
     try:
         item_to_delete = get_object_or_404(ForestData, id=item_id)
         item_to_delete.delete()
+        messages.success(request, 'Deleted successfully')
         return redirect('forest_table')
     except Exception as e:
         return HttpResponse(f"An error occurred: {str(e)}")
