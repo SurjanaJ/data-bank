@@ -4,7 +4,7 @@ from trade_data.models import Country_meta
 # # Create your models here.
 class ForestData(models.Model):
     Stock_Unit_Options=(
-        ('Cu_Mtr','Cu Mtr'),
+        ('Cu Mtr','Cu Mtr'),
     )
     Area_Unit_Options=(
         ('Hector','Hector'),

@@ -1,7 +1,7 @@
 import datetime
 from django.db import DataError
 from django.http import HttpResponse
-from django.shortcuts import render,redirect
+from django.shortcuts import get_object_or_404, render,redirect
 from django.core.paginator import Paginator
 from django.urls import reverse
 from django.db.models import Q
@@ -9,6 +9,14 @@ import pandas as pd
 from .models import ForestData, Country_meta
 from .forms import UploadForestDataForm,UpdateForestData
 from trade_data.views import tables
+from django.db import IntegrityError, transaction
+from django.contrib import messages
+from django.views.decorators.http import require_POST
+
+
+MESSAGE_TAGS = {
+    messages.SUCCESS: 'alert-success',
+}
 
 def is_valid_queryparam(param):
     return param !='' and param is not None
@@ -161,3 +169,28 @@ def display_forest_table(request):
     }
 
     return render(request, 'general_data/forest_table.html', context)
+
+
+def delete_forest_record(request, item_id):
+    try:
+        item_to_delete = get_object_or_404(ForestData, id=item_id)
+        item_to_delete.delete()
+        messages.success(request, 'Deleted successfully')
+        return redirect('forest_table')
+    except Exception as e:
+        return HttpResponse(f"An error occurred: {str(e)}")
+
+@require_POST
+def delete_selected(request):
+    selected_ids = request.POST.getlist('selected_items')
+    if not selected_ids:
+        messages.error(request, 'No items selected for deletion.')
+        return redirect('forest_table')
+    try:
+        ForestData.objects.filter(id__in=selected_ids).delete()
+        messages.success(request, 'Selected items deleted successfully.')
+    except Exception as e:
+        messages.error(request, f'Error deleting items: {e}')
+
+    return redirect('forest_table') 
+

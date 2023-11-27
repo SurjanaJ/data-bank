@@ -16,6 +16,7 @@
     ></script>
 
     <style>
+
       .styled-link {
         text-decoration: none;
         color: black;
@@ -43,6 +44,15 @@
         checkboxes.forEach((checkbox) => {
           checkbox.checked = selectAllCheckbox.checked;
         });
+      }
+
+      function confirmDeleteAll() {
+        var confirmDelete = confirm(
+          "Are you sure you want to delete all selected items?"
+        );
+        if (confirmDelete) {
+          document.getElementById("delete-form").submit();
+        }
       }
     </script>
     <script
