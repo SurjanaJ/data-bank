@@ -2,7 +2,7 @@ import datetime
 from math import isnan
 from django.db import IntegrityError
 from django.http import HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render,get_object_or_404
 from django.db.models import Q
 from numpy import NaN
 import pandas as pd
@@ -12,6 +12,7 @@ from django.db.utils import DataError
 from django.db import IntegrityError, transaction
 from django.contrib import messages
 from django.views.decorators.http import require_POST
+from .forms import UploadTradeData
 
 from .models import Country_meta, HS_Code_meta, TradeData,  Unit_meta
 from .forms import UploadCountryMetaForm, UploadHSCodeMetaForm, UploadTradeDataForm, UploadUnitMetaForm
@@ -280,6 +281,20 @@ def upload_trade_excel(request):
 
     return render(request, 'trade_data/upload_form.html', {'form': form, 'tables':tables})
 
+# def upload_trade_record(request):
+#     trade_type_categories = [choice[1] for choice in TradeData.TRADE_OPTIONS]
+
+#     form = UploadTradeData()
+
+#     if request.method == 'POST':
+#         form = UploadTradeData(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('display_table')
+
+#     context={'form': form,'trade_type_categories': trade_type_categories}
+#     return render(request, 'trade_data/upload_trade_record.html', context)
+
 
 def find_country_name(country_category):
     if country_category == '--':
@@ -292,6 +307,21 @@ def find_country_name(country_category):
         else:
             country_instance = 'All Countries'
         return country_instance
+    
+def upload_trade_record(request):
+    trade_type_categories = [choice[1] for choice in TradeData.TRADE_OPTIONS]
+
+    form = UploadTradeData()
+
+    if request.method == 'POST':
+        form = UploadTradeData(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('display_table')
+
+    context={'form': form,'trade_type_categories': trade_type_categories}
+    return render(request, 'trade_data/upload_trade_record.html', context)
+
     
 def find_hs_code(hs_code):
     if hs_code == '--':
@@ -399,7 +429,7 @@ def time_series_analysis(request):
     return render(request, 'trade_data/time_series.html', context)
 
 @require_POST
-def delete_selected(request):
+def delete_selected_trade(request):
     selected_ids = request.POST.getlist('selected_items')
     if not selected_ids:
         messages.error(request, 'No items selected for deletion.')
@@ -410,4 +440,13 @@ def delete_selected(request):
     except Exception as e:
         messages.error(request, f'Error deleting items: {e}')
 
-    return redirect('display_trade_table') 
+    return redirect('display_trade_table')
+
+def delete_trade_record(request, item_id):
+    try:
+        item_to_delete = get_object_or_404(TradeData, id=item_id)
+        item_to_delete.delete()
+        messages.success(request, 'Deleted successfully')
+        return redirect('display_trade_table')
+    except Exception as e:
+        return HttpResponse(f"An error occurred: {str(e)}")

@@ -10,6 +10,17 @@
   Filters
 </button>
 
+<div>
+  {% if messages %}
+    {% for m in messages %}
+      <div class="alert alert-success px-1 py-1 alert-dismissible mt-2 " id="delete_selected_message" role="alert">
+        {{m}}
+        <button type="button" class="btn-close px-2 py-2 " data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
 <div class="bg-light mt-2">
   <div class="collapse shadow rounded-2 p-4" id="collapseFilter">
     <form class="row g-3" method="GET" action=".">
@@ -124,7 +135,7 @@
 </div>
 {% else %}
 <div>
-  <form method="post" action="{% url 'delete_selected' %}" id="delete-form">
+  <form method="post" action="{% url 'delete_selected_trade' %}" id="delete-form-trade">
     {% csrf_token %}
     <div class="table-responsive mt-4 bg-light p-3">
       <div class="d-flex align-items-center justify-content-between mb-3">
@@ -235,12 +246,13 @@
             <td>{{ record.TradersName_ExporterImporter }}</td>
             <td>{{ record.DocumentsLegalProcedural }}</td>
             <td class="d-flex">
-              <div class="btn btn-outline-danger">
+              <div class="btn">
                 <a
-                  class="styled-link"
-                  href="{% url 'delete_trade_record' record.id %}"
-                  >Delete</a
-                >
+                  class=""
+                  id="delete_forest"
+                  onclick="confirmDelete('{{record.id}}')"
+                  ><i class="fa-regular fa-trash-can" style="color: #ff0000"></i></a>
+                  
               </div>
 
               <div class="btn btn-outline-primary">
@@ -294,4 +306,27 @@
     </div>
   </form>
 </div>
+
+<script>
+    function confirmDelete(itemId) {
+      var result = confirm("Are you sure you want to delete this record?");
+      if (result) {
+          // User clicked "OK"
+          // Redirect to the Django view for deleting the item
+          window.location.href = 'delete_trade_record/' + itemId + '/';
+      } else {
+          // User clicked "Cancel" or closed the dialog
+          alert("Delete canceled!");
+      }
+  }
+
+  function confirmDeleteAll() {
+        var confirmDelete = confirm(
+          "Are you sure you want to delete all selected items?"
+        );
+        if (confirmDelete) {
+          document.getElementById("delete-form-trade").submit();
+        }
+      }
+</script>
 {% endif %} {% endblock %}

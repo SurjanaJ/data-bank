@@ -1,0 +1,79 @@
+{% extends 'main.html' %} {% block content %}
+
+<form class="row" method="post">
+    {% csrf_token %}
+    <!-- {{ form.as_p }} -->
+
+    <div class="col-md-6">
+        <label for="" class="form-label">{{ form.Trade_Type.label_tag }}</label>
+        {{form.Trade_Type}}
+        <!-- {{ form.Trade_Type }} -->
+    </div>
+    <div class="col-md-6">
+        <label for="" class="form-label">{{ form.Calender.label_tag }}</label>
+        {{ form.Calender }}
+      </div>
+      <div class="col-md-6">
+        <label for="" class="form-label">{{ form.Fiscal_Year.label_tag }}</label>
+        {{ form.Fiscal_Year }}
+      </div>
+      <div class="col-md-6">
+        <label for="" class="form-label">{{ form.Duration.label_tag }}</label>
+        {{ form.Duration }}
+      </div>
+    
+      <div class="col-md-6">
+        <label for="" class="form-label">{{ form.Country_Name.label_tag }}</label>
+        {{ form.Country_Name }}
+      </div>
+      <div class="col-md-6">
+        <label for="" class="form-label">{{ form.HS_Code.label_tag }}</label>
+        {{ form.HS_Code }}
+      </div>
+      <div class="col-md-6">
+        <label for="" class="form-label">{{ form.Unit.label_tag }}</label>
+        {{ form.Unit }}
+      </div>
+      <div class="col-md-6">
+        <label for="" class="form-label">{{ form.Quantity.label_tag }}</label>
+        {{ form.Quantity }}
+      </div>
+      <div class="col-md-6">
+        <label for="" class="form-label">{{ form.Currency_Type.label_tag }}</label>
+        {{ form.Currency_Type }}
+      </div>
+      <div class="col-md-6">
+        <label for="" class="form-label">{{ form.Amount.label_tag }}</label>
+        {{ form.Amount }}
+      </div>
+      <div class="col-md-6">
+        <label for="" class="form-label">{{ form.Tarrif.label_tag }}</label>
+        {{ form.Tarrif }}
+      </div>
+      <div class="col-md-6">
+        <label for="" class="form-label"
+          >{{ form.Origin_Destination.label_tag }}</label
+        >
+        {{ form.Origin_Destination }}
+      </div>
+      <div class="col-md-6">
+        <label for="" class="form-label"
+          >{{ form.TradersName_ExporterImporter.label_tag }}</label
+        >
+        {{ form.TradersName_ExporterImporter }}
+      </div>
+      <div class="col-md-6">
+        <label for="" class="form-label">{{ form.Documents.label_tag }}</label>
+        {{ form.Documents }}
+      </div>
+    
+      <div class="col-md-6">
+        <label for="" class="form-label"
+          >{{ form.Product_Information.label_tag }}</label
+        >
+        {{ form.Product_Information }}
+      </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+{% endblock %}

@@ -181,7 +181,7 @@ def delete_forest_record(request, item_id):
         return HttpResponse(f"An error occurred: {str(e)}")
 
 @require_POST
-def delete_selected(request):
+def delete_selected_forest(request):
     selected_ids = request.POST.getlist('selected_items')
     if not selected_ids:
         messages.error(request, 'No items selected for deletion.')
