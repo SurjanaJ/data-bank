@@ -1,5 +1,6 @@
 from django import forms
 from django.forms import ModelForm
+from .models import TradeData
 
 
 class UploadCountryMetaForm(forms.Form):
@@ -13,3 +14,8 @@ class UploadHSCodeMetaForm(forms.Form):
 
 class UploadTradeDataForm(forms.Form):
     trade_data_file = forms.FileField()
+
+class UploadTradeData(ModelForm):
+    class Meta:
+        model = TradeData
+        fields = '__all__'

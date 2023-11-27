@@ -10,5 +10,8 @@ urlpatterns = [
     path('time_series_analysis', views.time_series_analysis, name='time_series_analysis'),
     path('export_to_excel', export_views.export_to_excel, name='export_to_excel'),
     path('trade_record_to_excel', export_views.trade_record_to_excel, name='trade_record_to_excel'),
-    path('delete_selected', views.delete_selected, name='delete_selected')
+    path('delete_selected_trade', views.delete_selected_trade, name='delete_selected_trade'),
+    path('upload_trade_record',views.upload_trade_record, name='upload_trade_record'),
+    path('delete_trade_record/<int:item_id>/', views.delete_trade_record ,name='delete_trade_trade')
+
 ]

@@ -114,7 +114,7 @@
   </div>
 </div>
 <div>
-  <form method="post" action="{% url 'delete_selected' %}" id="delete-form">
+  <form method="post" action="{% url 'delete_selected_forest' %}" id="delete-form-forest">
     {% csrf_token %}
     <div class="table-responsive mt-4 bg-light">
       <div class="d-flex align-items-center justify-content-between px-2">
@@ -240,6 +240,16 @@
           alert("Delete canceled!");
       }
   }
+
+  function confirmDeleteAll() {
+        var confirmDelete = confirm(
+          "Are you sure you want to delete all selected items?"
+        );
+        if (confirmDelete) {
+          document.getElementById("delete-form-forest").submit();
+        }
+      }
+  
 
   setTimeout(function(){
     var success_message=document.getElementById('delete_selected_message');
