@@ -15,7 +15,7 @@ from django.views.decorators.http import require_POST
 from .forms import UploadTradeData
 
 from .models import Country_meta, HS_Code_meta, TradeData,  Unit_meta
-from .forms import UploadCountryMetaForm, UploadHSCodeMetaForm, UploadTradeDataForm, UploadUnitMetaForm
+from .forms import UploadCountryMetaForm, UploadHSCodeMetaForm, UploadTradeDataForm, UploadUnitMetaForm,UploadTradeData
 
 tables =[
     {
@@ -281,19 +281,33 @@ def upload_trade_excel(request):
 
     return render(request, 'trade_data/upload_form.html', {'form': form, 'tables':tables})
 
-# def upload_trade_record(request):
-#     trade_type_categories = [choice[1] for choice in TradeData.TRADE_OPTIONS]
+def upload_trade_record(request):
+    trade_type_categories = [choice[1] for choice in TradeData.TRADE_OPTIONS]
 
-#     form = UploadTradeData()
+    form = UploadTradeData()
 
-#     if request.method == 'POST':
-#         form = UploadTradeData(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('display_table')
+    if request.method == 'POST':
+        form = UploadTradeData(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('display_trade_table')
 
-#     context={'form': form,'trade_type_categories': trade_type_categories}
-#     return render(request, 'trade_data/upload_trade_record.html', context)
+    context={'form': form,'trade_type_categories': trade_type_categories}
+    return render(request, 'trade_data/upload_form.html', context)
+
+
+def update_trade_record(request,pk):
+    trade_record = TradeData.objects.get(id=pk)
+    form = UploadTradeData(instance=trade_record)
+
+    if request.method == 'POST':
+        form = UploadTradeData(request.POST, instance=trade_record)
+        if form.is_valid():
+            form.save()
+            return redirect('display_trade_table')
+        
+    context={'form':form,}
+    return render(request,'trade_data/update_trade_record.html',context)
 
 
 def find_country_name(country_category):
@@ -308,20 +322,6 @@ def find_country_name(country_category):
             country_instance = 'All Countries'
         return country_instance
     
-def upload_trade_record(request):
-    trade_type_categories = [choice[1] for choice in TradeData.TRADE_OPTIONS]
-
-    form = UploadTradeData()
-
-    if request.method == 'POST':
-        form = UploadTradeData(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('display_table')
-
-    context={'form': form,'trade_type_categories': trade_type_categories}
-    return render(request, 'trade_data/upload_trade_record.html', context)
-
     
 def find_hs_code(hs_code):
     if hs_code == '--':

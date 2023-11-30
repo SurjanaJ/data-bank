@@ -5,7 +5,9 @@ from .models import ForestData
 class UploadForestDataForm(forms.Form):
     forest_data_file = forms.FileField()
 
-class UpdateForestData(ModelForm):
+class UploadForestData(ModelForm):
     class Meta:
         model = ForestData
         fields='__all__'
+
+        

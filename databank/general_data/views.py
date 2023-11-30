@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.db.models import Q
 import pandas as pd
 from .models import ForestData, Country_meta
-from .forms import UploadForestDataForm,UpdateForestData
+from .forms import UploadForestDataForm,UploadForestData
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -98,10 +98,10 @@ def update_existing_record(existing_record, row):
 
 def update_forest_record(request,pk):
     forest_record = ForestData.objects.get(id=pk)
-    form = UpdateForestData(instance=forest_record)
+    form = UploadForestData(instance=forest_record)
 
     if request.method == 'POST':
-        form = UpdateForestData(request.POST, instance=forest_record)
+        form = UploadForestData(request.POST, instance=forest_record)
         if form.is_valid():
             form.save()
             return redirect('forest_table')
