@@ -11,7 +11,6 @@
   >
     Filters
   </button>
-  <div class="fs-5 fw-semibold text-right">Forest Data</div>
 </div>
 
 <div>
@@ -113,6 +112,8 @@
     </div>
   </div>
 </div>
+<div class="fs-4 fw-bold text-center">Forest Data</div>
+
 <div>
   <form method="post" action="{% url 'delete_selected_forest' %}" id="delete-form-forest">
     {% csrf_token %}
@@ -133,13 +134,12 @@
             <i class="fa-solid fa-table"></i>
             <span class="fw-normal">Export to Excel</span>
             </a>
-          
         </div>
       </div>
       <table class="table table-striped table-bordered table-sm">
         <thead>
           <tr>
-            <th class="text-white fw-semibold fs-6   " scope="col"  style="background:#12486B;">
+            <th class="text-white fw-semibold fs-6  " scope="col"  style="background:#12486B;">
               <input
               type="checkbox"
               id="select-all"
