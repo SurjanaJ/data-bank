@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'import_export.apps.ImportExportConfig',
+    # 'import_export.apps.ImportExportConfig',
     'trade_data.apps.Trade_DataConfig',
     'general_data.apps.GeneralDataConfig',
     # 'django.contrib.messages'

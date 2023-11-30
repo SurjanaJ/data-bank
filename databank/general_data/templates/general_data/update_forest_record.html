@@ -2,7 +2,7 @@
 {% block content %}
 
 
-<form class="'row" method="POST">
+<!-- <form class="'row" method="POST">
     {% csrf_token %}
         <div class="col-md-6">
             <label for="" class="form-label">{{ form.Year.label_tag }}</label>
@@ -42,7 +42,24 @@
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>
         
-</form>
-
+</form> -->
+<div class="container bg-light p-3 shadow">
+  
+    <form method="POST" >
+      {% csrf_token %}<div class="row">
+      {% for field in form %}
+        <div class="col-6 mb-2">
+          <label for="{{field.label}}"> {{field.label}} </label>
+          
+            {{field}}
+         
+      
+        </div>
+      {% endfor %}</div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+  
+</div>
 
 {% endblock %}

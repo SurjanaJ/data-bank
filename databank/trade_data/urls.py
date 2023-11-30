@@ -12,6 +12,8 @@ urlpatterns = [
     path('trade_record_to_excel', export_views.trade_record_to_excel, name='trade_record_to_excel'),
     path('delete_selected_trade', views.delete_selected_trade, name='delete_selected_trade'),
     path('upload_trade_record',views.upload_trade_record, name='upload_trade_record'),
-    path('delete_trade_record/<int:item_id>/', views.delete_trade_record ,name='delete_trade_trade')
+    path('delete_trade_record/<int:pk>/', views.delete_trade_record ,name='delete_trade_trade'),
+    path('update_trade_record/<int:pk>/',views.update_trade_record, name='update_trade_record'),
+
 
 ]
