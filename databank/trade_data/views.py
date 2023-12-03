@@ -285,9 +285,12 @@ def upload_trade_record(request):
     trade_type_categories = [choice[1] for choice in TradeData.TRADE_OPTIONS]
 
     form = UploadTradeData()
-
+    
     if request.method == 'POST':
+
         form = UploadTradeData(request.POST)
+        print('form is valid')
+
         if form.is_valid():
             form.save()
             return redirect('display_trade_table')

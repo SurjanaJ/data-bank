@@ -160,6 +160,7 @@ def display_forest_table(request):
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
     context={
+        'data_len':len(data),
         'query_len': len(page),
         'page':page,
         'country_categories':country_categories,
