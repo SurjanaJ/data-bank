@@ -61,5 +61,72 @@ class Land(models.Model):
     Unit=models.CharField(max_length=10, choices=Land_Unit_Options, null=True, blank=True)
     Area=models.DecimalField(max_digits=100, decimal_places=3,blank=True, null=True)
 
+class Transport_Meta(models.Model):
+    id=models.AutoField(primary_key=True)
+    Code=models.CharField(max_length=100)
+    Transport_Type=models.TextField(null=True,blank=True)
+
+class Transport(models.Model):
+
+    Unit_Options=(
+        ('Metric Ton', 'Metric Ton'),
+    )
+
+
+    id=models.AutoField(primary_key=True)
+    Year=models.DateField(null=True, blank=True)
+    Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    Transport_Classification_Code=models.ForeignKey(Transport_Meta, on_delete=models.CASCADE)
+    Unit=models.CharField(max_length=10, choices=Unit_Options, null=True,blank=True)
+    Quantity=models.DecimalField(max_digits=100,decimal_places=3,blank=True,null=True)
+
+
+
+class Tourism_Meta(models.Model):
+    id=models.AutoField(primary_key=True)
+    Code=models.CharField(max_length=100)
+    Arrival_Mode=models.TextField(null=True,blank=True)
+
+class Tourism(models.Model):
+    id=models.AutoField(primary_key=True)
+    Year=models.DateField(null=True,blank=True)
+    Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    Tourism_code=models.ForeignKey(Tourism_Meta,on_delete=models.CASCADE)
+    Number=models.IntegerField(default=0,null=True,blank=True)
+
+
+class Hotel(models.Model):
+    id=models.AutoField(primary_key=True)
+    Year=models.DateField(null=True,blank=True)
+    Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    Name_Of_The_Hotel=models.CharField(null=True,blank=True)
+    Capacity_Room=models.IntegerField(default=0,null=True,blank=True)
+    Occupancy_In_Year=models.IntegerField(default=0,null=True,blank=True)
+    City = models.CharField(null=True,blank=True)
+
+
+class Water_Meta(models.Model):
+    id=models.AutoField(primary_key=True)
+    Code=models.CharField(max_length=100)
+    Water_Type=models.TextField(null=True,blank=True)
+
+
+class Water(models.Model):
+
+    Unit_Options = (
+        ('Cu Metre', 'Cu Metre'),
+    )
+
+    id = models.AutoField(primary_key=True)
+    Year=models.DateField(null=True,blank=True)
+    Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    Water_Type_Code=models.ForeignKey(Water_Meta,on_delete=models.CASCADE)
+    Description = models.CharField(null=True, blank=True)
+    Unit=models.CharField(max_length=10, choices=Unit_Options , null=True, blank=True)
+    Volume = models.DecimalField(max_digits=100,decimal_places=3,null=True,blank=True)
+    Name_Of_The_River = models.CharField(max_length=100,null=True,blank=True)
+
+
+
 
 

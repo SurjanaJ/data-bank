@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import ForestData,PopulationData,Land_Code_Meta,Land
+from .models import ForestData,PopulationData,Land_Code_Meta,Land,Transport_Meta,Transport,Tourism,Tourism_Meta,Hotel,Water,Water_Meta
 
 admin.site.register(PopulationData)
 admin.site.register(Land_Code_Meta)
@@ -11,5 +11,19 @@ class ForestData_Admin(admin.ModelAdmin ):
 admin.site.register(ForestData, ForestData_Admin)
 
 admin.site.register(Land)
+
+admin.site.register(Transport_Meta)
+
+admin.site.register(Transport)
+
+admin.site.register(Tourism_Meta)
+
+admin.site.register(Tourism)
+
+admin.site.register(Hotel)
+
+admin.site.register(Water_Meta)
+
+admin.site.register(Water)
 
 
