@@ -11,7 +11,7 @@ class Country_meta(models.Model):
     def __str__(self):
         return self.Country_Name
     
-class HS_Code_meta(models.Model):
+class HS_Code_meta(models.Model):   
     id = models.AutoField(primary_key=True)
     HS_Code = models.CharField(max_length=100)
     Product_Information = models.TextField(null=True, blank=True)
