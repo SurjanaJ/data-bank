@@ -82,6 +82,20 @@ class Transport(models.Model):
 
 
 
+class Tourism_Meta(models.Model):
+    id=models.AutoField(primary_key=True)
+    Code=models.CharField(max_length=100)
+    Arrival_Mode=models.TextField(null=True,blank=True)
+
+class Tourism(models.Model):
+    id=models.AutoField(primary_key=True)
+    Year=models.DateField(null=True,blank=True)
+    Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    Tourism_code=models.ForeignKey(Tourism_Meta,on_delete=models.CASCADE)
+    Number=models.IntegerField(default=0,null=True,blank=True)
+
+
+
 
 
 
