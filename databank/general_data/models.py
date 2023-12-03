@@ -105,5 +105,28 @@ class Hotel(models.Model):
     City = models.CharField(null=True,blank=True)
 
 
+class Water_Meta(models.Model):
+    id=models.AutoField(primary_key=True)
+    Code=models.CharField(max_length=100)
+    Water_Type=models.TextField(null=True,blank=True)
+
+
+class Water(models.Model):
+
+    Unit_Options = (
+        ('Cu Metre', 'Cu Metre'),
+    )
+
+    id = models.AutoField(primary_key=True)
+    Year=models.DateField(null=True,blank=True)
+    Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    Water_Type_Code=models.ForeignKey(Water_Meta,on_delete=models.CASCADE)
+    Description = models.CharField(null=True, blank=True)
+    Unit=models.CharField(max_length=10, choices=Unit_Options , null=True, blank=True)
+    Volume = models.DecimalField(max_digits=100,decimal_places=3,null=True,blank=True)
+    Name_Of_The_River = models.CharField(max_length=100,null=True,blank=True)
+
+
+
 
 
