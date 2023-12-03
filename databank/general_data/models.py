@@ -61,5 +61,27 @@ class Land(models.Model):
     Unit=models.CharField(max_length=10, choices=Land_Unit_Options, null=True, blank=True)
     Area=models.DecimalField(max_digits=100, decimal_places=3,blank=True, null=True)
 
+class Transport_Meta(models.Model):
+    id=models.AutoField(primary_key=True)
+    Code=models.CharField(max_length=100)
+    Transport_Type=models.TextField(null=True,blank=True)
+
+class Transport(models.Model):
+
+    Unit_Options=(
+        ('Metric Ton', 'Metric Ton'),
+    )
+
+
+    id=models.AutoField(primary_key=True)
+    Year=models.DateField(null=True, blank=True)
+    Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    Transport_Classification_Code=models.ForeignKey(Transport_Meta, on_delete=models.CASCADE)
+    Unit=models.CharField(max_length=10, choices=Unit_Options, null=True,blank=True)
+    Quantity=models.DecimalField(max_digits=100,decimal_places=3,blank=True,null=True)
+
+
+
+
 
 
