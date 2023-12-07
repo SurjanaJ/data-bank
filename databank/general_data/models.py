@@ -44,8 +44,11 @@ class PopulationData(models.Model):
 
 class Land_Code_Meta(models.Model):
     id=models.AutoField(primary_key=True)
-    Code=models.CharField(max_length=100)
+    Code=models.CharField()
     Land_Type=models.TextField(null=True,blank=True)
+
+    def __str__(self):
+        return self.Code
 
 
 class Land(models.Model):
@@ -56,7 +59,8 @@ class Land(models.Model):
 
 
     id=models.AutoField(primary_key=True)
-    year=models.DateField(null=True,blank=True)
+    Year=models.DateField(null=True,blank=True)
+    Country=models.ForeignKey(Country_meta,on_delete=models.CASCADE)
     Land_Code=models.ForeignKey(Land_Code_Meta, on_delete=models.CASCADE)
     Unit=models.CharField(max_length=10, choices=Land_Unit_Options, null=True, blank=True)
     Area=models.DecimalField(max_digits=100, decimal_places=3,blank=True, null=True)
@@ -90,8 +94,10 @@ class Tourism_Meta(models.Model):
 class Tourism(models.Model):
     id=models.AutoField(primary_key=True)
     Year=models.DateField(null=True,blank=True)
-    Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
-    Tourism_code=models.ForeignKey(Tourism_Meta,on_delete=models.CASCADE)
+    Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE, related_name='Tourism_Country')
+    Number_Of_Tourist = models.IntegerField(null=True,blank=True)
+    Nationality_Of_Tourism=models.ForeignKey(Country_meta, on_delete=models.CASCADE, related_name='Tourism_Nationality_Of_Tourism')
+    Arrival_code=models.ForeignKey(Tourism_Meta,on_delete=models.CASCADE)
     Number=models.IntegerField(default=0,null=True,blank=True)
 
 

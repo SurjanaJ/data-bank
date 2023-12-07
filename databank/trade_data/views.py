@@ -20,8 +20,33 @@ from .forms import UploadCountryMetaForm, UploadHSCodeMetaForm, UploadTradeDataF
 tables =[
     {
         "name":"Forest Data",
-        "url":"forest_table"
-    }
+        "url":"forest_table"    
+    },
+
+    {
+        "name":"Population Data",
+        "url":"population_table"    
+    },
+        {
+        "name":"Land Data",
+        "url":"land_table"    
+    },
+        {
+        "name":"Transport Data",
+        "url":"transport_table"    
+    },
+        {
+        "name":"Hotel Data",
+        "url":"hotel_table"    
+    },
+        {
+        "name":"Water Data",
+        "url":"water_table"    
+    },
+        {
+        "name":"Tourism Data",
+        "url":"tourism_table"    
+    },
     ]
 
 def is_valid_queryparam(param):
