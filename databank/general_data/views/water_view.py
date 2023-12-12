@@ -34,7 +34,6 @@ def display_water_table(request):
     age_group=request.GET.get('age_group')
 
 
-
     paginator = Paginator(data, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
@@ -44,6 +43,7 @@ def display_water_table(request):
         'tables':tables,
         'data_len':len(data),
         'page':page,
+        'query_len': len(page),
         'country_categories':country_categories,
         # 'gender_Options':gender_option,
         # 'age_group_options':age_group_options

@@ -114,6 +114,12 @@
 </div>
 <div class="fs-4 fw-bold text-center">Transport Data</div>
 
+{% if query_len == 0 %}
+<div class="bg-light p-4 text-center fw-normal mt-4 text-danger">
+  No Records
+</div>
+{% else %}
+
 <div>
   <form method="post" action="{% url 'delete_selected_transport' %}" id="delete-form-transport">
     {% csrf_token %}
@@ -212,7 +218,7 @@
   </form>
 </div>
 
-
+{% endif %}
 
 <script>
   function confirmDelete(itemId) {

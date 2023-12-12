@@ -114,6 +114,12 @@
 </div>
 <div class="fs-4 fw-bold text-center">Forest Data</div>
 
+{% if query_len == 0 %}
+<div class="bg-light p-4 text-center fw-normal mt-4 text-danger">
+  No Records
+</div>
+{% else %}
+
 <div>
   <form method="post" action="{% url 'delete_selected_water' %}" id="delete-form-water">
     {% csrf_token %}
@@ -218,6 +224,8 @@
     </div>
   </form>
 </div>
+
+{% endif %}
 
 
 

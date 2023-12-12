@@ -16,6 +16,7 @@ urlpatterns = [
     path('population_table',population_view.display_population_table, name='population_table'),
     path('delete_selected_population/', population_view.delete_selected_population, name='delete_selected_population'),
     path('delete_population_record/<int:item_id>/', population_view.delete_population_record, name='delete_population_record'),
+    path('export_population_table_to_excel/', export_views.export_population_table_to_excel, name='export_population_table_to_excel'),
     path('update_population_record/<int:pk>/',population_view.update_population_record,name='update_population_record'),
 
 
@@ -24,6 +25,8 @@ urlpatterns = [
     path('delete_hotel_record/<int:item_id>/', hotel_view.delete_hotel_record, name='delete_hotel_record'),
     path('delete_selected_hotel/', hotel_view.delete_selected_hotel, name='delete_selected_hotel'),
     path('update_hotel_record/<int:pk>/',hotel_view.update_hotel_record,name='update_hotel_record'),
+    path('export_hotel_table_to_excel/', export_views.export_hotel_table_to_excel, name='export_hotel_table_to_excel'),
+
 
 
 
@@ -38,6 +41,8 @@ urlpatterns = [
     path('delete_selected_land/', land_view.delete_selected_land, name='delete_selected_land'),
     path('delete_land_record/<int:item_id>/', land_view.delete_land_record, name='delete_land_record'),
     path('update_land_record/<int:pk>/',land_view.update_land_record,name='update_land_record'),
+    path('export_land_table_to_excel/', export_views.export_land_table_to_excel, name='export_land_table_to_excel'),
+
 
 
 
@@ -45,6 +50,8 @@ urlpatterns = [
     path('delete_selected_tourism/', tourism_view.delete_selected_tourism, name='delete_selected_tourism'),
     path('delete_tourism_record/<int:item_id>/', tourism_view.delete_tourism_record, name='delete_tourism_record'),
     path('update_tourism_record/<int:pk>/',tourism_view.update_tourism_record,name='update_tourism_record'),
+    path('export_tourism_table_to_excel/', export_views.export_tourism_table_to_excel, name='export_tourism_table_to_excel'),
+
 
 
 

@@ -60,16 +60,6 @@
           />
         </div>
   
-        <div class="col-md-3">
-          <label for="ViewNameOfPlant">Name of the plant </label>
-          <input
-            type="text"
-            class="form-control"
-            id="view_plant_Name"
-            placeholder="e.g. saal"
-            name="name_of_the_plant"
-          />
-        </div>
         <div class="form-group col-md-3">
           <label for="country_category">Country</label>
           <select
@@ -84,24 +74,44 @@
           </select>
         </div>
         <div class="col-md-3">
-          <label for="viewAreaUnit">Area Unit</label>
-          <select id="area_unit" name="area_unit" class="form-control">
+          <label for="viewGender">Gender </label>
+          <select id="gender" name="gender" class="form-control">
             <option selected>--</option>
-            {% for area_unit in area_unit_categories %}
-            <option value="{{area_unit.id}}">{{area_unit}}</option>
+            {% for gender in gender_options %}
+            <option value="{{gender.id}}">{{gender}}</option>
             {% endfor %}
           </select>
         </div>
         <div class="col-md-3">
-          <label for="viewStockAvailable">Stock Available</label>
+          <label for="viewAge_group">Age_Group </label>
+          <select id="age_group" name="age_group" class="form-control">
+            <option selected>--</option>
+            {% for age_group in age_group_options %}
+            <option value="{{age_group.id}}">{{age_group}}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label for="minimum_area">Minimum Population</label>
           <input
             type="number"
             min="0"
             class="form-control"
-            id="viewStockAvailable"
+            id="minimum_population"
             placeholder="1000"
-            name="stock_available"
+            name="minimum_population"
           />
+        </div>
+        <div class="col-md-3">
+          <label for="maximum_area">Maximum Population</label>
+          <input
+            type="number"
+            min="0"
+            class="form-control"
+            id="maximum_population"
+            placeholder="1000"
+            name="maximum_population"
+            />
         </div>
         <div class="col-md-3 d-flex align-items-end">
           <button type="submit" class=" btn btn-primary">
@@ -113,6 +123,11 @@
   </div>
 </div>
 <div class="fs-4 fw-bold text-center">Population Data</div>
+{% if query_len == 0 %}
+<div class="bg-light p-4 text-center fw-normal mt-4 text-danger">
+  No Records
+</div>
+{% else %}
 
 <div>
   <form method="post" action="{% url 'delete_selected_population' %}" id="delete-form-population">
@@ -128,7 +143,7 @@
               <span class="fw-normal">Delete Selected</span>
           </button>
             <a
-              href="{% url 'export_forest_table_to_excel' %}?{{ request.GET.urlencode }}"
+              href="{% url 'export_population_table_to_excel' %}?{{ request.GET.urlencode }}"
               class="border p-2 styled-link"
             >
             <i class="fa-solid fa-table"></i>
@@ -210,6 +225,7 @@
     </div>
   </form>
 </div>
+{% endif %}
 
 
 

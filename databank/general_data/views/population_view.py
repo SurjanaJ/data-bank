@@ -32,8 +32,24 @@ def display_population_table(request):
     country_category = request.GET.get('country_category')
     gender=request.GET.get('gender')
     age_group=request.GET.get('age_group')
+    min_population = request.GET.get('minimum_area')
+    max_population = request.GET.get('maximum_area')
 
 
+    if is_valid_queryparam(date_min):
+        data=data.filter(Year__gte=date_min)
+
+    if is_valid_queryparam(date_max):
+        data=data.filter(Year__lt=date_max)
+
+    if is_valid_queryparam(country_category) and country_category != '--':
+        data = data.filter(Country_id=country_category)
+    
+    if is_valid_queryparam(min_population):
+        data = data.filter(Population_gte=min_population)
+
+    if is_valid_queryparam(max_population):
+        data = data.filter(Population__lt=max_population)
 
     paginator = Paginator(data, 10)
     page_number = request.GET.get('page')
@@ -44,8 +60,9 @@ def display_population_table(request):
         'tables':tables,
         'data_len':len(data),
         'page':page,
+        'query_len': len(page),
         'country_categories':country_categories,
-        'gender_Options':gender_option,
+        'gender_options':gender_option,
         'age_group_options':age_group_options
     }
     return render(request, 'general_data/population_templates/population_table.html',context)

@@ -44,8 +44,7 @@ def display_land_table(request):
 
     if is_valid_queryparam(land_code) and land_code != '--':
         data=data.filter(Land_Code = land_code)
-
-        
+     
 
     if is_valid_queryparam(country_category) and country_category != '--':
         data = data.filter(Country_id=country_category)
@@ -61,8 +60,6 @@ def display_land_table(request):
         data = data.filter(Area__lt=max_value)
 
 
-
-
     paginator = Paginator(data, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
@@ -71,6 +68,7 @@ def display_land_table(request):
     context={
         'tables':tables,
         'data_len':len(data),
+        'query_len': len(page),
         'page':page,
         'country_categories':country_categories,
         'Land_Unit_Options':Land_Unit_Options,

@@ -28,9 +28,27 @@ def display_hotel_table(request):
     date_min = request.GET.get('date_min')
     date_max = request.GET.get('date_max')
 
+    name_of_the_hotel=request.GET.get('name_of_the_hotel')
+    name_of_the_city=request.GET.get('name_of_the_city')
+
+
+
     country_category = request.GET.get('country_category')
-    gender=request.GET.get('gender')
-    age_group=request.GET.get('age_group')
+
+    if is_valid_queryparam (date_min):
+        data=data.filter(Year__gte=date_min)
+
+    if is_valid_queryparam(date_max):
+        data=data.filter(Year__lte=date_max)
+
+    if is_valid_queryparam(name_of_the_hotel):
+        data=data.filter(Q(Name_Of_The_Hotel__icontains=name_of_the_hotel)).distinct()
+
+    if is_valid_queryparam(name_of_the_city):
+        data=data.filter(Q(City__icontains=name_of_the_city)).distinct()
+ 
+
+
 
 
 
@@ -42,6 +60,7 @@ def display_hotel_table(request):
     context={
         'tables':tables,
         'data_len':len(data),
+        'query_len': len(page),
         'page':page,
         'country_categories':country_categories,
 
