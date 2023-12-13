@@ -20,6 +20,6 @@ urlpatterns = [
 
     path('country',views.display_country_meta, name='country'),
     path('unit',views.display_country_meta, name='unit'),
-    path('hs_code',views.display_country_meta, name='hs_code'),
+    path('hs_code',views.display_hs_code_meta, name='hs_code'),
 
 ]

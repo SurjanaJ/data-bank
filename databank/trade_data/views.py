@@ -509,3 +509,17 @@ def display_country_meta(request):
 
     context = {'page': page, 'total_data':total_data, 'meta_tables':meta_tables, 'tables':tables, 'column_names':column_names}
     return render(request, 'trade_data/display_country_meta.html', context)
+
+
+def display_hs_code_meta(request):
+    data = HS_Code_meta.objects.all().order_by('HS_Code')
+    total_data = data.count()
+
+    column_names = HS_Code_meta._meta.fields
+
+    paginator = Paginator(data, 12)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+
+    context = {'page': page, 'total_data':total_data, 'meta_tables':meta_tables, 'tables':tables, 'column_names':column_names}
+    return render(request, 'trade_data/display_hs_code_meta.html', context)
