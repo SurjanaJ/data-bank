@@ -181,7 +181,7 @@ def upload_country_meta_excel(request):
     else:
         form = UploadCountryMetaForm()
 
-    return render(request, 'trade_data/upload_form.html', {'form': form, 'tables': tables})
+    return render(request, 'trade_data/upload_form.html', {'form': form, 'tables': tables, 'meta_tables':meta_tables})
 
 
 def upload_unit_meta_excel(request):
@@ -219,7 +219,7 @@ def upload_unit_meta_excel(request):
                 return HttpResponse('success')
     else:
         form = UploadUnitMetaForm()
-    return render(request, 'trade_data/upload_form.html', {'form': form, 'tables':tables})
+    return render(request, 'trade_data/upload_form.html', {'form': form, 'tables':tables, 'meta_tables':meta_tables})
 
 def upload_hs_code_meta_excel(request):
     errors = []
@@ -268,7 +268,7 @@ def upload_hs_code_meta_excel(request):
     else:
         form = UploadHSCodeMetaForm()
 
-    return render(request, 'trade_data/upload_form.html', {'form': form})
+    return render(request, 'trade_data/upload_form.html', {'form': form, 'meta_tables':meta_tables})
 
 def upload_trade_excel(request):
     if request.method == 'POST':
@@ -320,7 +320,7 @@ def upload_trade_excel(request):
     else:
         form = UploadTradeDataForm()
 
-    return render(request, 'trade_data/upload_form.html', {'form': form, 'tables':tables})
+    return render(request, 'trade_data/upload_form.html', {'form': form, 'tables':tables, 'meta_tables':meta_tables})
 
 def upload_trade_record(request):
     trade_type_categories = [choice[1] for choice in TradeData.TRADE_OPTIONS]
@@ -336,7 +336,7 @@ def upload_trade_record(request):
             form.save()
             return redirect('display_trade_table')
 
-    context={'form': form,'trade_type_categories': trade_type_categories}
+    context={'form': form,'trade_type_categories': trade_type_categories, 'meta_tables':meta_tables}
     return render(request, 'trade_data/upload_form.html', context)
 
 
@@ -350,7 +350,7 @@ def update_trade_record(request,pk):
             form.save()
             return redirect('display_trade_table')
         
-    context={'form':form,}
+    context={'form':form, 'meta_tables':meta_tables}
     return render(request,'trade_data/update_trade_record.html',context)
 
 
@@ -468,7 +468,7 @@ def time_series_analysis(request):
 
 
     context = {'data':data, 'country_categories':country_categories, 'unit_categories':unit_categories,'hs_codes':hs_codes, 'trade_type_categories':trade_type_categories, 'result_country': result_country,'result_hs_code': result_hs_code,
-               'years':sorted_years, 'display_country':display_country, 'display_hs_code':display_hs_code, 'queryset_length':len(total_amount_by_origin_destination), 'total_amount_year':total_amount_year, 'tables':tables}
+               'years':sorted_years, 'display_country':display_country, 'display_hs_code':display_hs_code, 'queryset_length':len(total_amount_by_origin_destination), 'total_amount_year':total_amount_year, 'tables':tables, 'meta_tables':meta_tables}
 
     return render(request, 'trade_data/time_series.html', context)
 
@@ -505,5 +505,5 @@ def display_country_meta(request):
     page = paginator.get_page(page_number)
 
 
-    context = {'page': page, 'total_data':total_data}
+    context = {'page': page, 'total_data':total_data, 'meta_tables':meta_tables, 'tables':tables}
     return render(request, 'trade_data/display_country_meta.html', context)
