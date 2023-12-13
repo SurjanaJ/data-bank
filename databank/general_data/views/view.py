@@ -6,8 +6,8 @@ from django.core.paginator import Paginator
 from django.urls import reverse
 from django.db.models import Q
 import pandas as pd
-from .models import ForestData, Country_meta
-from .forms import UploadForestDataForm,UploadForestData
+from ..models import ForestData, Country_meta
+from ..forms import UploadForestDataForm,UploadForestData
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -109,12 +109,12 @@ def update_forest_record(request,pk):
     context={'form':form,}
     return render(request,'general_data/update_forest_record.html',context)
 
-def delete_selected_records(request):
-    if request.method == 'POST':
-        selected_record_ids = request.POST.getlist('selected_records')
-        ForestData.objects.filter(id__in=selected_record_ids).delete()
+# def delete_selected_records(request):
+#     if request.method == 'POST':
+#         selected_record_ids = request.POST.getlist('selected_records')
+#         ForestData.objects.filter(id__in=selected_record_ids).delete()
 
-    return redirect('forest_table')
+#     return redirect('forest_table')
 
 
 def display_forest_table(request):

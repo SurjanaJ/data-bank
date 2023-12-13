@@ -116,6 +116,32 @@
             </ul>
           </li>
 
+
+          <li class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              Show Meta Tables
+            </a>
+            
+            <ul class="dropdown-menu">
+              {% for meta_table in meta_tables %}
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="{% url meta_table.url %}"
+                  > {{meta_table.name}} </a
+                >
+              </li>
+              {% endfor %}
+             
+            </ul>
+          </li>
+
           <!-- Upload single record -->
 
           <!-- <li class="nav-item">
