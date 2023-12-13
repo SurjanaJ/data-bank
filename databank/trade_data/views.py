@@ -49,6 +49,22 @@ tables =[
     },
     ]
 
+
+meta_tables =[
+    {
+        "name":"HS Code Meta",
+        "url":"hs_code"    
+    },
+    {
+        "name": "Country Meta",
+        "url":"country"
+    },
+     {
+        "name": "Unit Meta",
+        "url":"unit"
+    }
+    ]
+
 def is_valid_queryparam(param):
     return param !='' and param is not None
 
@@ -104,7 +120,7 @@ def display_trade_table(request):
 
     
     context = { 'data_len': len(data), 'country_categories': country_categories, 'unit_categories': unit_categories,
-               'hs_codes': hs_codes, 'page':page,'trade_type_categories': trade_type_categories , 'query_len': len(page), 'tables':tables}
+               'hs_codes': hs_codes, 'page':page,'trade_type_categories': trade_type_categories , 'query_len': len(page), 'tables':tables, 'meta_tables':meta_tables}
 
     return render(request, 'trade_data/display_trade_table.html', context)
 
@@ -478,3 +494,9 @@ def delete_trade_record(request, item_id):
         return redirect('display_trade_table')
     except Exception as e:
         return HttpResponse(f"An error occurred: {str(e)}")
+    
+
+def display_country_meta(request):
+    data = Country_meta.objects.all()
+    context = {'data': data}
+    return render(request, 'trade_data/display_country_meta.html', context)
