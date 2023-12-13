@@ -497,6 +497,13 @@ def delete_trade_record(request, item_id):
     
 
 def display_country_meta(request):
-    data = Country_meta.objects.all()
-    context = {'data': data}
+    data = Country_meta.objects.all().order_by('Country_Name')
+    total_data = data.count()
+
+    paginator = Paginator(data, 12)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+
+
+    context = {'page': page, 'total_data':total_data}
     return render(request, 'trade_data/display_country_meta.html', context)
