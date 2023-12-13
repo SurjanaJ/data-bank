@@ -500,10 +500,12 @@ def display_country_meta(request):
     data = Country_meta.objects.all().order_by('Country_Name')
     total_data = data.count()
 
+    column_names = Country_meta._meta.fields
+
     paginator = Paginator(data, 12)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
 
 
-    context = {'page': page, 'total_data':total_data, 'meta_tables':meta_tables, 'tables':tables}
+    context = {'page': page, 'total_data':total_data, 'meta_tables':meta_tables, 'tables':tables, 'column_names':column_names}
     return render(request, 'trade_data/display_country_meta.html', context)
