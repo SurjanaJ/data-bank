@@ -34,6 +34,8 @@ urlpatterns = [
     path('delete_selected_water/', water_view.delete_selected_water, name='delete_selected_water'),
     path('delete_water_record/<int:item_id>/', water_view.delete_water_record, name='delete_water_record'),
     path('update_water_record/<int:pk>/',water_view.update_water_record,name='update_water_record'),
+    path('export_water_table_to_excel/', export_views.export_water_table_to_excel, name='export_water_table_to_excel'),
+
 
 
 
@@ -59,5 +61,6 @@ urlpatterns = [
     path('delete_selected_transport/', transport_view.delete_selected_transport, name='delete_selected_transport'),
     path('delete_transport_record/<int:item_id>/', transport_view.delete_transport_record, name='delete_transport_record'),
     path('update_transport_record/<int:pk>/',transport_view.update_transport_record,name='update_transport_record'),
+    path('export_transport_table_to_excel/', export_views.export_transport_table_to_excel, name='export_transport_table_to_excel'),
 
 ]

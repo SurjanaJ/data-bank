@@ -224,6 +224,57 @@ def export_tourism_table_to_excel(request):
     response['Content-Disposition'] = 'attachment; filename=Tourism_Data.xlsx'
     return response
 
+def export_water_table_to_excel(request):
+    data=Water.objects.all()
+    data=data.annotate(
+        country_name=F('Country__Country_Name'),
+        water_code = F('Water_Type_Code__Code'),
+    )
+
+    df=pd.DataFrame(data.values('Year','country_name','water_code','Description','Unit','Volume','Name_Of_The_River'))
+
+    df.rename(columns={'country_name':'Country','water_code':'Code_Type'},inplace=True)
+
+    df=df[['Year','Country','Code_Type','Description','Unit','Volume','Name_Of_The_River']]
+
+    output=BytesIO()
+    writer=pd.ExcelWriter(output,engine='xlsxwriter')
+    df.to_excel(writer,sheet_name='sheet1',index=False)
+
+    writer.close()
+    output.seek(0)
+
+    response=HttpResponse(
+        output,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['content-Disposition'] = 'attachment; filename=Water_Data.xlsx'
+    return response
 
 
+
+def export_transport_table_to_excel(request):
+    data = Transport.objects.all()
     
+    data = data.annotate(
+        country_name=F('Country__Country_Name'),
+        transport_classification_code = F('Transport_Classification_Code__Code'),
+    )
+
+    df=pd.DataFrame(data.values('Year','country_name','transport_classification_code','Unit','Quantity'))
+
+    df.rename(columns={'country_name':'Country','transport_classification_code':'Transport_Classification_Code'},inplace=True)
+
+    df = df[['Year','Country','Transport_Classification_Code','Unit','Quantity']]
+
+    output=BytesIO()
+    writer=pd.ExcelWriter(output,engine='xlsxwriter')
+    df.to_excel(writer,sheet_name='sheet1',index=False)
+
+    writer.close()
+    output.seek(0)
+
+    response=HttpResponse(
+        output,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['content-Disposition'] = 'attachment; filename=transport_data.xlsx'
+    return response
