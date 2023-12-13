@@ -19,7 +19,7 @@ urlpatterns = [
     path('update_trade_record/<int:pk>/',views.update_trade_record, name='update_trade_record'),
 
     path('country',views.display_country_meta, name='country'),
-    path('unit',views.display_country_meta, name='unit'),
+    path('unit',views.display_unit_meta, name='unit'),
     path('hs_code',views.display_hs_code_meta, name='hs_code'),
 
 ]

@@ -523,3 +523,16 @@ def display_hs_code_meta(request):
 
     context = {'page': page, 'total_data':total_data, 'meta_tables':meta_tables, 'tables':tables, 'column_names':column_names}
     return render(request, 'trade_data/display_hs_code_meta.html', context)
+
+def display_unit_meta(request):
+    data = Unit_meta.objects.all().order_by('Unit_Name')
+    total_data = data.count()
+
+    column_names = Unit_meta._meta.fields
+
+    paginator = Paginator(data, 12)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+
+    context = {'page': page, 'total_data':total_data, 'meta_tables':meta_tables, 'tables':tables, 'column_names':column_names}
+    return render(request, 'trade_data/display_unit_meta.html', context)
