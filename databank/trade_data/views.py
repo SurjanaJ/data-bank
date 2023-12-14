@@ -1,7 +1,10 @@
 import datetime
+from io import BytesIO
+import json
 from math import isnan
+from urllib.parse import unquote
 from django.db import IntegrityError
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect, render,get_object_or_404
 from django.db.models import Q
 from numpy import NaN
@@ -175,6 +178,7 @@ def upload_country_meta_excel(request):
                 # If there are errors, return them as a response
                 return render(request, 'trade_data/error_template.html', {'errors': errors})
             elif duplicate_data:
+                request.session['duplicate_data'] = duplicate_data
                 return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data})
             elif success_messages:
                 return render(request,'trade_data/success_template.html' ,{'success_messages':success_messages})
@@ -513,7 +517,6 @@ def display_country_meta(request):
     context = {'page': page, 'total_data':total_data, 'meta_tables':meta_tables, 'tables':tables, 'column_names':column_names}
     return render(request, 'trade_data/display_country_meta.html', context)
 
-
 def display_hs_code_meta(request):
     data = HS_Code_meta.objects.all().order_by('HS_Code')
     total_data = data.count()
@@ -539,3 +542,31 @@ def display_unit_meta(request):
 
     context = {'page': page, 'total_data':total_data, 'meta_tables':meta_tables, 'tables':tables, 'column_names':column_names}
     return render(request, 'trade_data/display_unit_meta.html', context)
+
+def duplicate_data_to_excel(duplicate_data):
+    # Convert duplicate_data to a DataFrame
+    column_names = list(duplicate_data[0]['data'].keys())
+    duplicate_df = pd.DataFrame([d['data'] for d in duplicate_data], columns=column_names)
+
+    # Create a response object with Excel content
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=duplicate_data.xlsx'
+
+    # Write DataFrame to Excel file
+    duplicate_df.to_excel(response, index=False, sheet_name='duplicate_data')
+
+    return response
+
+def download_duplicate_excel(request):
+    # Retrieve duplicate_data from session or any other storage method
+    duplicate_data = request.session.get('duplicate_data', [])
+
+    if duplicate_data:
+        # Export duplicate_data to Excel if there are duplicate data
+        response = duplicate_data_to_excel(duplicate_data)
+        # Clear the duplicate data from the session
+        request.session.pop('duplicate_data', None)
+        return response
+    else:
+        # Handle case where there are no success messages
+        return HttpResponse('No data to export.')
