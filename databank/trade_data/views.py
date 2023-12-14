@@ -543,8 +543,8 @@ def display_unit_meta(request):
     context = {'page': page, 'total_data':total_data, 'meta_tables':meta_tables, 'tables':tables, 'column_names':column_names}
     return render(request, 'trade_data/display_unit_meta.html', context)
 
+# Convert duplicate_data to a DataFrame, then to excel
 def duplicate_data_to_excel(duplicate_data):
-    # Convert duplicate_data to a DataFrame
     column_names = list(duplicate_data[0]['data'].keys())
     duplicate_df = pd.DataFrame([d['data'] for d in duplicate_data], columns=column_names)
 
@@ -552,21 +552,18 @@ def duplicate_data_to_excel(duplicate_data):
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename=duplicate_data.xlsx'
 
-    # Write DataFrame to Excel file
     duplicate_df.to_excel(response, index=False, sheet_name='duplicate_data')
 
     return response
 
+
+# Get the data from session storage
 def download_duplicate_excel(request):
-    # Retrieve duplicate_data from session or any other storage method
     duplicate_data = request.session.get('duplicate_data', [])
 
     if duplicate_data:
-        # Export duplicate_data to Excel if there are duplicate data
         response = duplicate_data_to_excel(duplicate_data)
-        # Clear the duplicate data from the session
         request.session.pop('duplicate_data', None)
         return response
     else:
-        # Handle case where there are no success messages
         return HttpResponse('No data to export.')

@@ -4,15 +4,15 @@
 
 <div class="row">
     <div class="alert alert-danger col-8" role="alert">
-        Cannot add duplicate records. 
-        <a href="{% url 'download_duplicate_excel' %}" class="alert-link">Export Excel?</a> 
+        Cannot add the following duplicate records. 
+        <a href="{% url 'download_duplicate_excel' %}" class="alert-link">Export to Excel?</a> 
       </div>
 </div>
     
     
     <div class="row">
         <div class="col-8">
-            <table class="table table-sm">
+            <table class="table table-sm table-striped">
                 <thead>
                     <tr>
                         <th class="p-2">Row </th>
