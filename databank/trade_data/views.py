@@ -128,6 +128,7 @@ def display_trade_table(request):
 def upload_country_meta_excel(request):
     errors = []
     success_messages = []
+    duplicate_data = []
 
     if request.method == 'POST':
         form = UploadCountryMetaForm(request.POST, request.FILES)
@@ -151,7 +152,7 @@ def upload_country_meta_excel(request):
                 if existing_record:
                     # If a duplicate record is found, check if all columns are identical
                     if all(getattr(existing_record, key) == value for key, value in country_data.items()):
-                        errors.append(f"Cannot add duplicate data at row {index}.")
+                        duplicate_data.append({'row_index': index, 'data': country_data})
                     else:
                         # Update the row with non-duplicate data
                         for key, value in country_data.items():
@@ -173,6 +174,8 @@ def upload_country_meta_excel(request):
             if errors:
                 # If there are errors, return them as a response
                 return render(request, 'trade_data/error_template.html', {'errors': errors})
+            elif duplicate_data:
+                return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data})
             elif success_messages:
                 return render(request,'trade_data/success_template.html' ,{'success_messages':success_messages})
             else:
