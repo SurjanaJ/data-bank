@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from io import BytesIO
 import json
 from math import isnan
@@ -127,7 +127,6 @@ def display_trade_table(request):
 
     return render(request, 'trade_data/display_trade_table.html', context)
 
-
 def upload_country_meta_excel(request):
     errors = []
     success_messages = []
@@ -189,7 +188,6 @@ def upload_country_meta_excel(request):
         form = UploadCountryMetaForm()
 
     return render(request, 'trade_data/upload_form.html', {'form': form, 'tables': tables, 'meta_tables':meta_tables})
-
 
 def upload_unit_meta_excel(request):
     errors = [] 
@@ -278,52 +276,61 @@ def upload_hs_code_meta_excel(request):
     return render(request, 'trade_data/upload_form.html', {'form': form, 'meta_tables':meta_tables})
 
 def upload_trade_excel(request):
+    errors = []
+    success_messages = []
+    duplicate_data = []
+
     if request.method == 'POST':
         form = UploadTradeDataForm(request.POST, request.FILES)
+
         if form.is_valid():
             excel_data = request.FILES['trade_data_file']
             df = pd.read_excel(excel_data)
 
             for index, row in df.iterrows():
-                Country = row['Country']
-                HS_Code = row['HS_Code']
-                Unit = row['Unit']
-                Origin_Destination = row['Origin_Destination']
-                Calender = row['Calender']
-                tarrif_value = row['Tarrif']
+                trade_data = {
+                    'Trade_Type':row['Trade_Type'],
+                    # 'Calender': datetime.strptime(str(row['Calender']), '%Y-%m-%d').date().strftime('%Y-%m-%d'),
+                    'Calender': str(row['Calender']),
+                    'Fiscal_Year':row['Fiscal_Year'],
+                    'Duration':row['Duration'],
+                    'Country' : row['Country'],
+                    'HS_Code' : row['HS_Code'],
+                    'Unit' :row['Unit'],
+                    'Tarrif' : None if row['Tarrif'] == 'nan' or isnan(row['Tarrif']) else row['Tarrif'],
+                    'Origin_Destination' : row['Origin_Destination'],
+                    'TradersName_ExporterImporter':row['TradersName_ExporterImporter'],
+                    'DocumentsLegalProcedural':row['DocumentsLegalProcedural']
+                }
 
                 try:
-                    Country = Country_meta.objects.get(Country_Name=Country)
-                    HS_Code = HS_Code_meta.objects.get(HS_Code=HS_Code)
-                    Unit = Unit_meta.objects.get(Unit_Code=Unit)
-                    Origin_Destination = Country_meta.objects.get(
-                        Country_Name=Origin_Destination)
+                    calender_date = datetime.strptime(trade_data['Calender'], '%Y-%m-%d').date()
+                except ValueError:
+                    # If ValueError occurs, it means the input didn't match the format, so set default month and day
+                    calender_date = datetime.strptime(f'{trade_data['Calender']}-01-01', '%Y-%m-%d').date()
+                try:
+                    # Format the date as a string in the same format
+                    trade_data['Calender'] = calender_date.strftime('%Y-%m-%d')
+                    trade_data['Country'] = Country_meta.objects.get(Country_Name=trade_data['Country'])
+                    trade_data['HS_Code'] = HS_Code_meta.objects.get(HS_Code=trade_data['HS_Code'])
+                    trade_data['Unit'] = Unit_meta.objects.get(Unit_Code=trade_data['Unit'])
+                    trade_data['Origin_Destination'] = Country_meta.objects.get(
+                        Country_Name=trade_data['Origin_Destination'])
                     
+                    trade_data = TradeData(**trade_data)
+                    trade_data.save()
+                    success_messages.append(f"Inserted new record at row {index}.")
+                
+                except Exception as e:
+                    errors.append({'row_index': index, 'data': trade_data, 'reason': str(e)})
 
-                except DataError as e:
-                    print(f"Error inserting row {index}: {e}")
-                    print(f"Problematic row data: {row}")
-
-                trade_data = TradeData(
-                    Trade_Type=row['Trade_Type'],
-                    Calender=datetime.date(Calender, 1, 1),
-                    Fiscal_Year=row['Fiscal_Year'],
-                    Duration=row['Duration'],
-                    Country=Country,
-                    HS_Code=HS_Code,
-                    Unit=Unit,
-                    Quantity=row['Quantity'],
-                    Currency_Type=row['Currency_Type'],
-                    Amount=row['Amount'],
-                    Tarrif = None if tarrif_value == 'nan' or isnan(tarrif_value) else tarrif_value,
-                    Origin_Destination=Origin_Destination,
-                    TradersName_ExporterImporter=row['TradersName_ExporterImporter'],
-                    DocumentsLegalProcedural=row['DocumentsLegalProcedural']
-                )
-                trade_data.save()
-
-            return HttpResponse('success')
-
+            if errors:
+                request.session['errors'] = errors
+                return render(request, 'trade_data/error_template.html', {'errors': errors})
+            elif success_messages:
+                return render(request,'trade_data/success_template.html' ,{'success_messages':success_messages})
+            else:
+                return HttpResponse('success')    
     else:
         form = UploadTradeDataForm()
 
@@ -346,7 +353,6 @@ def upload_trade_record(request):
     context={'form': form,'trade_type_categories': trade_type_categories, 'meta_tables':meta_tables}
     return render(request, 'trade_data/upload_form.html', context)
 
-
 def update_trade_record(request,pk):
     trade_record = TradeData.objects.get(id=pk)
     form = UploadTradeData(instance=trade_record)
@@ -360,7 +366,6 @@ def update_trade_record(request,pk):
     context={'form':form, 'meta_tables':meta_tables}
     return render(request,'trade_data/update_trade_record.html',context)
 
-
 def find_country_name(country_category):
     if country_category == '--':
         return('All Countries')
@@ -372,8 +377,7 @@ def find_country_name(country_category):
         else:
             country_instance = 'All Countries'
         return country_instance
-    
-    
+       
 def find_hs_code(hs_code):
     if hs_code == '--':
         return("All Commodities")
@@ -543,6 +547,7 @@ def display_unit_meta(request):
     context = {'page': page, 'total_data':total_data, 'meta_tables':meta_tables, 'tables':tables, 'column_names':column_names}
     return render(request, 'trade_data/display_unit_meta.html', context)
 
+
 # Convert duplicate_data to a DataFrame, then to excel
 def duplicate_data_to_excel(duplicate_data):
     column_names = list(duplicate_data[0]['data'].keys())
@@ -555,7 +560,6 @@ def duplicate_data_to_excel(duplicate_data):
     duplicate_df.to_excel(response, index=False, sheet_name='duplicate_data')
 
     return response
-
 
 # Get the data from session storage
 def download_duplicate_excel(request):
