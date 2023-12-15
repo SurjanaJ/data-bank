@@ -288,41 +288,55 @@ def upload_trade_excel(request):
             df = pd.read_excel(excel_data)
 
             for index, row in df.iterrows():
-                trade_data = {
+                try:
+                    calender_date = datetime.strptime(str(row['Calender']), '%Y-%m-%d').date()
+                except ValueError:
+                    # If ValueError occurs, it means the input didn't match the format, so set default month and day
+                    calender_date = datetime.strptime(f'{str(row['Calender'])}-01-01', '%Y-%m-%d').date()
+                
+                try:
+                    # Format the date as a string in the same format
+                    Calender = calender_date.strftime('%Y-%m-%d')
+                    Country = Country_meta.objects.get(Country_Name=row['Country'])
+                    HS_Code = HS_Code_meta.objects.get(HS_Code=row['HS_Code'])
+                    Unit = Unit_meta.objects.get(Unit_Code=row['Unit'])
+                    Origin_Destination = Country_meta.objects.get(
+                        Country_Name=row['Origin_Destination'])
+                    
+
+                    trade_data = {
                     'Trade_Type':row['Trade_Type'],
                     # 'Calender': datetime.strptime(str(row['Calender']), '%Y-%m-%d').date().strftime('%Y-%m-%d'),
-                    'Calender': str(row['Calender']),
+                    'Calender': Calender,
                     'Fiscal_Year':row['Fiscal_Year'],
                     'Duration':row['Duration'],
-                    'Country' : row['Country'],
-                    'HS_Code' : row['HS_Code'],
-                    'Unit' :row['Unit'],
+                    'Country' : Country,
+                    'HS_Code' : HS_Code,
+                    'Unit' : Unit,
                     'Tarrif' : None if row['Tarrif'] == 'nan' or isnan(row['Tarrif']) else row['Tarrif'],
-                    'Origin_Destination' : row['Origin_Destination'],
+                    'Origin_Destination' : Origin_Destination,
                     'TradersName_ExporterImporter':row['TradersName_ExporterImporter'],
                     'DocumentsLegalProcedural':row['DocumentsLegalProcedural']
                 }
-
-                try:
-                    calender_date = datetime.strptime(trade_data['Calender'], '%Y-%m-%d').date()
-                except ValueError:
-                    # If ValueError occurs, it means the input didn't match the format, so set default month and day
-                    calender_date = datetime.strptime(f'{trade_data['Calender']}-01-01', '%Y-%m-%d').date()
-                try:
-                    # Format the date as a string in the same format
-                    trade_data['Calender'] = calender_date.strftime('%Y-%m-%d')
-                    trade_data['Country'] = Country_meta.objects.get(Country_Name=trade_data['Country'])
-                    trade_data['HS_Code'] = HS_Code_meta.objects.get(HS_Code=trade_data['HS_Code'])
-                    trade_data['Unit'] = Unit_meta.objects.get(Unit_Code=trade_data['Unit'])
-                    trade_data['Origin_Destination'] = Country_meta.objects.get(
-                        Country_Name=trade_data['Origin_Destination'])
-                    
                     trade_data = TradeData(**trade_data)
                     trade_data.save()
                     success_messages.append(f"Inserted new record at row {index}.")
                 
+                    trade_data_dict = {
+    'Trade_Type': trade_data.Trade_Type,
+    'Calender': trade_data.Calender,
+    'Fiscal_Year': trade_data.Fiscal_Year,
+    'Duration': trade_data.Duration,
+    'Country': trade_data.Country.Country_Name,  # Assuming 'Country' is a ForeignKey in TradeData
+    'HS_Code': trade_data.HS_Code.HS_Code,  # Assuming 'HS_Code' is a ForeignKey in TradeData
+    'Unit': trade_data.Unit.Unit_Code,  # Assuming 'Unit' is a ForeignKey in TradeData
+    'Tarrif': trade_data.Tarrif,
+    'Origin_Destination': trade_data.Origin_Destination.Country_Name,  # Assuming 'Origin_Destination' is a ForeignKey in TradeData
+    'TradersName_ExporterImporter': trade_data.TradersName_ExporterImporter,
+    'DocumentsLegalProcedural': trade_data.DocumentsLegalProcedural,
+}
                 except Exception as e:
-                    errors.append({'row_index': index, 'data': trade_data, 'reason': str(e)})
+                    errors.append({'row_index': index, 'data': trade_data_dict, 'reason': str(e)})
 
             if errors:
                 request.session['errors'] = errors
