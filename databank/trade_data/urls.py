@@ -23,5 +23,7 @@ urlpatterns = [
     path('hs_code',views.display_hs_code_meta, name='hs_code'),
 
     # path('export_duplicate_country', views.export_duplicate_country, name='export_duplicate_country')
-    path('download_duplicate_excel/', views.download_duplicate_excel, name='download_duplicate_excel')
+    path('download_duplicate_excel/', views.download_duplicate_excel, name='download_duplicate_excel'),
+    path('download_error_excel/', views.download_error_excel, name='download_error_excel')
+
 ]

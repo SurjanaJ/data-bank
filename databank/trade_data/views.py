@@ -590,3 +590,27 @@ def download_duplicate_excel(request):
         return response
     else:
         return HttpResponse('No data to export.')
+    
+def error_data_to_excel(error_data):
+    column_names = list(error_data[0]['data'].keys())
+    error_df = pd.DataFrame([d['data'] for d in error_data], columns=column_names)
+
+    # Create a response object with Excel content
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=error_data.xlsx'
+
+    error_df.to_excel(response, index=False, sheet_name='error_data')
+
+    return response
+
+
+
+def download_error_excel(request):
+    error_data = request.session.get('errors', [])
+
+    if error_data:
+        response = error_data_to_excel(error_data)
+        request.session.pop('error_data', None)
+        return response
+    else:
+        return HttpResponse('No data to export.')
