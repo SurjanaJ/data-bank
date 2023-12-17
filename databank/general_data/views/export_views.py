@@ -1,11 +1,13 @@
 from ..models import ForestData,Land,Hotel,Transport,Tourism,Water,PopulationData
 from io import BytesIO
-from ..views import view
+from ..views import view,population_view
 import xlsxwriter
 from django.db.models import Q
 from django.db.models import F
 import pandas as pd
 from django.shortcuts import HttpResponse
+
+
 def filter(request):
     data =ForestData.objects.all()
 
@@ -74,8 +76,8 @@ def filter_land(request):
     country_category = request.GET.get('country_category')
     land_code = request.GET.get('land_code')
     unit = request.GET.get('land_unit')
-    min_value = request.POST.get('minimum_area')
-    max_value = request.POST.get('maximum_area')
+    min_value = request.GET.get('minimum_population')
+    max_value = request.GET.get('maximum_population')
 
  
  
@@ -169,10 +171,42 @@ def export_hotel_table_to_excel(request):
 
 
 #filter population required
+def filter_population(request):
+    data = PopulationData.objects.all()
+
+    date_min = request.GET.get('date_min')
+    date_max = request.GET.get('date_max')
+
+    country_category = request.GET.get('country_category')
+    gender=request.GET.get('gender')
+    age_group=request.GET.get('age_group')
+    min_population = request.GET.get('minimum_population')
+    max_population = request.GET.get('maximum_population')
+
+
+    if population_view.is_valid_queryparam(date_min):
+        data=data.filter(Year__gte=date_min)
+
+    if population_view.is_valid_queryparam(date_max):
+        data=data.filter(Year__lt=date_max)
+
+    if population_view.is_valid_queryparam(country_category) and country_category != '--':
+        data = data.filter(Country_id=country_category)
+
+    if population_view.is_valid_queryparam(gender) and gender != '--':
+        data = data.filter(Gender=gender)
+
+    if population_view.is_valid_queryparam(age_group) and age_group != '--':
+        data = data.filter(Age_Group=age_group)
+    
+    if population_view.is_valid_queryparam(min_population):
+        data = data.filter(Population_gte=min_population)
+
+    if population_view.is_valid_queryparam(max_population):
+        data = data.filter(Population__lt=max_population)
 
 def export_population_table_to_excel(request):
-
-    data = PopulationData.objects.all()
+    data = filter_population(request)
 
     data = data.annotate(
         country_name=F('Country__Country_Name'),

@@ -19,8 +19,6 @@ def is_valid_queryparam(param):
 
 
 def display_population_table(request):
-
-    url = reverse('population_table')
     data = PopulationData.objects.all()
     country_categories = Country_meta.objects.all()
     gender_option = [choice[1] for choice in PopulationData.Gender_Options]
@@ -32,8 +30,8 @@ def display_population_table(request):
     country_category = request.GET.get('country_category')
     gender=request.GET.get('gender')
     age_group=request.GET.get('age_group')
-    min_population = request.GET.get('minimum_area')
-    max_population = request.GET.get('maximum_area')
+    min_population = request.GET.get('minimum_population')
+    max_population = request.GET.get('maximum_population')
 
 
     if is_valid_queryparam(date_min):
@@ -44,6 +42,12 @@ def display_population_table(request):
 
     if is_valid_queryparam(country_category) and country_category != '--':
         data = data.filter(Country_id=country_category)
+
+    if is_valid_queryparam(gender) and gender != '--':
+        data = data.filter(Gender=gender)
+
+    if is_valid_queryparam(age_group) and age_group != '--':
+        data = data.filter(Age_Group=age_group)
     
     if is_valid_queryparam(min_population):
         data = data.filter(Population_gte=min_population)

@@ -47,13 +47,14 @@ def display_hotel_table(request):
     if is_valid_queryparam(name_of_the_city):
         data=data.filter(Q(City__icontains=name_of_the_city)).distinct()
  
-
+    if is_valid_queryparam(country_category) and country_category != '--':
+        data = data.filter(Country_id=country_category)
 
 
 
 
     paginator = Paginator(data, 10)
-    page_number = request.GET.get('page')
+    page_number = request.GET.get('page')   
     page = paginator.get_page(page_number)
     
 

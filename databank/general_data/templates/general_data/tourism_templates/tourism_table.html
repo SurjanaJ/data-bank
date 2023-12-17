@@ -59,17 +59,6 @@
             name="date_max"
           />
         </div>
-  
-        <div class="col-md-3">
-          <label for="ViewNameOfPlant">Name of the plant </label>
-          <input
-            type="text"
-            class="form-control"
-            id="view_plant_Name"
-            placeholder="e.g. saal"
-            name="name_of_the_plant"
-          />
-        </div>
         <div class="form-group col-md-3">
           <label for="country_category">Country</label>
           <select
@@ -83,25 +72,53 @@
             {% endfor %}
           </select>
         </div>
-        <div class="col-md-3">
-          <label for="viewAreaUnit">Area Unit</label>
-          <select id="area_unit" name="area_unit" class="form-control">
+        <div class="form-group col-md-3">
+          <label for="nationality_category">Nationality Of Tourism</label>
+          <select
+            id="nationality_category"
+            class="form-control"
+            name="nationality_category"
+          >
             <option selected>--</option>
-            {% for area_unit in area_unit_categories %}
-            <option value="{{area_unit.id}}">{{area_unit}}</option>
+            {% for country_category in country_categories %}
+            <option value="{{country_category.id}}">{{country_category}}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group col-md-3">
+          <label for="arrival_mode">Arrival Mode</label>
+          <select
+            id="arrival_mode"
+            class="form-control"
+            name="arrival_mode"
+          >
+            <option selected>--</option>
+            {% for code in arrival_codes %}
+            <option value="{{code.id}}">{{code.Code}} - {{code.Arrival_Mode}}</option>
             {% endfor %}
           </select>
         </div>
         <div class="col-md-3">
-          <label for="viewStockAvailable">Stock Available</label>
+          <label for="minimum_population">Minimum No_Of_Tourist</label>
           <input
             type="number"
             min="0"
             class="form-control"
-            id="viewStockAvailable"
+            id="minimum_tourist"
             placeholder="1000"
-            name="stock_available"
+            name="minimum_tourist"
           />
+        </div>
+        <div class="col-md-3">
+          <label for="maximum_population">Maximum No_Of_Tourist</label>
+          <input
+            type="number"
+            min="0"
+            class="form-control"
+            id="maximum_tourist"
+            placeholder="1000"
+            name="maximum_tourist"
+            />
         </div>
         <div class="col-md-3 d-flex align-items-end">
           <button type="submit" class=" btn btn-primary">

@@ -6,7 +6,7 @@ from django.core.paginator import Paginator
 from django.urls import reverse
 from django.db.models import Q
 import pandas as pd
-from ..models import Tourism, Country_meta
+from ..models import Tourism, Country_meta,Tourism_Meta
 from ..forms import UploadForestDataForm,UploadTourismData
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
@@ -23,16 +23,37 @@ def display_tourism_table(request):
     url = reverse('tourism_table')
     data = Tourism.objects.all()
     country_categories = Country_meta.objects.all()
-    # gender_option = [choice[1] for choice in Tourism.Gender_Options]
-    # age_group_options=[choice[1] for choice in Tourism.Age_Group_Options]
+    arrival_codes = Tourism_Meta.objects.all()
 
     date_min = request.GET.get('date_min')
     date_max = request.GET.get('date_max')
-
+    arrival_mode = request.GET.get('arrival_mode')
     country_category = request.GET.get('country_category')
-    gender=request.GET.get('gender')
-    age_group=request.GET.get('age_group')
+    nationality_category = request.GET.get('nationality_category')
+    min_tourist = request.GET.get('minimum_tourist')
+    max_tourist = request.GET.get('maximum_tourist')
 
+
+    if is_valid_queryparam(date_min):
+        data=data.filter(Year__gte=date_min)
+
+    if is_valid_queryparam(date_max):
+        data=data.filter(Year__lt=date_max)
+
+    if is_valid_queryparam(country_category) and country_category != '--':
+        data = data.filter(Country_id=country_category)
+
+    if is_valid_queryparam(nationality_category) and nationality_category != '--':
+        data = data.filter(Nationality_Of_Tourism_id=nationality_category)
+
+    if is_valid_queryparam(arrival_mode) and arrival_mode != '--':
+        data = data.filter(Arrival_code_id=arrival_mode)
+
+    if is_valid_queryparam(min_tourist):
+        data = data.filter(Number_Of_Tourist__gte=min_tourist)
+
+    if is_valid_queryparam(max_tourist):
+        data = data.filter(Number_Of_Tourist__lt=max_tourist)
 
 
     paginator = Paginator(data, 10)
@@ -46,8 +67,8 @@ def display_tourism_table(request):
         'page':page,
         'query_len': len(page),
         'country_categories':country_categories,
-        # 'gender_Options':gender_option,
-        # 'age_group_options':age_group_options
+        'arrival_codes':arrival_codes,
+        
     }
     return render(request, 'general_data/tourism_templates/tourism_table.html',context)
 

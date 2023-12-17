@@ -78,7 +78,7 @@
           <select id="gender" name="gender" class="form-control">
             <option selected>--</option>
             {% for gender in gender_options %}
-            <option value="{{gender.id}}">{{gender}}</option>
+            <option value="{{gender}}">{{gender}}</option>
             {% endfor %}
           </select>
         </div>
@@ -87,12 +87,12 @@
           <select id="age_group" name="age_group" class="form-control">
             <option selected>--</option>
             {% for age_group in age_group_options %}
-            <option value="{{age_group.id}}">{{age_group}}</option>
+            <option value="{{age_group}}">{{age_group}}</option>
             {% endfor %}
           </select>
         </div>
         <div class="col-md-3">
-          <label for="minimum_area">Minimum Population</label>
+          <label for="minimum_population">Minimum Population</label>
           <input
             type="number"
             min="0"
@@ -103,7 +103,7 @@
           />
         </div>
         <div class="col-md-3">
-          <label for="maximum_area">Maximum Population</label>
+          <label for="maximum_population">Maximum Population</label>
           <input
             type="number"
             min="0"

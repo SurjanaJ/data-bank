@@ -6,7 +6,7 @@ from django.core.paginator import Paginator
 from django.urls import reverse
 from django.db.models import Q
 import pandas as pd
-from ..models import Transport, Country_meta
+from ..models import Transport, Country_meta,Transport_Meta
 from ..forms import UploadForestDataForm,UploadTransportData
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
@@ -23,15 +23,39 @@ def display_transport_table(request):
     url = reverse('transport_table')
     data = Transport.objects.all()
     country_categories = Country_meta.objects.all()
-    # gender_option = [choice[1] for choice in Transport.Gender_Options]
-    # age_group_options=[choice[1] for choice in Transport.Age_Group_Options]
+    unit_options = [choice[1] for choice in Transport.Unit_Options]
+    transport_classification_codes = Transport_Meta.objects.all()
 
     date_min = request.GET.get('date_min')
     date_max = request.GET.get('date_max')
 
     country_category = request.GET.get('country_category')
-    gender=request.GET.get('gender')
-    age_group=request.GET.get('age_group')
+    transport_classification_code = request.GET.get('transport_classification_code')
+
+    quantity_unit=request.GET.get('quantity_unit')
+    min_quantity = request.GET.get('minimum_quantity')
+    max_quantity = request.GET.get('maximum_quantity')
+
+    if is_valid_queryparam(date_min):
+        data=data.filter(Year__gte=date_min)
+
+    if is_valid_queryparam(date_max):
+        data=data.filter(Year__lt=date_max)
+
+    if is_valid_queryparam(country_category) and country_category != '--':
+        data = data.filter(Country_id=country_category)
+
+    if is_valid_queryparam(transport_classification_code) and transport_classification_code != '--':
+        data = data.filter(Transport_Classification_Code_id=transport_classification_code)
+
+    if is_valid_queryparam(quantity_unit) and quantity_unit != '--':
+        data = data.filter(Unit=quantity_unit)
+
+    if is_valid_queryparam(min_quantity):
+        data = data.filter(Quantity__gte=min_quantity)
+
+    if is_valid_queryparam(max_quantity):
+        data = data.filter(Quantity__lt=max_quantity)
 
 
 
@@ -46,8 +70,8 @@ def display_transport_table(request):
         'page':page,
         'query_len': len(page),
         'country_categories':country_categories,
-        # 'gender_Options':gender_option,
-        # 'age_group_options':age_group_options
+        'unit_options':unit_options,
+        'transport_classification_codes':transport_classification_codes
     }
     return render(request, 'general_data/transport_templates/transport_table.html',context)
 
