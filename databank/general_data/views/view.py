@@ -14,10 +14,6 @@ from django.contrib import messages
 from django.views.decorators.http import require_POST
 
 
-MESSAGE_TAGS = {
-    messages.SUCCESS: 'alert-success',
-}
-
 def is_valid_queryparam(param):
     return param !='' and param is not None
     

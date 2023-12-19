@@ -11,17 +11,6 @@
   Filters
 </button>
 
-<div>
-  {% if messages %}
-    {% for m in messages %}
-      <div class="alert alert-success px-1 py-1 alert-dismissible mt-2 " id="delete_selected_message" role="alert">
-        {{m}}
-        <button type="button" class="btn-close px-2 py-2 " data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-    {% endfor %}
-  {% endif %}
-</div>
-
 <div class="bg-light mt-3">
   <div class="collapse shadow rounded-2 " id="collapseFilter">
     <div class="px-2 py-2"> 

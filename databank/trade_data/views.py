@@ -2,7 +2,6 @@ from datetime import datetime
 from io import BytesIO
 import json
 from math import isnan
-from urllib.parse import unquote
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect, render,get_object_or_404
@@ -129,9 +128,9 @@ def display_trade_table(request):
 
 def upload_country_meta_excel(request):
     errors = []
-    success_messages = []
     duplicate_data = []
     added_count = 0
+    updated_count = 0
 
     if request.method == 'POST':
         form = UploadCountryMetaForm(request.POST, request.FILES)
@@ -162,7 +161,7 @@ def upload_country_meta_excel(request):
                             setattr(existing_record, key, value)
                         try:
                             existing_record.save()
-                            # success_messages.append(f"Updated the record at row {index}.")
+                            updated_count += 1
                         except IntegrityError as e:
                             errors.append(f"Error updating row {index}: {e}")
                 else:
@@ -171,7 +170,6 @@ def upload_country_meta_excel(request):
                         country_meta = Country_meta(**country_data)
                         country_meta.save()
                         added_count += 1
-                        # success_messages.append(f"Inserted new record at row {index}.")
                     except IntegrityError as e:
                         errors.append(f"Error inserting row {index}: {e}")
 
@@ -181,9 +179,8 @@ def upload_country_meta_excel(request):
             elif duplicate_data:
                 request.session['duplicate_data'] = duplicate_data
                 return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data})
-            # elif success_messages:
-            #     return render(request,'trade_data/success_template.html' ,{'success_messages':success_messages})
             else:
+                messages.info(request, str(updated_count) + ' records updated.')
                 messages.success(request, str(added_count) + ' records added.')
                 return redirect('country')
 

@@ -1,16 +1,7 @@
 {% extends 'main.html' %}
 {% block content %}
 
-<div>
-  {% if messages %}
-    {% for m in messages %}
-      <div class="alert alert-success px-1 py-1 alert-dismissible mt-2 " id="delete_selected_message" role="alert">
-        {{m}}
-        <button type="button" class="btn-close px-2 py-2 " data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-    {% endfor %}
-  {% endif %}
-</div>
+
 <div class="container">
   <span class="text-danger">* {{total_data}} Records Found</span>
   <table class="table table-striped table-bordered table-sm ">

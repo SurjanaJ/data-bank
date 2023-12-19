@@ -27,21 +27,34 @@
   {% include 'navbar.html' %}
 
   <div class="container fw-light pt-3">
+
+    <div>
+      {% if messages %}
+      {% for m in messages %}
+      <div class="alert {{m.tags}} px-1 py-1 alert-dismissible mt-2 custom-alert" role="alert">
+        {{m}}
+        <button type="button" class="btn-close px-2 py-2 " data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% endfor %}
+      {% endif %}
+    </div>
+
     {% block content %} {% endblock %}
   </div>
   <script>
+    // Assuming you have added the class 'custom-alert' to your alert messages
+    var alertMessages = document.querySelectorAll('.custom-alert');
 
-    setTimeout(function () {
-      var success_message = document.getElementById('delete_selected_message');
-      if (success_message) {
-        success_message.style.transition = "opacity 2s";
-        success_message.style.opacity = '0';
+    alertMessages.forEach(function (alertMessage) {
+      setTimeout(function () {
+        alertMessage.style.transition = "opacity 2s";
+        alertMessage.style.opacity = '0';
 
         setTimeout(function () {
-          success_message.style.display = 'none';
+          alertMessage.style.display = 'none';
         }, 3000);
-      }
-    }, 3000);
+      }, 3000);
+    });
 
     // Function to handle "Select All" checkbox
     function toggleSelectAll() {
