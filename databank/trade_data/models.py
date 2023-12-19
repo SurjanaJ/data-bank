@@ -17,6 +17,8 @@ class HS_Code_meta(models.Model):
     id = models.AutoField(primary_key=True)
     HS_Code = models.CharField(max_length=100)
     Product_Information = models.TextField(null=True, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.HS_Code
@@ -26,6 +28,8 @@ class Unit_meta(models.Model):
     id = models.AutoField(primary_key=True)
     Unit_Code = models.CharField(max_length=50)
     Unit_Name = models.CharField(max_length=200, null=True, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.Unit_Code
@@ -51,6 +55,8 @@ class TradeData(models.Model):
     Origin_Destination =  models.ForeignKey(Country_meta, on_delete=models.CASCADE, related_name='tradedata_origin_destination')
     TradersName_ExporterImporter = models.CharField(max_length=100, null=True, blank=True)
     DocumentsLegalProcedural = models.CharField(max_length=300, null=True, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
     
 
     def __str__(self):
