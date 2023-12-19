@@ -182,7 +182,6 @@ def upload_country_meta_excel(request):
                 request.session['duplicate_data'] = duplicate_data
                 return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data})
             else:
-                
                 return redirect('country')
 
     else:
@@ -232,14 +231,17 @@ def upload_unit_meta_excel(request):
 
 def upload_hs_code_meta_excel(request):
     errors = []
-    success_messages = []
+    duplicate_data = []
+    added_count = 0
+    updated_count = 0
 
     if request.method == 'POST':
         form = UploadHSCodeMetaForm(request.POST, request.FILES)
 
         if form.is_valid():
             excel_data = request.FILES['hs_code_meta_file']
-            df = pd.read_excel(excel_data)
+            df = pd.read_excel(excel_data, dtype={'HS_Code': str})
+            print(df.head())
 
             try:
                 with transaction.atomic():
@@ -253,27 +255,34 @@ def upload_hs_code_meta_excel(request):
 
                         if existing_record:
                             if existing_record == HS_Code_meta(**data):
-                                errors.append(f"Cannot add duplicate data at row {index}.")
+                                duplicate_data.append({'row_index': index, 'data': data})
+
                             else:
                                 HS_Code_meta.objects.update_or_create(
                                     HS_Code=data['HS_Code'],
                                     defaults={'Product_Information': data['Product_Information']}
                                 )
-                                success_messages.append(f"{'Updated' if existing_record else 'Inserted'} record at row {index}.")
+                                updated_count += 1
+
 
                         else:
                             HS_Code_meta.objects.create(**data)
-                            success_messages.append(f"Inserted new record at row {index}.")
+                            added_count += 1
+
 
             except IntegrityError as e:
                 errors.append(f"Error during database operation: {e}")
 
+            messages.info(request, str(updated_count) + ' records updated.')
+            messages.success(request, str(added_count) + ' records added.')
             if errors:
+                # If there are errors, return them as a response
                 return render(request, 'trade_data/error_template.html', {'errors': errors})
-            elif success_messages:
-                return render(request, 'trade_data/success_template.html', {'success_messages': success_messages})
+            elif duplicate_data:
+                request.session['duplicate_data'] = duplicate_data
+                return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data})
             else:
-                return HttpResponse('success')
+                return redirect('hs_code')
     else:
         form = UploadHSCodeMetaForm()
 
