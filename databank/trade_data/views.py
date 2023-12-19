@@ -191,6 +191,7 @@ def upload_country_meta_excel(request):
 
 def upload_unit_meta_excel(request):
     errors = [] 
+    added_count = 0
     if request.method == 'POST':
         form = UploadUnitMetaForm(request.POST, request.FILES)
         if form.is_valid():
@@ -212,6 +213,7 @@ def upload_unit_meta_excel(request):
                     try:
                         unit_meta = Unit_meta(**unit_data)
                         unit_meta.save()
+                        added_count += 1 
                     except IntegrityError as e:
                         print(f"Error inserting row {index}: {e}")
                         print(f"Problematic row data: {unit_data}")
@@ -221,7 +223,8 @@ def upload_unit_meta_excel(request):
                 # If there are errors, return them as a response
                 return render(request, 'trade_data/error_template.html', {'errors': errors})
             else:
-                return HttpResponse('success')
+                messages.success(request, str(added_count) + ' records added.')
+                return redirect('unit')
     else:
         form = UploadUnitMetaForm()
     return render(request, 'trade_data/upload_form.html', {'form': form, 'tables':tables, 'meta_tables':meta_tables})
