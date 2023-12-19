@@ -8,7 +8,7 @@
     <thead>
       <tr>
         {% for column in column_names %}
-        {% if column.name != 'id' %}
+        {% if column.name != 'id' and column.name != 'modified_date' and column.name !=  'created_date' %}
         <th scope="col" class="p-2">{{ column.verbose_name }}</th>
         {% endif %}
         {% endfor %}
