@@ -131,6 +131,7 @@ def upload_country_meta_excel(request):
     errors = []
     success_messages = []
     duplicate_data = []
+    added_count = 0
 
     if request.method == 'POST':
         form = UploadCountryMetaForm(request.POST, request.FILES)
@@ -161,7 +162,7 @@ def upload_country_meta_excel(request):
                             setattr(existing_record, key, value)
                         try:
                             existing_record.save()
-                            success_messages.append(f"Updated the record at row {index}.")
+                            # success_messages.append(f"Updated the record at row {index}.")
                         except IntegrityError as e:
                             errors.append(f"Error updating row {index}: {e}")
                 else:
@@ -169,7 +170,8 @@ def upload_country_meta_excel(request):
                     try:
                         country_meta = Country_meta(**country_data)
                         country_meta.save()
-                        success_messages.append(f"Inserted new record at row {index}.")
+                        added_count += 1
+                        # success_messages.append(f"Inserted new record at row {index}.")
                     except IntegrityError as e:
                         errors.append(f"Error inserting row {index}: {e}")
 
@@ -179,10 +181,11 @@ def upload_country_meta_excel(request):
             elif duplicate_data:
                 request.session['duplicate_data'] = duplicate_data
                 return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data})
-            elif success_messages:
-                return render(request,'trade_data/success_template.html' ,{'success_messages':success_messages})
+            # elif success_messages:
+            #     return render(request,'trade_data/success_template.html' ,{'success_messages':success_messages})
             else:
-                return HttpResponse('success')
+                messages.success(request, str(added_count) + ' records added.')
+                return redirect('country')
 
     else:
         form = UploadCountryMetaForm()
