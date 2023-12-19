@@ -7,6 +7,8 @@ class Country_meta(models.Model):
     Country_Name = models.CharField(max_length=200)
     Country_Code_2 = models.CharField(max_length=3, null=True, blank=True)
     Country_Code_3 = models.CharField(max_length=3, null=True, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.Country_Name
