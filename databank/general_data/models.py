@@ -23,7 +23,7 @@ class ForestData(models.Model):
         
 class PopulationData(models.Model):
 
-    Gender_Options=(
+    Gender_Options=(        
         ('Male','Male'),
         ('Female','Female')
     )

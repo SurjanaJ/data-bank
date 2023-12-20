@@ -2,8 +2,6 @@ from django.contrib import admin
 
 from .models import ForestData,PopulationData,Land_Code_Meta,Land,Transport_Meta,Transport,Tourism,Tourism_Meta,Hotel,Water,Water_Meta
 
-admin.site.register(PopulationData)
-
 class LandCodeMeta_Admin(admin.ModelAdmin ):
     list_display=('id','Code','Land_Type')
 
@@ -18,6 +16,14 @@ class Land_Admin(admin.ModelAdmin ):
     list_display=('id','Year','Country','Land_Code','Unit','Area')
 
 admin.site.register(Land,Land_Admin)
+
+
+class PopulationData_Admin(admin.ModelAdmin):
+    list_display = ['id','Year','Country','Gender','Age_Group','Population']
+
+admin.site.register(PopulationData,PopulationData_Admin)
+
+
 
 
 

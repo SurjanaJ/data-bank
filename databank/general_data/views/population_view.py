@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.db.models import Q
 import pandas as pd
 from ..models import PopulationData, Country_meta
-from ..forms import UploadForestDataForm,UploadPopulationData
+from ..forms import UploadPopulationDataForm,UploadPopulationData
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -111,5 +111,100 @@ def update_population_record(request,pk):
     return render(request,'general_data/population_templates/update_population_record.html',context)
 
 
+
+def upload_population_excel(request):
+    if request.method == 'POST':
+        form = UploadPopulationDataForm(request.POST,request.FILES)
+        if form.is_valid():
+            excel_data = request.FILES['population_data_file']
+            df = pd.read_excel(excel_data)
+
+
+            errors = []
+            duplicate_data = []
+            updated_count = 0
+            added_count = 0
+
+
+            if 'id' in df.columns or 'ID' in df.columns:
+                for index,row in df.iterrows():
+                    id_value = row['ID']
+
+                    try:
+                        population_instance = PopulationData.objects.get(id=id_value)
+                    except:
+                        population_instance = PopulationData()
+
+
+                    population_instance.Year = row['Year']
+                    Country = row['Country']
+                    try:
+                        country = Country_meta.objects.get(Country_Name=Country)
+                    except DataError as e:
+                        print(f"error inserting row at {index}:{e}")
+                        continue
+
+                    population_instance.Country = country
+                    population_instance.Gender = row['Gender']
+                    population_instance.Age_Group = row['Age_Group']
+                    population_instance.Population = row['Population']
+                    population_instance.save()
+
+                    updated_count +=1
+            else:
+                for index,row in df.iterrows():
+
+                    country_name = row['Country']
+                    country_instance = Country_meta.objects.get(Country_Name=country_name)
+                    existing_data= PopulationData.objects.filter(
+                        Year = row['Year'],
+                        Country = country_instance,
+                        Gender = row['Gender'],
+                        Age_Group = row['Age_Group'],
+                        Population = row['Population']
+                    ).first()
+
+                    if existing_data:
+                        duplicate_data.append(
+                            {
+                                'Year':row['Year'],
+                                'Country':row['Country'],
+                                'Gender':row['Gender'],
+                                'Age_Group':row['Age_Group'],
+                                'Population':row['Population'],    
+                            }
+                        )
+
+
+                    
+                    if not existing_data:
+                        new_population_data_instance = PopulationData(
+                            Year = row['Year'],
+                            Country = country_instance,
+                            Gender = row['Gender'],
+                            Age_Group = row['Age_Group'],
+                            Population = row['Population']
+                        )
+
+                        new_population_data_instance.save()
+                        added_count += 1
+
+            if added_count > 0 :
+                messages.success(request,str(added_count)+'records added')
+            
+            if updated_count > 0 :
+                messages.info(request,str(updated_count)+'records updated')
+
+            if duplicate_data:
+                return render(request,'general_data/duplicate_template.html',{'duplicate_data':duplicate_data})
+                
+    else:
+        form = UploadPopulationDataForm()
+
+    return render(request,'general_data/population_templates/upload_population_form.html',{'form':form})
+
+
+
+                
 
 

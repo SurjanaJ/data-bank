@@ -63,8 +63,7 @@ def upload_forest_excel(request):
                 if existing_forest_data:
                     update_existing_record(existing_forest_data, row)
                     # Handle duplicate data, such as logging a message or skipping the row
-                    print(request, f"updated data found for Year '{Year}', Country '{Country}', Name_Of_The_Plant '{Name_Of_The_Plant}'")
-                    continue
+                    return HttpResponse(f"updated data found for Year --'{Year}', Country --'{Country}', Name_Of_The_Plant --'{Name_Of_The_Plant}'")
                 
                 forest_data = ForestData (
                     Year = Year,

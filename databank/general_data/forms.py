@@ -25,6 +25,9 @@ class UploadForestData(ModelForm):
         }
 
 # Hotel Data
+class UploadHotelDataForm(forms.Form):
+    Hotel_data_file = forms.FileField()
+
 
 class UploadHotelData(ModelForm):
     class Meta:
@@ -33,6 +36,9 @@ class UploadHotelData(ModelForm):
 
 
 # Land Data
+class UploadLandDataForm(forms.Form):
+    Land_data_file = forms.FileField()
+
 
 class UploadLandData(ModelForm):
     class Meta:
@@ -40,6 +46,9 @@ class UploadLandData(ModelForm):
         fields='__all__'
 
 # Population Data
+class UploadPopulationDataForm(forms.Form):
+    population_data_file = forms.FileField()
+
 
 class UploadPopulationData(ModelForm):
     class Meta:
@@ -48,6 +57,9 @@ class UploadPopulationData(ModelForm):
 
 
 # water
+class UploadWaterDataForm(forms.Form):
+    Water_data_file = forms.FileField()
+
 
 class UploadWaterData(ModelForm):
     class Meta:
@@ -55,6 +67,9 @@ class UploadWaterData(ModelForm):
         fields='__all__'
 
 # Tourism data
+class UploadTourismDataForm(forms.Form):
+    Tourism_data_file = forms.FileField()
+
 
 class UploadTourismData(ModelForm):
     class Meta:
@@ -62,6 +77,9 @@ class UploadTourismData(ModelForm):
         fields='__all__'
 
 # transport data
+class UploadTransportDataForm(forms.Form):
+    Transport_data_file = forms.FileField()
+
 
 class UploadTransportData(ModelForm):
     class Meta:

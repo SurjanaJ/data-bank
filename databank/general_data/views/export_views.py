@@ -200,10 +200,12 @@ def filter_population(request):
         data = data.filter(Age_Group=age_group)
     
     if population_view.is_valid_queryparam(min_population):
-        data = data.filter(Population_gte=min_population)
+        data = data.filter(Population__gte=min_population)
 
     if population_view.is_valid_queryparam(max_population):
         data = data.filter(Population__lt=max_population)
+
+    return data
 
 def export_population_table_to_excel(request):
     data = filter_population(request)
@@ -214,6 +216,8 @@ def export_population_table_to_excel(request):
 
     df = pd.DataFrame(data.values('Year','country_name','Gender','Age_Group','Population'))
     df.rename(columns={'country_name':'Country'},inplace=True)
+
+    df = df[['Year','Country','Gender','Age_Group','Population']]
 
     output=BytesIO()
     writer = pd.ExcelWriter(output,engine='xlsxwriter')
