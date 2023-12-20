@@ -173,8 +173,12 @@ def upload_country_meta_excel(request):
                     except IntegrityError as e:
                         errors.append(f"Error inserting row {index}: {e}")
 
-            messages.info(request, str(updated_count) + ' records updated.')
-            messages.success(request, str(added_count) + ' records added.')
+            if added_count > 0:
+                messages.success(request, str(added_count) + ' records added.')
+            
+            if updated_count > 0:
+                messages.info(request, str(updated_count) + ' records updated.')
+                
             if errors:
                 # If there are errors, return them as a response
                 return render(request, 'trade_data/error_template.html', {'errors': errors})
