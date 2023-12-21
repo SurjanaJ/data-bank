@@ -178,7 +178,7 @@ def upload_country_meta_excel(request):
             
             if updated_count > 0:
                 messages.info(request, str(updated_count) + ' records updated.')
-                
+
             if errors:
                 # If there are errors, return them as a response
                 return render(request, 'trade_data/error_template.html', {'errors': errors})
@@ -297,12 +297,16 @@ def upload_trade_excel(request):
     success_messages = []
     duplicate_data = []
 
+    added_count = 0
+    updated_count = 0
+    existing_count = 0
+
     if request.method == 'POST':
         form = UploadTradeDataForm(request.POST, request.FILES)
 
         if form.is_valid():
             excel_data = request.FILES['trade_data_file']
-            df = pd.read_excel(excel_data)
+            df = pd.read_excel(excel_data,dtype={'HS_Code': str})
 
             for index, row in df.iterrows():
                 trade_data = {
@@ -335,78 +339,75 @@ def upload_trade_excel(request):
                     Unit = Unit_meta.objects.get(Unit_Code=row['Unit'])
                     Origin_Destination = Country_meta.objects.get(
                         Country_Name=row['Origin_Destination'])
-
-                
-                    trade_data['Trade_Type'] = row['Trade_Type']
-                    trade_data['Calender']: Calender
-                    trade_data['Fiscal_Year']:row['Fiscal_Year']
-                    trade_data['Duration']:row['Duration']
-                    trade_data['Country'] : Country
-                    trade_data['HS_Code'] : HS_Code
-                    trade_data['Unit'] : Unit
-                    trade_data['Quantity']:row['Quantity']
-                    trade_data['Currency_Type']:row['Currency_Type']
-                    trade_data['Amount']:row['Amount']
-                    trade_data['Tarrif'] : None if row['Tarrif'] == 'nan' or isnan(row['Tarrif']) else row['Tarrif']
-                    trade_data['Origin_Destination'] : Origin_Destination
-                    trade_data['TradersName_ExporterImporter']:row['TradersName_ExporterImporter']
-                    trade_data['DocumentsLegalProcedural']:row['DocumentsLegalProcedural']
                     
-                    trade_data_dict = {
-                            'Trade_Type': trade_data['Trade_Type'],
-                            'Calender': trade_data['Calender'],
-                            'Fiscal_Year': trade_data['Fiscal_Year'],
-                            'Duration': trade_data['Duration'],
-                            'Country': trade_data['Country'],  
-                            'HS_Code': trade_data['HS_Code'],  
-                            'Unit': trade_data['Unit'], 
-                            'Quantity': trade_data['Quantity'],
-                            'Currency_Type':trade_data['Currency_Type'],
-                            'Amount': trade_data['Amount'], 
-                            'Tarrif': trade_data['Tarrif'],
-                            'Origin_Destination': trade_data['Origin_Destination'] ,  
-                            'TradersName_ExporterImporter': trade_data['TradersName_ExporterImporter'],
-                            'DocumentsLegalProcedural': trade_data['DocumentsLegalProcedural'],
-                        }
+                    
+                    trade_data = {
+                        'Trade_Type': row['Trade_Type'],
+                        'Calender': Calender,
+                        'Fiscal_Year':row['Fiscal_Year'],
+                        'Duration':row['Duration'],
+                        'Country' : Country,
+                        'HS_Code' : HS_Code,
+                        'Unit' : Unit,
+                        'Quantity':row['Quantity'],
+                        'Currency_Type' :row['Currency_Type'],
+                        'Amount':row['Amount'],
+                        'Tarrif' : None if row['Tarrif'] == 'nan' or isnan(row['Tarrif']) else row['Tarrif'],
+                        'Origin_Destination' : Origin_Destination,
+                        'TradersName_ExporterImporter':row['TradersName_ExporterImporter'],
+                        'DocumentsLegalProcedural':row['DocumentsLegalProcedural']
+                    }
                 
                 except Exception as e:
-                    errors.append({'row_index': index, 'data': trade_data_dict, 'reason': str(e)})
+                    errors.append({'row_index': index, 'data': trade_data, 'reason': str(e)})
                     continue
-                    
                     
                 existing_record = TradeData.objects.filter(
-                        Calender=Calender,
-                        Country=Country,
-                        HS_Code=HS_Code,
-                        Unit=Unit,
-                        Origin_Destination=Origin_Destination,
-                    ).first()
-                
+                        Q(Calender=Calender) & Q(Country=Country) & Q(HS_Code=HS_Code) & Q(Unit=Unit) & Q(Origin_Destination=Origin_Destination)
+                        ).first()
                 
                 if existing_record:
-                    duplicate_data.append({
-                            'row_index' :index,
-                            'data': trade_data_dict
-                        })
-                    continue
+                    if all(getattr(existing_record, key) == value for key, value in trade_data.items()):
+                        duplicate_data.append({
+                                'row_index' :index,
+                                'data': trade_data
+                            })
+                    else:
+                        # Update the row with non-duplicate data
+                        for key, value in trade_data.items():
+                            setattr(existing_record, key, value)
+                        try:
                             
+                            existing_record.save()
+                            updated_count += 1
+                        except IntegrityError as e:
+                            errors.append(f"Error updating row {index}: {e}")        
 
-                trade_data = TradeData(**trade_data)
-                trade_data.save()
-                success_messages.append(f"Inserted new record at row {index}.")
+                else:
+                    try:
+                        tradeData = TradeData(**trade_data)
+                        tradeData.save()
+                        added_count += 1
                 
+                    except Exception as e:
+                        errors.append(f"THIS IS ARKAI ERROR:: Error inserting row {index}: {e}")
+                        
+            if added_count > 0:
+                messages.success(request, str(added_count) + ' records added.')
+            
+            if updated_count > 0:
+                messages.info(request, str(updated_count) + ' records updated.')
 
             if errors:
                 request.session['errors'] = errors
                 return render(request, 'trade_data/error_template.html', {'errors': errors})
+            
             elif duplicate_data:
                 request.session['duplicate_data'] = duplicate_data
                 return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data})
                 
-            elif success_messages:
-                return render(request,'trade_data/success_template.html' ,{'success_messages':success_messages})
             else:
-                return HttpResponse('success')    
+                return redirect('display_trade_table')    
     else:
         form = UploadTradeDataForm()
 
