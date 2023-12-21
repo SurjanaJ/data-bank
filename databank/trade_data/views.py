@@ -1,7 +1,9 @@
-import datetime
+from datetime import datetime
+from io import BytesIO
+import json
 from math import isnan
 from django.db import IntegrityError
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect, render,get_object_or_404
 from django.db.models import Q
 from numpy import NaN
@@ -47,6 +49,22 @@ tables =[
         "name":"Tourism Data",
         "url":"tourism_table"    
     },
+    ]
+
+
+meta_tables =[
+    {
+        "name":"HS Code Meta",
+        "url":"hs_code"    
+    },
+    {
+        "name": "Country Meta",
+        "url":"country"
+    },
+     {
+        "name": "Unit Meta",
+        "url":"unit"
+    }
     ]
 
 def is_valid_queryparam(param):
@@ -104,14 +122,15 @@ def display_trade_table(request):
 
     
     context = { 'data_len': len(data), 'country_categories': country_categories, 'unit_categories': unit_categories,
-               'hs_codes': hs_codes, 'page':page,'trade_type_categories': trade_type_categories , 'query_len': len(page), 'tables':tables}
+               'hs_codes': hs_codes, 'page':page,'trade_type_categories': trade_type_categories , 'query_len': len(page), 'tables':tables, 'meta_tables':meta_tables}
 
     return render(request, 'trade_data/display_trade_table.html', context)
 
-
 def upload_country_meta_excel(request):
     errors = []
-    success_messages = []
+    duplicate_data = []
+    added_count = 0
+    updated_count = 0
 
     if request.method == 'POST':
         form = UploadCountryMetaForm(request.POST, request.FILES)
@@ -135,14 +154,14 @@ def upload_country_meta_excel(request):
                 if existing_record:
                     # If a duplicate record is found, check if all columns are identical
                     if all(getattr(existing_record, key) == value for key, value in country_data.items()):
-                        errors.append(f"Cannot add duplicate data at row {index}.")
+                        duplicate_data.append({'row_index': index, 'data': country_data})
                     else:
                         # Update the row with non-duplicate data
                         for key, value in country_data.items():
                             setattr(existing_record, key, value)
                         try:
                             existing_record.save()
-                            success_messages.append(f"Updated the record at row {index}.")
+                            updated_count += 1
                         except IntegrityError as e:
                             errors.append(f"Error updating row {index}: {e}")
                 else:
@@ -150,26 +169,33 @@ def upload_country_meta_excel(request):
                     try:
                         country_meta = Country_meta(**country_data)
                         country_meta.save()
-                        success_messages.append(f"Inserted new record at row {index}.")
+                        added_count += 1
                     except IntegrityError as e:
                         errors.append(f"Error inserting row {index}: {e}")
+
+            if added_count > 0:
+                messages.success(request, str(added_count) + ' records added.')
+            
+            if updated_count > 0:
+                messages.info(request, str(updated_count) + ' records updated.')
 
             if errors:
                 # If there are errors, return them as a response
                 return render(request, 'trade_data/error_template.html', {'errors': errors})
-            elif success_messages:
-                return render(request,'trade_data/success_template.html' ,{'success_messages':success_messages})
+            elif duplicate_data:
+                request.session['duplicate_data'] = duplicate_data
+                return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data})
             else:
-                return HttpResponse('success')
+                return redirect('country')
 
     else:
         form = UploadCountryMetaForm()
 
-    return render(request, 'trade_data/upload_form.html', {'form': form, 'tables': tables})
-
+    return render(request, 'trade_data/upload_form.html', {'form': form, 'tables': tables, 'meta_tables':meta_tables})
 
 def upload_unit_meta_excel(request):
     errors = [] 
+    added_count = 0
     if request.method == 'POST':
         form = UploadUnitMetaForm(request.POST, request.FILES)
         if form.is_valid():
@@ -191,6 +217,7 @@ def upload_unit_meta_excel(request):
                     try:
                         unit_meta = Unit_meta(**unit_data)
                         unit_meta.save()
+                        added_count += 1 
                     except IntegrityError as e:
                         print(f"Error inserting row {index}: {e}")
                         print(f"Problematic row data: {unit_data}")
@@ -200,21 +227,25 @@ def upload_unit_meta_excel(request):
                 # If there are errors, return them as a response
                 return render(request, 'trade_data/error_template.html', {'errors': errors})
             else:
-                return HttpResponse('success')
+                messages.success(request, str(added_count) + ' records added.')
+                return redirect('unit')
     else:
         form = UploadUnitMetaForm()
-    return render(request, 'trade_data/upload_form.html', {'form': form, 'tables':tables})
+    return render(request, 'trade_data/upload_form.html', {'form': form, 'tables':tables, 'meta_tables':meta_tables})
 
 def upload_hs_code_meta_excel(request):
     errors = []
-    success_messages = []
+    duplicate_data = []
+    added_count = 0
+    updated_count = 0
 
     if request.method == 'POST':
         form = UploadHSCodeMetaForm(request.POST, request.FILES)
 
         if form.is_valid():
             excel_data = request.FILES['hs_code_meta_file']
-            df = pd.read_excel(excel_data)
+            df = pd.read_excel(excel_data, dtype={'HS_Code': str})
+            print(df.head())
 
             try:
                 with transaction.atomic():
@@ -228,83 +259,159 @@ def upload_hs_code_meta_excel(request):
 
                         if existing_record:
                             if existing_record == HS_Code_meta(**data):
-                                errors.append(f"Cannot add duplicate data at row {index}.")
+                                duplicate_data.append({'row_index': index, 'data': data})
+
                             else:
                                 HS_Code_meta.objects.update_or_create(
                                     HS_Code=data['HS_Code'],
                                     defaults={'Product_Information': data['Product_Information']}
                                 )
-                                success_messages.append(f"{'Updated' if existing_record else 'Inserted'} record at row {index}.")
+                                updated_count += 1
+
 
                         else:
                             HS_Code_meta.objects.create(**data)
-                            success_messages.append(f"Inserted new record at row {index}.")
+                            added_count += 1
+
 
             except IntegrityError as e:
                 errors.append(f"Error during database operation: {e}")
 
+            messages.info(request, str(updated_count) + ' records updated.')
+            messages.success(request, str(added_count) + ' records added.')
             if errors:
+                # If there are errors, return them as a response
                 return render(request, 'trade_data/error_template.html', {'errors': errors})
-            elif success_messages:
-                return render(request, 'trade_data/success_template.html', {'success_messages': success_messages})
+            elif duplicate_data:
+                request.session['duplicate_data'] = duplicate_data
+                return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data})
             else:
-                return HttpResponse('success')
+                return redirect('hs_code')
     else:
         form = UploadHSCodeMetaForm()
 
-    return render(request, 'trade_data/upload_form.html', {'form': form})
+    return render(request, 'trade_data/upload_form.html', {'form': form, 'meta_tables':meta_tables})
 
 def upload_trade_excel(request):
+    errors = []
+    success_messages = []
+    duplicate_data = []
+
+    added_count = 0
+    updated_count = 0
+    existing_count = 0
+
     if request.method == 'POST':
         form = UploadTradeDataForm(request.POST, request.FILES)
+
         if form.is_valid():
             excel_data = request.FILES['trade_data_file']
-            df = pd.read_excel(excel_data)
+            df = pd.read_excel(excel_data,dtype={'HS_Code': str})
 
             for index, row in df.iterrows():
-                Country = row['Country']
-                HS_Code = row['HS_Code']
-                Unit = row['Unit']
-                Origin_Destination = row['Origin_Destination']
-                Calender = row['Calender']
-                tarrif_value = row['Tarrif']
-
+                trade_data = {
+                    'Trade_Type':row['Trade_Type'],
+                    'Calender': row['Calender'],
+                    'Fiscal_Year':row['Fiscal_Year'],
+                    'Duration':row['Duration'],
+                    'Country' : row['Country'],
+                    'HS_Code' : row['HS_Code'],
+                    'Unit' : row['Unit'],
+                    'Quantity':row['Quantity'],
+                    'Currency_Type':row['Currency_Type'],
+                    'Amount':row['Amount'],
+                    'Tarrif' : None if row['Tarrif'] == 'nan' or isnan(row['Tarrif']) else row['Tarrif'],
+                    'Origin_Destination' : row['Origin_Destination'],
+                    'TradersName_ExporterImporter':row['TradersName_ExporterImporter'],
+                    'DocumentsLegalProcedural':row['DocumentsLegalProcedural']
+                }
                 try:
-                    Country = Country_meta.objects.get(Country_Name=Country)
-                    HS_Code = HS_Code_meta.objects.get(HS_Code=HS_Code)
-                    Unit = Unit_meta.objects.get(Unit_Code=Unit)
+                    calender_date = datetime.strptime(str(row['Calender']), '%Y-%m-%d').date()
+                except ValueError:
+                    # If ValueError occurs, it means the input didn't match the format, so set default month and day
+                    calender_date = datetime.strptime(f'{str(row['Calender'])}-01-01', '%Y-%m-%d').date()
+                
+                try:
+                    # Format the date as a string in the same format
+                    Calender = calender_date.strftime('%Y-%m-%d')
+                    Country = Country_meta.objects.get(Country_Name=row['Country'])
+                    HS_Code = HS_Code_meta.objects.get(HS_Code=row['HS_Code'])
+                    Unit = Unit_meta.objects.get(Unit_Code=row['Unit'])
                     Origin_Destination = Country_meta.objects.get(
-                        Country_Name=Origin_Destination)
+                        Country_Name=row['Origin_Destination'])
                     
+                    
+                    trade_data = {
+                        'Trade_Type': row['Trade_Type'],
+                        'Calender': Calender,
+                        'Fiscal_Year':row['Fiscal_Year'],
+                        'Duration':row['Duration'],
+                        'Country' : Country,
+                        'HS_Code' : HS_Code,
+                        'Unit' : Unit,
+                        'Quantity':row['Quantity'],
+                        'Currency_Type' :row['Currency_Type'],
+                        'Amount':row['Amount'],
+                        'Tarrif' : None if row['Tarrif'] == 'nan' or isnan(row['Tarrif']) else row['Tarrif'],
+                        'Origin_Destination' : Origin_Destination,
+                        'TradersName_ExporterImporter':row['TradersName_ExporterImporter'],
+                        'DocumentsLegalProcedural':row['DocumentsLegalProcedural']
+                    }
+                
+                except Exception as e:
+                    errors.append({'row_index': index, 'data': trade_data, 'reason': str(e)})
+                    continue
+                    
+                existing_record = TradeData.objects.filter(
+                        Q(Calender=Calender) & Q(Country=Country) & Q(HS_Code=HS_Code) & Q(Unit=Unit) & Q(Origin_Destination=Origin_Destination)
+                        ).first()
+                
+                if existing_record:
+                    if all(getattr(existing_record, key) == value for key, value in trade_data.items()):
+                        duplicate_data.append({
+                                'row_index' :index,
+                                'data': trade_data
+                            })
+                    else:
+                        # Update the row with non-duplicate data
+                        for key, value in trade_data.items():
+                            setattr(existing_record, key, value)
+                        try:
+                            
+                            existing_record.save()
+                            updated_count += 1
+                        except IntegrityError as e:
+                            errors.append(f"Error updating row {index}: {e}")        
 
-                except DataError as e:
-                    print(f"Error inserting row {index}: {e}")
-                    print(f"Problematic row data: {row}")
+                else:
+                    try:
+                        tradeData = TradeData(**trade_data)
+                        tradeData.save()
+                        added_count += 1
+                
+                    except Exception as e:
+                        errors.append(f"THIS IS ARKAI ERROR:: Error inserting row {index}: {e}")
+                        
+            if added_count > 0:
+                messages.success(request, str(added_count) + ' records added.')
+            
+            if updated_count > 0:
+                messages.info(request, str(updated_count) + ' records updated.')
 
-                trade_data = TradeData(
-                    Trade_Type=row['Trade_Type'],
-                    Calender=datetime.date(Calender, 1, 1),
-                    Fiscal_Year=row['Fiscal_Year'],
-                    Duration=row['Duration'],
-                    Country=Country,
-                    HS_Code=HS_Code,
-                    Unit=Unit,
-                    Quantity=row['Quantity'],
-                    Currency_Type=row['Currency_Type'],
-                    Amount=row['Amount'],
-                    Tarrif = None if tarrif_value == 'nan' or isnan(tarrif_value) else tarrif_value,
-                    Origin_Destination=Origin_Destination,
-                    TradersName_ExporterImporter=row['TradersName_ExporterImporter'],
-                    DocumentsLegalProcedural=row['DocumentsLegalProcedural']
-                )
-                trade_data.save()
-
-            return HttpResponse('success')
-
+            if errors:
+                request.session['errors'] = errors
+                return render(request, 'trade_data/error_template.html', {'errors': errors})
+            
+            elif duplicate_data:
+                request.session['duplicate_data'] = duplicate_data
+                return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data})
+                
+            else:
+                return redirect('display_trade_table')    
     else:
         form = UploadTradeDataForm()
 
-    return render(request, 'trade_data/upload_form.html', {'form': form, 'tables':tables})
+    return render(request, 'trade_data/upload_form.html', {'form': form, 'tables':tables, 'meta_tables':meta_tables})
 
 def upload_trade_record(request):
     trade_type_categories = [choice[1] for choice in TradeData.TRADE_OPTIONS]
@@ -314,15 +421,13 @@ def upload_trade_record(request):
     if request.method == 'POST':
 
         form = UploadTradeData(request.POST)
-        print('form is valid')
 
         if form.is_valid():
             form.save()
             return redirect('display_trade_table')
 
-    context={'form': form,'trade_type_categories': trade_type_categories}
+    context={'form': form,'trade_type_categories': trade_type_categories, 'meta_tables':meta_tables}
     return render(request, 'trade_data/upload_form.html', context)
-
 
 def update_trade_record(request,pk):
     trade_record = TradeData.objects.get(id=pk)
@@ -334,9 +439,8 @@ def update_trade_record(request,pk):
             form.save()
             return redirect('display_trade_table')
         
-    context={'form':form,}
+    context={'form':form, 'meta_tables':meta_tables}
     return render(request,'trade_data/update_trade_record.html',context)
-
 
 def find_country_name(country_category):
     if country_category == '--':
@@ -349,8 +453,7 @@ def find_country_name(country_category):
         else:
             country_instance = 'All Countries'
         return country_instance
-    
-    
+       
 def find_hs_code(hs_code):
     if hs_code == '--':
         return("All Commodities")
@@ -452,7 +555,7 @@ def time_series_analysis(request):
 
 
     context = {'data':data, 'country_categories':country_categories, 'unit_categories':unit_categories,'hs_codes':hs_codes, 'trade_type_categories':trade_type_categories, 'result_country': result_country,'result_hs_code': result_hs_code,
-               'years':sorted_years, 'display_country':display_country, 'display_hs_code':display_hs_code, 'queryset_length':len(total_amount_by_origin_destination), 'total_amount_year':total_amount_year, 'tables':tables}
+               'years':sorted_years, 'display_country':display_country, 'display_hs_code':display_hs_code, 'queryset_length':len(total_amount_by_origin_destination), 'total_amount_year':total_amount_year, 'tables':tables, 'meta_tables':meta_tables}
 
     return render(request, 'trade_data/time_series.html', context)
 
@@ -478,3 +581,93 @@ def delete_trade_record(request, item_id):
         return redirect('display_trade_table')
     except Exception as e:
         return HttpResponse(f"An error occurred: {str(e)}")
+    
+
+def display_country_meta(request):
+    data = Country_meta.objects.all().order_by('Country_Name')
+    total_data = data.count()
+
+    column_names = Country_meta._meta.fields
+
+    paginator = Paginator(data, 12)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+
+
+    context = {'page': page, 'total_data':total_data, 'meta_tables':meta_tables, 'tables':tables, 'column_names':column_names}
+    return render(request, 'trade_data/display_country_meta.html', context)
+
+def display_hs_code_meta(request):
+    data = HS_Code_meta.objects.all().order_by('HS_Code')
+    total_data = data.count()
+
+    column_names = HS_Code_meta._meta.fields
+
+    paginator = Paginator(data, 12)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+
+    context = {'page': page, 'total_data':total_data, 'meta_tables':meta_tables, 'tables':tables, 'column_names':column_names}
+    return render(request, 'trade_data/display_hs_code_meta.html', context)
+
+def display_unit_meta(request):
+    data = Unit_meta.objects.all().order_by('Unit_Name')
+    total_data = data.count()
+
+    column_names = Unit_meta._meta.fields
+
+    paginator = Paginator(data, 12)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+
+    context = {'page': page, 'total_data':total_data, 'meta_tables':meta_tables, 'tables':tables, 'column_names':column_names}
+    return render(request, 'trade_data/display_unit_meta.html', context)
+
+
+# Convert duplicate_data to a DataFrame, then to excel
+def duplicate_data_to_excel(duplicate_data):
+    column_names = list(duplicate_data[0]['data'].keys())
+    duplicate_df = pd.DataFrame([d['data'] for d in duplicate_data], columns=column_names)
+
+    # Create a response object with Excel content
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=duplicate_data.xlsx'
+
+    duplicate_df.to_excel(response, index=False, sheet_name='duplicate_data')
+
+    return response
+
+# Get the data from session storage
+def download_duplicate_excel(request):
+    duplicate_data = request.session.get('duplicate_data', [])
+
+    if duplicate_data:
+        response = duplicate_data_to_excel(duplicate_data)
+        request.session.pop('duplicate_data', None)
+        return response
+    else:
+        return HttpResponse('No data to export.')
+    
+def error_data_to_excel(error_data):
+    column_names = list(error_data[0]['data'].keys())
+    error_df = pd.DataFrame([d['data'] for d in error_data], columns=column_names)
+
+    # Create a response object with Excel content
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=error_data.xlsx'
+
+    error_df.to_excel(response, index=False, sheet_name='error_data')
+
+    return response
+
+
+
+def download_error_excel(request):
+    error_data = request.session.get('errors', [])
+
+    if error_data:
+        response = error_data_to_excel(error_data)
+        request.session.pop('error_data', None)
+        return response
+    else:
+        return HttpResponse('No data to export.')

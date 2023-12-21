@@ -1,10 +1,41 @@
 {% extends 'main.html' %}
 {% block content %}
+<div class="container bg-light p-4">
 
-<div class="list-group">
-{% for error in errors %}
-    <div class="list-group-item"> {{error}} </div>
-{% endfor %}
+
+    <div class="alert alert-danger " role="alert">
+        Cannot add the following records.
+        <a href="{% url 'download_error_excel' %}" class="alert-link">Export to Excel?</a>
+    </div>
+
+        <div class="table-responsive mt-4 bg-light p-3">
+            <table class="table  table-sm table-striped">
+                <thead>
+                    <tr>
+                        <th class="p-2">Row</th>
+                        {% for key, _ in errors.0.data.items %}
+                        <th class="p-2">{{ key|title }}</th>
+                        {% endfor %}
+                        <th class="col-6">Reason</th>
+                    </tr>
+
+                </thead>
+                <tbody>
+                    {% for data in errors %}
+                    <tr>
+                        <td>{{ data.row_index }}</td>
+                        {% for key, value in data.data.items %}
+                        <td>{{ value }}</td>
+                        {% endfor %}
+                        <td col-6> {{data.reason}} </td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+
+
 </div>
 
 

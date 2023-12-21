@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     # 'django.contrib.messages'
 ]
 
-
 from django.contrib.messages import constants as messages
 
 MESSAGE_TAGS = {
@@ -55,7 +54,7 @@ MESSAGE_TAGS = {
         messages.ERROR: 'alert-danger',
  }
 
-
+    
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
