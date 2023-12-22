@@ -188,5 +188,53 @@ def delete_selected_forest(request):
     except Exception as e:
         messages.error(request, f'Error deleting items: {e}')
 
-    return redirect('forest_table') 
+    return redirect('forest_table')
 
+def duplicate_data_to_excel(duplicate_data):
+    column_names = list(duplicate_data[0]['data'].keys())
+    duplicate_df = pd.DataFrame([d['data'] for d in duplicate_data], columns=column_names)
+
+    # Create a response object with Excel content
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=duplicate_data.xlsx'
+
+    duplicate_df.to_excel(response, index=False, sheet_name='duplicate_data')
+
+    return response
+
+# Get the data from session storage
+def download_duplicate_excel(request):
+    duplicate_data = request.session.get('duplicate_data', [])
+    print('DUPLICATE DATA!!!!')
+    print(duplicate_data)
+    print()
+    if duplicate_data:
+        response = duplicate_data_to_excel(duplicate_data)
+        request.session.pop('duplicate_data', None)
+        return response
+    else:
+        return HttpResponse('No data to export.')
+    
+def error_data_to_excel(error_data):
+    column_names = list(error_data[0]['data'].keys())
+    error_df = pd.DataFrame([d['data'] for d in error_data], columns=column_names)
+
+    # Create a response object with Excel content
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=error_data.xlsx'
+
+    error_df.to_excel(response, index=False, sheet_name='error_data')
+
+    return response
+
+
+
+def download_error_excel(request):
+    error_data = request.session.get('errors', [])
+
+    if error_data:
+        response = error_data_to_excel(error_data)
+        request.session.pop('error_data', None)
+        return response
+    else:
+        return HttpResponse('No data to export.')

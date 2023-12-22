@@ -5,7 +5,7 @@
     <div class="row">
         <div class="alert alert-danger col-8" role="alert">
             Cannot add the following duplicate records.
-            <a href="#" class="alert-link">Export to Excel?</a>
+            <a href="{% url 'download_duplicate_excel' %}" class="alert-link">Export to Excel?</a>
         </div>
     </div>
 
@@ -16,7 +16,7 @@
                 <thead>
                     <tr>
                         <th class="p-2">Row</th>
-                        {% for key, _ in duplicate_data.0.items %}  
+                        {% for key, _ in duplicate_data.0.data.items %}  
                             <th class="p-2">{{ key|title }}</th>
                         {% endfor %}
                     </tr>
@@ -26,12 +26,8 @@
                     {% for data in duplicate_data %}
                     <tr>
                         <td>{{ data.row_index }}</td>
-                        {% for key, value in data.items %}
-                            {% if key == 'Year' %}
-                                <td>{{ value|date }}</td>
-                            {% else %}
-                                <td>{{ value }}</td>
-                            {% endif %}
+                        {% for key, value in data.data.items %}
+                        <td>{{ value }}</td>
                         {% endfor %}
                     </tr>
                     {% endfor %}

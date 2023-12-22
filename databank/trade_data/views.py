@@ -329,7 +329,8 @@ def upload_trade_excel(request):
                     calender_date = datetime.strptime(str(row['Calender']), '%Y-%m-%d').date()
                 except ValueError:
                     # If ValueError occurs, it means the input didn't match the format, so set default month and day
-                    calender_date = datetime.strptime(f'{str(row['Calender'])}-01-01', '%Y-%m-%d').date()
+                    calender_date = datetime.strptime(f'{str(row["Calender"])}-01-01', '%Y-%m-%d').date()
+
                 
                 try:
                     # Format the date as a string in the same format

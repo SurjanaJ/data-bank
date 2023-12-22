@@ -13,6 +13,8 @@ urlpatterns = [
     path('delete_forest_record/<int:item_id>/', view.delete_forest_record, name='delete_forest_record'),
 
 
+    path('download_duplicate_excel',view.download_duplicate_excel, name='download_duplicate_excel'),
+
     path('population_table',population_view.display_population_table, name='population_table'),
     path('delete_selected_population/', population_view.delete_selected_population, name='delete_selected_population'),
     path('delete_population_record/<int:item_id>/', population_view.delete_population_record, name='delete_population_record'),
