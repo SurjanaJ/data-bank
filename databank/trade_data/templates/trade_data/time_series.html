@@ -79,14 +79,14 @@
         <tbody class="table-hover">
             {% if request.GET.country_category != '--' and  request.GET.country_category != None %}
             <tr class="fst-italic fw-light">
-                <td>Total Amount</td>
+                <td class="fw-medium"> Total Amount </td>
                 {% for item in total_amount_year %}
-                   <td> {{item.total_amount}}</td>
+                   <td class="fw-medium"> {{item.total_amount}} </td>
                 {% endfor %}
             </tr>
                 {% for hs_code, year_data in result_hs_code.items %}
                     <tr >
-                        <td> {{ hs_code }} - {{year_data.Product_Information}} </td>
+                        <td> <span class="fw-normal">{{ hs_code }}</span> - {{year_data.Product_Information}} </td>
                         {% for year, total_amount in year_data.items %}
                         {% if year != 'Product_Information' %}
                         <td>{{ total_amount }}</td>
@@ -97,7 +97,7 @@
             
             {% else %}
             <tr class="fst-italic fw-light">
-                <td>Total Amount</td>
+                <td class="fw-medium"> Total Amount </td>
                 {% for item in total_amount_year %}
                    <td> {{item.total_amount}}</td>
                 {% endfor %}
