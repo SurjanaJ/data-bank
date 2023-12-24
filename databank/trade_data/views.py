@@ -201,7 +201,6 @@ def upload_unit_meta_excel(request):
         if form.is_valid():
             excel_data = request.FILES['unit_meta_file']
             db_data_list = list(Unit_meta.objects.values('Unit_Code', 'Unit_Name'))
-            print(db_data_list)
             df = pd.read_excel(excel_data)
             df.replace( NaN, 'nan', inplace=True)
 
@@ -245,7 +244,6 @@ def upload_hs_code_meta_excel(request):
         if form.is_valid():
             excel_data = request.FILES['hs_code_meta_file']
             df = pd.read_excel(excel_data, dtype={'HS_Code': str})
-            print(df.head())
 
             try:
                 with transaction.atomic():
