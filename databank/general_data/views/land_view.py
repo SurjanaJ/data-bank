@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from django.db import DataError
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render,redirect
@@ -29,7 +29,7 @@ def display_land_table(request):
     date_min = request.GET.get('date_min')
     date_max = request.GET.get('date_max')
     country_category = request.GET.get('country_category')
-    land_code = request.GET.get('land_code')
+    Land_Code = request.GET.get('land_code')
     unit = request.GET.get('land_unit')
     min_value = request.GET.get('minimum_area')
     max_value = request.GET.get('maximum_area')
@@ -42,8 +42,8 @@ def display_land_table(request):
     if is_valid_queryparam(date_max):
         data=data.filter(Year__lt=date_max)
 
-    if is_valid_queryparam(land_code) and land_code != '--':
-        data=data.filter(Land_Code = land_code)
+    if is_valid_queryparam(Land_Code) and Land_Code != '--':
+        data=data.filter(Land_Code = Land_Code)
      
 
     if is_valid_queryparam(country_category) and country_category != '--':
@@ -118,16 +118,17 @@ def update_land_record(request,pk):
 
 
 def upload_land_excel(request):
+    errors = []
+    duplicate_data = []
+    updated_count = 0
+    added_count = 0
+    
     if request.method == 'POST':
         form = UploadLandDataForm(request.POST,request.FILES)
+        
         if form.is_valid():
-            excel_data = request.Files['land_data_file']
+            excel_data = request.FILES['Land_data_file']
             df = pd.read_excel(excel_data)
-
-            errors = []
-            duplicate_data = []
-            updated_count = 0
-            added_count = 0
 
             if 'id' in df.columns or 'ID' in df.columns:
                 for index,row in df.iterrows():
@@ -138,20 +139,20 @@ def upload_land_excel(request):
                     except:
                         land_instance=Land()
 
+                        
                     Year = row['Year']
                     Country = row['Country']
-                    land_code = row['land_Code']
+                    Land_Code = row['Land_Code']
 
                     try:
                         calender_year = datetime.strptime(str(row['Year']),'%Y-%m-%d').date()
                     except ValueError:
                         calender_year = datetime.strptime(f'{str(row["Year"])}-01-01','%Y-%m-%d').date()
 
-
                     try:
                         Year = calender_year.strftime('%Y-%m-%d')
                         country = Country_meta.objects.get(Country_Name = Country)
-                        land_code = Land_Code_Meta.objects.get(Code = land_code)
+                        Land_Code = Land_Code_Meta.objects.get(Code = Land_Code)
                         
                     except DataError as e:
                         print(f"error handling the row at {index}:{e}")
@@ -159,47 +160,86 @@ def upload_land_excel(request):
 
                     land_instance.Year = Year
                     land_instance.Country = country
-                    land_instance.Land_Code = land_code
+                    land_instance.Land_Code = Land_Code
                     land_instance.Unit = row['Unit']
                     land_instance.Area = row['Area']
                     land_instance.save()
 
                     updated_count +=1
+                    print(land_instance.Country)
 
-                else:
-                    for index,row in df.iterrows():
+            else:
+                for index,row in df.iterrows():
+                    land_data={
+                        'Year': row['Year'].date().strftime('%Y-%m-%d'),
+                        'Country': row['Country'],
+                        'Land_Code': row['Land_Code'],
+                        'Unit': row['Unit'],
+                        'Area': row['Area']
+                    }
 
+                    try:
+                        calender_date = datetime.strptime(str(row['Year'].date().strftime('%Y-%m-%d')), '%Y-%m-%d').date()
+                        
+                    except ValueError:
+                        calender_date = datetime.strptime(f'{str(row["Year"].date().strftime("%Y-%m-%d"))}-01-01', '%Y-%m-%d').date()
+
+                    try:
+                        Year = calender_date.strftime('%Y-%m-%d')
+                        Country = Country_meta.objects.get(Country_Name=row['Country'])
+                        Land_Code = Land_Code_Meta.objects.get(Code = row['Land_Code'])
+                        
                         land_data={
-                            'Year': row['Year'].date().strftime('%Y-%m-%d'),
-                            'Country': row['Country'],
-                            'land_code': row['land_Code'],
+                            'Year': Year,
+                            'Country': Country.Country_Name,
+                            'Land_Code':Land_Code.Code,
                             'Unit': row['Unit'],
                             'Area': row['Area']
                         }
+                        
 
+                    except Exception as e:
+                        errors.append({'row_index': index, 'data': land_data, 'reason': str(e)})
+                        continue
+
+                    existing_record = Land.objects.filter(Q(Year = Year) & Q(Country = Country) & Q(Land_Code = Land_Code) & Q(Unit = land_data['Unit']) & Q(Area = land_data['Area'])).first()
+
+                    if existing_record:
+                            duplicate_data.append({
+                                'row_index' :index,
+                                'data': land_data
+                            })       
+                        
+                    else:
                         try:
-                            calender_date = datetime.strptime(str(row['Year'].date().strftime('%Y-%m-%d')), '%Y-%m-%d').date()
-                        except ValueError:
-                            calender_date = datetime.strptime(f'{str(row["Year"].date().strftime("%Y-%m-%d"))}-01-01', '%Y-%m-%d').date()
-
-                        try:
-                            Year = calender_date.strftime('%Y-%m-%d')
-                            Country = Country_meta.objects.get(Country_Name=row['Country'])
-                            land_code = Land_Code_Meta.objects.get(Code = land_code)
-
-                            land_data={
-                                'Year': row['Year'].date().strftime('%Y-%m-%d'),
-                                'Country': row['Country'],
-                                'land_code': row['land_Code'],
-                                'Unit': row['Unit'],
-                                'Area': row['Area']
-                            }
+                            LandData = Land(**land_data)
+                            LandData.save()
+                            added_count +=1
 
                         except Exception as e:
-                            errors.append({'row_index': index, 'data': population_data, 'reason': str(e)})
-                            continue
+                            errors.append(f"Error inserting row {index}: {e}")
 
-                        
+                if added_count> 0 :
+                        messages.success(request,str(added_count)+ 'records addad')
+                                
+                if updated_count > 0:
+                    messages.info(request,str(updated_count)+'records updated') 
+
+                if errors:
+                    request.session['errors'] = errors
+                    print()
+                    print('errors: ')
+                    print(errors)
+                    print()
+                    print()
+                    return render(request, 'general_data/error_template.html', {'errors': errors})
+
+                if duplicate_data:
+                    request.session['duplicate_data'] = duplicate_data
+                    return render (request,'general_data/duplicate_template.html',{'duplicate_data':duplicate_data})      
+              
+    else:
+        form = UploadLandDataForm()
+
+    return render(request,'general_data/land_templates/upload_land_form.html',{'form':form})
         
-
-    
