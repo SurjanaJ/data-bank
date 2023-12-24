@@ -70,7 +70,9 @@
                     <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Importers</th>
                     {% endif %}
                 {% for year in years %}
+                {% if year != 'Product_Information' %}
                 <th class="bg-primary text-white fw-semibold fs-6 p-2" scope="col">Exported value in {{year}} </th>
+                {% endif %}
                 {% endfor %}
             </tr>
         </thead>
@@ -84,9 +86,11 @@
             </tr>
                 {% for hs_code, year_data in result_hs_code.items %}
                     <tr >
-                        <td>{{ hs_code }}</td>
+                        <td> {{ hs_code }} - {{year_data.Product_Information}} </td>
                         {% for year, total_amount in year_data.items %}
+                        {% if year != 'Product_Information' %}
                         <td>{{ total_amount }}</td>
+                        {% endif %}
                         {% endfor %}
                     </tr>
                 {% endfor %}
