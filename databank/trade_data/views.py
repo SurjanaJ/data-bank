@@ -201,7 +201,6 @@ def upload_unit_meta_excel(request):
         if form.is_valid():
             excel_data = request.FILES['unit_meta_file']
             db_data_list = list(Unit_meta.objects.values('Unit_Code', 'Unit_Name'))
-            print(db_data_list)
             df = pd.read_excel(excel_data)
             df.replace( NaN, 'nan', inplace=True)
 
@@ -245,7 +244,6 @@ def upload_hs_code_meta_excel(request):
         if form.is_valid():
             excel_data = request.FILES['hs_code_meta_file']
             df = pd.read_excel(excel_data, dtype={'HS_Code': str})
-            print(df.head())
 
             try:
                 with transaction.atomic():
@@ -496,6 +494,7 @@ def time_series_analysis(request):
     total_amount_by_origin_destination = data.values(
         'Origin_Destination__Country_Name',
         'HS_Code_id__HS_Code',
+        'HS_Code_id__Product_Information',
         'Calender__year',
     ).annotate(
         total_amount=Sum('Amount')
@@ -522,6 +521,7 @@ def time_series_analysis(request):
     for item in total_amount_by_origin_destination:
         origin_destination = item['Origin_Destination__Country_Name']
         hs_code = item['HS_Code_id__HS_Code']
+        product_information = item['HS_Code_id__Product_Information']
         year = item['Calender__year']
         total_amount = item['total_amount']
         
@@ -529,31 +529,32 @@ def time_series_analysis(request):
             result_country[origin_destination] = {}
         
         if hs_code not in result_hs_code:
-            result_hs_code[hs_code] = {}
-        
+            result_hs_code[hs_code] = {'Product_Information': product_information}
+         
         for y in years:
             result_country[origin_destination][y] = 0
             result_hs_code[hs_code][y] = 0
-        
     
     for item in total_amount_by_origin_destination:
         origin_destination = item['Origin_Destination__Country_Name']
         hs_code = item['HS_Code_id__HS_Code']
+        product_information = item['HS_Code_id__Product_Information']
         year = item['Calender__year']
         total_amount = item['total_amount']
         result_country[origin_destination][year] = total_amount
         result_hs_code[hs_code][year] =total_amount
-        
 
     sorted_years = sorted(list(years), reverse=True)
     
     for origin_destination, year_data in result_country.items():
         result_country[origin_destination] = dict(
             sorted(year_data.items(), key=lambda x: x[0], reverse=True))
-        
+       
     for hs_code, year_data in result_hs_code.items():
-        result_hs_code[hs_code] = dict(sorted(year_data.items(), key=lambda x: x[0], reverse=True))
-
+        years = {(key, value) for key, value in year_data.items() if isinstance(key, int)}
+        sorted_years = dict(sorted(years, key=lambda x: x[0], reverse=True))
+        sorted_years['Product_Information'] = year_data['Product_Information']
+        result_hs_code[hs_code] = sorted_years
 
     context = {'data':data, 'country_categories':country_categories, 'unit_categories':unit_categories,'hs_codes':hs_codes, 'trade_type_categories':trade_type_categories, 'result_country': result_country,'result_hs_code': result_hs_code,
                'years':sorted_years, 'display_country':display_country, 'display_hs_code':display_hs_code, 'queryset_length':len(total_amount_by_origin_destination), 'total_amount_year':total_amount_year, 'tables':tables, 'meta_tables':meta_tables}
