@@ -115,7 +115,7 @@ def trade_record_to_excel(request):
 
     if country_category != '--' and country_category is not None:
         # Filter for the specific case where 'country_category' is selected
-        df = data.values('HS_Code_id__HS_Code', 'Calender__year', 'Amount').annotate(
+        df = data.values('HS_Code_id__HS_Code', 'HS_Code_id__Product_Information', 'Calender__year', 'Amount').annotate(
             year_amount=Sum('Amount')
         ).order_by('HS_Code_id', 'Calender__year')
     else:
@@ -125,19 +125,18 @@ def trade_record_to_excel(request):
         ).order_by('Origin_Destination__Country_Name', 'Calender__year')
 
     # Convert QuerySet to a Pandas DataFrame
-    df = pd.DataFrame.from_records(data.values('HS_Code_id__HS_Code','Origin_Destination__Country_Name', 'Calender__year', 'Amount'))
-   
+    df = pd.DataFrame.from_records(data.values('HS_Code_id__HS_Code', 'HS_Code_id__Product_Information','Origin_Destination__Country_Name', 'Calender__year', 'Amount'))
     df['year_amount'] = df['Amount']  # Create a column to hold the aggregated amounts
    
     # Determine the index column based on 'country_category' parameter
     index_col = 'HS_Code_id__HS_Code' if (country_category != '--' and country_category is not None) else 'Origin_Destination__Country_Name'
 
-    df = df.groupby([index_col, 'Calender__year'])['year_amount'].sum().unstack().reset_index()
+    df = df.groupby([index_col,'HS_Code_id__Product_Information', 'Calender__year'])['year_amount'].sum().unstack().reset_index()
     df.fillna(0, inplace=True)
     df.columns = ["Exported value in {}".format(col) for col in df.columns]
 
 
-    sums = df.iloc[:, 1:].sum()
+    sums = df.iloc[:, 2:].sum()
     # Create a new DataFrame for the sums
     sums = pd.DataFrame(sums).transpose()  # Transpose the DataFrame to match column names
     sums.index = ["Total"]  # Optional: Rename the index to "Total"
