@@ -314,6 +314,7 @@ def upload_trade_excel(request):
                     'Duration':row['Duration'],
                     'Country' : row['Country'],
                     'HS_Code' : row['HS_Code'],
+                    'Product_Information': row['Product_Information'],
                     'Unit' : row['Unit'],
                     'Quantity':row['Quantity'],
                     'Currency_Type':row['Currency_Type'],
@@ -338,6 +339,10 @@ def upload_trade_excel(request):
                     Origin_Destination = Country_meta.objects.get(
                         Country_Name=row['Origin_Destination'])
                     
+                    if HS_Code:
+                        trade_data['Product_Information'] = HS_Code.Product_Information
+                    else:
+                        trade_data['Product_Information'] = row['Product_Information']
                     
                     trade_data = {
                         'Trade_Type': row['Trade_Type'],
