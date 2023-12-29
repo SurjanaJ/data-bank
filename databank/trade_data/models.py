@@ -51,7 +51,7 @@ class TradeData(models.Model):
     Quantity = models.IntegerField(default=0, null=True, blank=True)
     Currency_Type = models.CharField(max_length=100, null=True, blank=True)
     Amount = models.DecimalField(max_digits=100, decimal_places=3,null=True, blank=True)
-    Tarrif = models.DecimalField(max_digits=100, decimal_places=3, null=True, blank=True, default=None)
+    Tarrif = models.DecimalField(max_digits=100, decimal_places=1, null=True, blank=True, default=0.0)
     Origin_Destination =  models.ForeignKey(Country_meta, on_delete=models.CASCADE, related_name='tradedata_origin_destination')
     TradersName_ExporterImporter = models.CharField(max_length=100, null=True, blank=True)
     DocumentsLegalProcedural = models.CharField(max_length=300, null=True, blank=True)
