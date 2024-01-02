@@ -3,7 +3,8 @@ from io import BytesIO
 import json
 from math import isnan
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.forms import model_to_dict
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import redirect, render,get_object_or_404
 from django.db.models import Q
 from numpy import NaN
@@ -305,7 +306,9 @@ def upload_trade_excel(request):
         if form.is_valid():
             excel_data = request.FILES['trade_data_file']
             df = pd.read_excel(excel_data,dtype={'HS_Code': str})
-
+            df.fillna('', inplace=True)
+            df['Calender'] = pd.to_datetime(df['Calender']).dt.date
+            
             for index, row in df.iterrows():
                 trade_data = {
                     'Trade_Type':row['Trade_Type'],
@@ -319,20 +322,13 @@ def upload_trade_excel(request):
                     'Quantity':row['Quantity'],
                     'Currency_Type':row['Currency_Type'],
                     'Amount':row['Amount'],
-                    'Tarrif' : None if row['Tarrif'] == 'nan' or isnan(row['Tarrif']) else row['Tarrif'],
+                    'Tarrif' : 0.0 if row['Tarrif'] == 'nan' or (row['Tarrif']== '') else row['Tarrif'],
                     'Origin_Destination' : row['Origin_Destination'],
                     'TradersName_ExporterImporter':row['TradersName_ExporterImporter'],
                     'DocumentsLegalProcedural':row['DocumentsLegalProcedural']
                 }
                 try:
-                    calender_date = datetime.strptime(str(row['Calender']), '%Y-%m-%d').date()
-                except ValueError:
-                    # If ValueError occurs, it means the input didn't match the format, so set default month and day
-                    calender_date = datetime.strptime(f'{str(row['Calender'])}-01-01', '%Y-%m-%d').date()
-                
-                try:
-                    # Format the date as a string in the same format
-                    Calender = calender_date.strftime('%Y-%m-%d')
+                    Calender = row['Calender']
                     Country = Country_meta.objects.get(Country_Name=row['Country'])
                     HS_Code = HS_Code_meta.objects.get(HS_Code=row['HS_Code'])
                     Unit = Unit_meta.objects.get(Unit_Code=row['Unit'])
@@ -355,32 +351,43 @@ def upload_trade_excel(request):
                         'Quantity':row['Quantity'],
                         'Currency_Type' :row['Currency_Type'],
                         'Amount':row['Amount'],
-                        'Tarrif' : None if row['Tarrif'] == 'nan' or isnan(row['Tarrif']) else row['Tarrif'],
+                        'Tarrif' : 0.0 if row['Tarrif'] == 'nan' or (row['Tarrif']== '') else row['Tarrif'],
                         'Origin_Destination' : Origin_Destination,
                         'TradersName_ExporterImporter':row['TradersName_ExporterImporter'],
                         'DocumentsLegalProcedural':row['DocumentsLegalProcedural']
                     }
                 
                 except Exception as e:
+                    trade_data['Calender'] = Calender.isoformat()
+                    # Convert datetime.date objects to strings before appending to errors
                     errors.append({'row_index': index, 'data': trade_data, 'reason': str(e)})
                     continue
+
+                    
                     
                 existing_record = TradeData.objects.filter(
                         Q(Calender=Calender) & Q(Country=Country) & Q(HS_Code=HS_Code) & Q(Unit=Unit) & Q(Origin_Destination=Origin_Destination)
                         ).first()
-                
+
                 if existing_record:
-                    if all(getattr(existing_record, key) == value for key, value in trade_data.items()):
+                    existing_dict = model_to_dict(existing_record)
+                    trade_data_dict = model_to_dict(TradeData(**trade_data))
+
+                # Check for equality, handling NaN values
+                    if all(existing_dict[key] == trade_data_dict[key] or (pd.isna(existing_dict[key]) and pd.isna(trade_data_dict[key])) for key in trade_data_dict if key != 'id'):
                         duplicate_data.append({
-                                'row_index' :index,
-                                'data': trade_data
-                            })
+                            'row_index': index,
+                            'data': {key: str(trade_data[key]) if isinstance(trade_data[key], Calender) else trade_data[key] for key in trade_data}
+                        })
+                        print('duplicate data:')
+                        print(duplicate_data)
+                        print()
+                        print()
                     else:
                         # Update the row with non-duplicate data
                         for key, value in trade_data.items():
                             setattr(existing_record, key, value)
                         try:
-                            
                             existing_record.save()
                             updated_count += 1
                         except IntegrityError as e:
@@ -402,6 +409,7 @@ def upload_trade_excel(request):
                 messages.info(request, str(updated_count) + ' records updated.')
 
             if errors:
+                print('THERE IS SOME ERROR!!!!!!!!!!!!!!!!!')
                 request.session['errors'] = errors
                 return render(request, 'trade_data/error_template.html', {'errors': errors})
             
