@@ -113,48 +113,48 @@ def update_population_record(request,pk):
 
 
 def upload_population_excel(request):
+    errors = []
+    duplicate_data = []
+    updated_count = 0
+    added_count = 0
+    
     if request.method == 'POST':
-        form = UploadPopulationDataForm(request.POST,request.FILES)
+        form = UploadPopulationDataForm(request.POST, request.FILES)
         if form.is_valid():
             excel_data = request.FILES['population_data_file']
             df = pd.read_excel(excel_data)
 
 
-            errors = []
-            duplicate_data = []
-            updated_count = 0
-            added_count = 0
 
-
-            if 'id' in df.columns or 'ID' in df.columns:
-                for index,row in df.iterrows():
+            if 'ID' in df.columns or 'id' in df.columns:
+                for index, row in df.iterrows():
                     id_value = row['ID']
 
                     try:
+                        # Try to get an existing record with the given 'ID'
                         population_instance = PopulationData.objects.get(id=id_value)
                     except:
+                        # If not found, create a new instance
                         population_instance = PopulationData()
-
 
                     Year = row['Year']
                     Country = row['Country']
 
                     try:
-                        calender_year = datetime.strptime(str(row['Year']), '%Y-%m-%d').date()
+                        # Convert 'Year' to a datetime object
+                        calender_year =pd.to_datetime(Year).date()
                     except ValueError:
-                    # If ValueError occurs, it means the input didn't match the format, so set default month and day
-                        calender_year = datetime.strptime(f'{str(row["Year"])}-01-01', '%Y-%m-%d').date()
-
-
+                        print(f"Error converting date in row {index}: {e}")
+                        print(f"Problematic row data: {row}")
                     try:
-                        Year = calender_year.strftime('%Y-%m-%d')
-                        country = Country_meta.objects.get(Country_Name=Country)
+                        Year = calender_year
+                        Country = Country_meta.objects.get(Country_Name = Country )
                     except DataError as e:
-                        print(f"error inserting row at {index}:{e}")
+                        print(f'error handling the row at {index}:{e}')
                         continue
-                    
-                    population_instance.Year = Year
-                    population_instance.Country = country
+                        # Update the instance with the new values
+                    population_instance.Year = calender_year.strftime('%Y-%m-%d')
+                    population_instance.Country = Country_meta.objects.get(Country_Name=Country)
                     population_instance.Gender = row['Gender']
                     population_instance.Age_Group = row['Age_Group']
                     population_instance.Population = row['Population']
@@ -162,6 +162,10 @@ def upload_population_excel(request):
 
                     updated_count +=1
             else:
+                gender_options = [option[0] for option in PopulationData.Gender_Options]
+                age_group_options = [option[0] for option in PopulationData.Age_Group_Options]
+
+
                 for index,row in df.iterrows():
 
                     population_data = {
@@ -171,55 +175,79 @@ def upload_population_excel(request):
                         'Age_Group' : row['Age_Group'],
                         'Population' : row['Population']
                     }
+
+
+                    if population_data['Gender'] not in gender_options:
+                        errors.append({
+                            'row_index': index,
+                            'data': population_data,
+                            'reason': f'Error inserting row {index}: Invalid Gender value'
+                        })
+
+                    elif population_data['Age_Group'] not in age_group_options:
+                        errors.append({
+                            'row_index': index,
+                            'data': population_data,
+                            'reason': f'Error inserting row {index}: Invalid Age group value'
+                        })
+
+                    else:                        
                    
-                    try:
-                        calender_date = datetime.strptime(str(row['Year'].date().strftime('%Y-%m-%d')), '%Y-%m-%d').date()
-                    except ValueError:
-                        calender_date = datetime.strptime(f'{str(row["Year"].date().strftime("%Y-%m-%d"))}-01-01', '%Y-%m-%d').date()
-
-                    try:
-                        Year = calender_date.strftime('%Y-%m-%d')
-                        Country = Country_meta.objects.get(Country_Name=row['Country'])
-                        
-                        population_data ={
-                            'Year' : Year,
-                            'Country': Country.Country_Name,
-                            'Gender' : row['Gender'],
-                            'Age_Group' : row['Age_Group'],
-                            'Population' : row['Population']
-                        }
-
-                    except Exception as e:
-                        errors.append({'row_index': index, 'data': population_data, 'reason': str(e)})
-                        continue
-
-                    existing_record = PopulationData.objects.filter(Q(Year = Year) & Q(Country = Country) & Q(Gender = population_data['Gender']) & Q(Age_Group = population_data['Age_Group']) & Q(Population = population_data['Population'])).first()
-
-                    if existing_record:
-                        duplicate_data.append({
-                                    'row_index' :index,
-                                    'data': population_data
-                                })
-                    else:
                         try:
-                            populationData = PopulationData(**population_data)
-                            populationData.save()
-                            added_count += 1
-                    
+                            calender_date = datetime.strptime(str(row['Year'].date().strftime('%Y-%m-%d')), '%Y-%m-%d').date()
+                        except ValueError:
+                            calender_date = datetime.strptime(f'{str(row["Year"].date().strftime("%Y-%m-%d"))}-01-01', '%Y-%m-%d').date()
+                        
+                        Country = None
+
+                        try:
+                            Year = calender_date.strftime('%Y-%m-%d')
+                            Country = Country_meta.objects.get(Country_Name=row['Country'])
+                            
+                            population_data ={
+                                'Year' : Year,
+                                'Country': Country,
+                                'Gender' : row['Gender'],
+                                'Age_Group' : row['Age_Group'],
+                                'Population' : row['Population']
+                            }
+
                         except Exception as e:
-                            errors.append(f"THIS IS ARKAI ERROR:: Error inserting row {index}: {e}")
+                            errors.append({'row_index': index, 'data': population_data, 'reason': str(e)})
+                            continue
 
+                        existing_record = PopulationData.objects.filter(Q(Year = Year) & Q(Country = Country) & Q(Gender = population_data['Gender']) & Q(Age_Group = population_data['Age_Group']) & Q(Population = population_data['Population'])).first()
 
-            if added_count > 0 :
-                messages.success(request,str(added_count)+'records added')
-            
-            if updated_count > 0 :
-                messages.info(request,str(updated_count)+'records updated')
-
-            if duplicate_data:
-                request.session['duplicate_data'] = duplicate_data
-
-                return render(request,'general_data/duplicate_template.html',{'duplicate_data':duplicate_data})
+                        if existing_record:
+                            duplicate_data.append({
+                                        'row_index' :index,
+                                        'data': population_data,
+                                        'reason': 'Duplicate record found'
+                                    })
+                        else:
+                            try:
+                                populationData = PopulationData(**population_data)
+                                populationData.save()
+                                added_count += 1
+                        
+                            except Exception as e:
+                                errors.append({
+                                    'row_index': index,
+                                    'data': population_data,
+                                    'reason': f'Error inserting row  {index}: {e}'
+                                })
+                if added_count > 0 :
+                    messages.success(request,str(added_count)+'records added')
+                
+                if updated_count > 0 :
+                    messages.info(request,str(updated_count)+'records updated')
+                
+                if errors:
+                    request.session['errors'] = errors
+                    return render(request, 'general_data/error_template.html', {'errors': errors})
+                
+                if duplicate_data:
+                    return render(request,'general_data/duplicate_template.html',{'duplicate_data':duplicate_data})
                 
     else:
         form = UploadPopulationDataForm()

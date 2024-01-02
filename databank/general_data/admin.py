@@ -24,7 +24,13 @@ class PopulationData_Admin(admin.ModelAdmin):
 admin.site.register(PopulationData,PopulationData_Admin)
 
 
+class Transport_Admin(admin.ModelAdmin):
+    list_display=['id','Year','Country','Transport_Classification_Code','Unit','Quantity']
+    
+    
 
+class Water_Admin(admin.ModelAdmin):
+    list_display=['id','Year','Country','Water_Type_Code','Unit','Volume','Name_Of_The_River']
 
 
 
@@ -34,7 +40,7 @@ admin.site.register(PopulationData,PopulationData_Admin)
 
 admin.site.register(Transport_Meta)
 
-admin.site.register(Transport)
+admin.site.register(Transport,Transport_Admin)
 
 admin.site.register(Tourism_Meta)
 
@@ -44,6 +50,6 @@ admin.site.register(Hotel)
 
 admin.site.register(Water_Meta)
 
-admin.site.register(Water)
+admin.site.register(Water,Water_Admin)
 
 

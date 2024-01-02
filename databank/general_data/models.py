@@ -76,7 +76,6 @@ class Transport(models.Model):
         ('Metric Ton', 'Metric Ton'),
     )
 
-
     id=models.AutoField(primary_key=True)
     Year=models.DateField(null=True, blank=True)
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
@@ -90,6 +89,9 @@ class Tourism_Meta(models.Model):
     id=models.AutoField(primary_key=True)
     Code=models.CharField(max_length=100)
     Arrival_Mode=models.TextField(null=True,blank=True)
+
+    def __str__(self):
+        return self.Code
 
 class Tourism(models.Model):
     id=models.AutoField(primary_key=True)
@@ -116,6 +118,9 @@ class Water_Meta(models.Model):
     Code=models.CharField(max_length=100)
     Water_Type=models.TextField(null=True,blank=True)
 
+    def __str__(self):
+        return self.Code
+
 
 class Water(models.Model):
 
@@ -131,6 +136,8 @@ class Water(models.Model):
     Unit=models.CharField(max_length=10, choices=Unit_Options , null=True, blank=True)
     Volume = models.DecimalField(max_digits=100,decimal_places=3,null=True,blank=True)
     Name_Of_The_River = models.CharField(max_length=100,null=True,blank=True)
+
+
 
 
 

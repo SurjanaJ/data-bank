@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from django.db import DataError
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render,redirect
@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.db.models import Q
 import pandas as pd
 from ..models import Water, Country_meta,Water_Meta
-from ..forms import UploadForestDataForm,UploadWaterData
+from ..forms import UploadWaterDataForm,UploadWaterData
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -63,7 +63,7 @@ def display_water_table(request):
     if is_valid_queryparam(max_volume):
         data = data.filter(Volume__lt=max_volume)
 
-    paginator = Paginator(data, 10)
+    paginator = Paginator(data, 50)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
     
@@ -118,3 +118,162 @@ def update_water_record(request,pk):
         
     context={'form':form,}
     return render(request,'general_data/water_templates/update_water_record.html',context)
+
+
+
+def upload_water_excel(request):
+    errors = []
+    duplicate_data = []
+    updated_count = 0
+    added_count = 0
+
+
+    if request.method == 'POST':
+        form = UploadWaterDataForm(request.POST,request.FILES)
+
+        if form.is_valid():
+            excel_data = request.FILES['Water_data_file']
+            df = pd.read_excel(excel_data)
+
+            if 'id' in df.columns or 'ID' in df.columns:
+                for index,row in df.iterrows():
+                    id_value = row['ID']
+
+                    try:
+                        water_instance = Water.objects.get(id = id_value)
+                    except:
+                        water_instance = Water()
+
+                    Year = row['Year']
+                    Country = row['Country']
+                    Water_Type_Code = row['Water_Type_Code']
+
+                    try:
+                        calender_year =pd.to_datetime(Year).date()
+
+                    except ValueError as e:
+                        print(f"Error converting date in row {index}: {e}")
+                        print(f"Problematic row data: {row}")
+                        continue
+
+                    try:
+                        Year = calender_year 
+                        Country = Country_meta.objects.get(Country_Name = Country)
+                        Water_Type_Code = Water_Meta.objects.get(Code = Water_Type_Code)
+
+                    except DataError as e:
+                        print(f'error handling the row at {index}:{e}')
+                        continue
+
+                    water_instance.Year = Year
+                    water_instance.Country = Country
+                    water_instance.Water_Type_Code = Water_Type_Code
+                    water_instance.Description = row['Description']
+                    water_instance.Unit = row['Unit']
+                    water_instance.Volume = row['Volume']
+                    water_instance.Name_Of_The_River = row['Name_Of_The_River']
+
+                    water_instance.save()
+
+                    updated_count +=1       
+            else:
+
+                water_unit_options = [option[0] for option in Water.Unit_Options]
+
+                for index, row in df.iterrows():
+                    water_data = {
+                        'Year': row['Year'].date().strftime('%Y-%m-%d'),
+                        'Country': row['Country'],
+                        'Water_Type_Code': row['Water_Type_Code'],
+                        'Description': row['Description'],
+                        'Unit': row['Unit'],
+                        'Volume': row['Volume'],
+                        'Name_Of_The_River': row['Name_Of_The_River']
+                    }
+
+                    if water_data['Unit'] not in water_unit_options:
+                        errors.append({
+                            'row_index': index,
+                            'data': water_data,
+                            'reason': f'Error inserting row {index}: Invalid unit value'
+                        })
+
+                    else:
+
+                        try:
+                            calender_date = datetime.strptime(str(row['Year'].date().strftime('%Y-%m-%d')), '%Y-%m-%d').date()
+                        except:
+                            calender_date = datetime.strptime(f'{str(row["Year"].date().strftime("%Y-%m-%d"))}-01-01', '%Y-%m-%d').date()
+                        
+                        Country = None
+                        Water_Type_Code = None
+
+                        
+
+                        try:
+                            Year = calender_date.strftime('%Y-%m-%d')
+                            Country = Country_meta.objects.get(Country_Name=row['Country'])
+                            Water_Type_Code = Water_Meta.objects.get(Code=row['Water_Type_Code'])
+
+                            water_data = {
+                                'Year': Year,
+                                'Country': Country,
+                                'Water_Type_Code': Water_Type_Code,
+                                'Description': row['Description'],
+                                'Unit': row['Unit'],
+                                'Volume': row['Volume'],
+                                'Name_Of_The_River': row['Name_Of_The_River']
+                            }
+
+                        
+                        except Exception as e:
+                            errors.append({
+                                'row_index': index,
+                                'data': water_data,
+                                'reason': f'Error inserting row {index}:{e}'
+                            })
+                            continue
+                        
+                        existing_record = Water.objects.filter(
+                            Q(Year=Year) & Q(Country=Country) & Q(Water_Type_Code=Water_Type_Code) & Q(Name_Of_The_River=water_data['Name_Of_The_River'])
+                        ).first()
+
+
+                        if existing_record:
+                            duplicate_data.append({
+                                'row_index': index,
+                                'data': water_data,
+                                'reason': 'Duplicate record found'
+                            })
+                            
+                        else:
+                            try:
+                                WaterData = Water(**water_data)
+                                WaterData.save()
+                                added_count += 1
+                            except Exception as e:
+                                errors.append({
+                                    'row_index': index,
+                                    'data': water_data,
+                                    'reason': f'Error inserting row {index}: {e}'
+                                })
+
+                # Update the success messages
+            if added_count > 0:
+                messages.success(request, f'{added_count} records added')
+
+            if updated_count > 0:
+                    messages.success(request, f'{updated_count} records updated')
+
+            if errors:
+                request.session['errors'] = errors
+                return render(request, 'general_data/error_template.html', {'errors': errors})
+
+            if duplicate_data:
+                return render(request, 'general_data/duplicate_template.html', {'duplicate_data': duplicate_data})
+
+    else:
+        form = UploadWaterDataForm()
+
+    return render(request,'general_data/water_templates/upload_water_form.html',{'form':form})
+ 

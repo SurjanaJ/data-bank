@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from django.db import DataError
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render,redirect
@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.db.models import Q
 import pandas as pd
 from ..models import Tourism, Country_meta,Tourism_Meta
-from ..forms import UploadForestDataForm,UploadTourismData
+from ..forms import UploadTourismDataForm,UploadTourismData
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -110,3 +110,142 @@ def update_tourism_record(request,pk):
         
     context={'form':form,}
     return render(request,'general_data/tourism_templates/update_tourism_record.html',context)
+
+
+
+def upload_tourism_excel(request):
+    errors = []
+    duplicate_data = []
+    updated_count = 0
+    added_count = 0
+
+
+    if request.method == 'POST':
+        form = UploadTourismDataForm(request.POST,request.FILES)
+
+        if form.is_valid():
+            excel_data = request.FILES['Tourism_data_file']
+            df = pd.read_excel(excel_data)
+
+            if 'id' in df.columns or 'ID' in df.columns:
+                for index,row in df.iterrows():
+                    id_value = row['ID']
+
+                    try:
+                        tourism_instance = Tourism.objects.get(id = id_value)
+                    except:
+                        tourism_instance = Tourism()
+
+                    Year = row['Year']
+                    Country = row['Country']
+                    Nationality_Of_Tourism = row['Nationality_Of_Tourism']
+                    Arrival_Mode = row['Arrival_Mode']
+
+                    try:
+                        calender_year =pd.to_datetime(Year).date()
+                    except ValueError as e:
+                        print(f"Error converting date in row {index}: {e}")
+                        print(f"Problematic row data: {row}")
+                        continue
+
+                    try:
+                        Year = calender_year 
+                        Country = Country_meta.objects.get(Country_Name = Country)
+                        Nationality_Of_Tourism = Country_meta.objects.get(Country_Name = Nationality_Of_Tourism)
+                        Arrival_Mode = Tourism_Meta.objects.get(Code = Arrival_Mode)
+                    except DataError as e:
+                        print(f'error handling the row at {index}:{e}')
+                        continue
+
+                    tourism_instance.Year = Year
+                    tourism_instance.Country = Country
+                    tourism_instance.Number_Of_Tourist = row['Number_Of_Tourist']
+                    tourism_instance.Nationality_Of_Tourism= Nationality_Of_Tourism
+                    tourism_instance.Arrival_code = Arrival_Mode
+                    tourism_instance.Number = row['Number']
+
+                    tourism_instance.save()
+                    updated_count +=1
+
+            else:
+                for index,row in df.iterrows():
+                    tourism_data ={
+                        'Year':row['Year'].date().strftime('%Y-%m-%d'),
+                        'Country': row['Country'],
+                        'Number_Of_Tourist': row['Number_Of_Tourist'],
+                        'Nationality_Of_Tourism':row['Nationality_Of_Tourism'],
+                        'Arrival_Mode':row['Arrival_Mode'],
+                        'Number': row['Number']
+                    }
+                    try:
+                        calender_date = datetime.strptime(str(row['Year'].date().strftime('%Y-%m-%d')), '%Y-%m-%d').date()
+                    except:
+                        calender_date = datetime.strptime(f'{str(row["Year"].date().strftime("%Y-%m-%d"))}-01-01', '%Y-%m-%d').date()
+
+                    Country = None
+                    Arrival_Mode =None
+                    Nationality_Of_Tourism = None
+
+
+                    try:
+                        Year = calender_date.strftime('%Y-%m-%d')
+                        Country = Country_meta.objects.get(Country_Name=row['Country'])
+                        Nationality_Of_Tourism = Country_meta.objects.get(Country_Name = row['Nationality_Of_Tourism'])
+                        Arrival_Mode = Tourism_Meta.objects.get(Code = row['Arrival_Mode'])
+
+                        tourism_data = {
+                            'Year':Year,
+                            'Country':Country,
+                            'Number_Of_Tourist': row['Number_Of_Tourist'],
+                            'Nationality_Of_Tourism':Nationality_Of_Tourism,
+                            'Arrival_Mode':Arrival_Mode,
+                            'Number':row['Number']    
+                        }
+
+                    except Exception as e:
+                        errors.append({
+                            'row_index': index,
+                            'data': tourism_data,
+                            'reason':  f'Error inserting row  {index}: {e}'
+                        })
+                        continue
+                        
+
+                    existing_record = Tourism.objects.filter(Q(Year = Year) & Q(Country = Country) & Q(Nationality_Of_Tourism = Nationality_Of_Tourism) & Q(Arrival_code = Arrival_Mode)).first()
+
+                    if existing_record:
+                        duplicate_data.append({
+                            'row_index':index,
+                            'data':tourism_data,
+                            'reason': 'Duplicate record found'
+                        })
+
+                    else:
+                        try:
+                            TourismData = Tourism(**tourism_data)
+                            TourismData.save()
+
+                            added_count +=1
+
+                        except Exception as e:
+                            errors.append({
+                                'row_index': index,
+                                'data': tourism_data,
+                                'reason':f'Error inserting row {index}:{e}'
+                            })
+            if added_count > 0:
+                messages.success(request, f'{added_count} records added')
+
+            if updated_count > 0:
+                messages.success(request, f'{updated_count} records updated')
+
+            if errors:
+                request.session['errors'] = errors
+                return render(request, 'general_data/error_template.html', {'errors': errors})
+
+            if duplicate_data:
+                    return render(request, 'general_data/duplicate_template.html', {'duplicate_data': duplicate_data})
+    else:
+        form = UploadTourismDataForm()
+
+    return render(request,'general_data/tourism_templates/upload_tourism_form.html',{'form':form})

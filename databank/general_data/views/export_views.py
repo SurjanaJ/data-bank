@@ -300,7 +300,7 @@ def filter_tourism(request):
     if  tourism_view.is_valid_queryparam(max_tourist):
         data = data.filter(Number_Of_Tourist__lt=max_tourist)
 
-        return data
+    return data
 
 
 
@@ -309,12 +309,13 @@ def export_tourism_table_to_excel(request):
     data = data.annotate(
         country_name=F('Country__Country_Name'),
         arrival_mode=F('Arrival_code__Code'),
+        nationality_of_tourism=F('Nationality_Of_Tourism__Country_Name')
     )
 
-    df = pd.DataFrame(data.values('Year','country_name','Number_Of_Tourist','Nationality_Of_Tourism','arrival_mode','Number'))
+    df = pd.DataFrame(data.values('Year','country_name','Number_Of_Tourist','nationality_of_tourism','arrival_mode','Number'))
 
 
-    df.rename(columns={'country_name':'Country','arrival_mode':'Arrival_Mode'},inplace=True)  
+    df.rename(columns={'country_name':'Country','nationality_of_tourism':'Nationality_Of_Tourism','arrival_mode':'Arrival_Mode'},inplace=True)  
 
     df = df[['Year','Country','Number_Of_Tourist','Nationality_Of_Tourism','Arrival_Mode','Number']]  
     
@@ -384,9 +385,9 @@ def export_water_table_to_excel(request):
 
     df=pd.DataFrame(data.values('Year','country_name','water_code','Description','Unit','Volume','Name_Of_The_River'))
 
-    df.rename(columns={'country_name':'Country','water_code':'Code_Type'},inplace=True)
+    df.rename(columns={'country_name':'Country','water_code':'Water_Type_Code'},inplace=True)
 
-    df=df[['Year','Country','Code_Type','Description','Unit','Volume','Name_Of_The_River']]
+    df=df[['Year','Country','Water_Type_Code','Description','Unit','Volume','Name_Of_The_River']]
 
     output=BytesIO()
     writer=pd.ExcelWriter(output,engine='xlsxwriter')

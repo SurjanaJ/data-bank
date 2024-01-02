@@ -116,7 +116,7 @@ def display_trade_table(request):
     if is_valid_queryparam(trade_type) and trade_type != '--':
         data = data.filter(Trade_Type=trade_type) 
 
-    paginator = Paginator(data, 10)
+    paginator = Paginator(data, 40)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
 
