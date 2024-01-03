@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 from io import BytesIO
 import json
 from math import isnan
@@ -298,7 +298,6 @@ def upload_trade_excel(request):
 
     added_count = 0
     updated_count = 0
-    existing_count = 0
 
     if request.method == 'POST':
         form = UploadTradeDataForm(request.POST, request.FILES)
@@ -308,7 +307,10 @@ def upload_trade_excel(request):
             df = pd.read_excel(excel_data,dtype={'HS_Code': str})
             df.fillna('', inplace=True)
             df['Calender'] = pd.to_datetime(df['Calender']).dt.date
-            
+
+            total_rows = len(df)
+            rows_processed = 0
+
             for index, row in df.iterrows():
                 trade_data = {
                     'Trade_Type':row['Trade_Type'],
@@ -328,6 +330,7 @@ def upload_trade_excel(request):
                     'DocumentsLegalProcedural':row['DocumentsLegalProcedural']
                 }
                 try:
+                    
                     Calender = row['Calender']
                     Country = Country_meta.objects.get(Country_Name=row['Country'])
                     HS_Code = HS_Code_meta.objects.get(HS_Code=row['HS_Code'])
@@ -340,6 +343,9 @@ def upload_trade_excel(request):
                     else:
                         trade_data['Product_Information'] = row['Product_Information']
                     
+                    trade_type = row['Trade_Type']
+                    if trade_type not in ['Import', 'Export']:
+                        raise ValueError(f"Invalid Trade_Type at row {index}: {trade_type}")
                     trade_data = {
                         'Trade_Type': row['Trade_Type'],
                         'Calender': Calender,
@@ -358,15 +364,15 @@ def upload_trade_excel(request):
                     }
                 
                 except Exception as e:
-                    trade_data['Calender'] = Calender.isoformat()
                     # Convert datetime.date objects to strings before appending to errors
+                    trade_data['Calender'] = Calender.isoformat()
                     errors.append({'row_index': index, 'data': trade_data, 'reason': str(e)})
+                    rows_processed +=1
+                    print(f'{str(total_rows - rows_processed)} left')
                     continue
-
-                    
                     
                 existing_record = TradeData.objects.filter(
-                        Q(Calender=Calender) & Q(Country=Country) & Q(HS_Code=HS_Code) & Q(Unit=Unit) & Q(Origin_Destination=Origin_Destination)
+                        Q(Calender=Calender) & Q(Country=Country) & Q(HS_Code=HS_Code) & Q(Unit=Unit) & Q(Origin_Destination=Origin_Destination) & Q(Trade_Type = trade_data['Trade_Type'])
                         ).first()
 
                 if existing_record:
@@ -374,15 +380,32 @@ def upload_trade_excel(request):
                     trade_data_dict = model_to_dict(TradeData(**trade_data))
 
                 # Check for equality, handling NaN values
+                    
                     if all(existing_dict[key] == trade_data_dict[key] or (pd.isna(existing_dict[key]) and pd.isna(trade_data_dict[key])) for key in trade_data_dict if key != 'id'):
+                        trade_data = {
+                        'Trade_Type': row['Trade_Type'],
+                        'Calender': Calender.isoformat(),
+                        'Fiscal_Year':row['Fiscal_Year'],
+                        'Duration':row['Duration'],
+                        'Country' : Country.Country_Name,
+                        'HS_Code' : HS_Code.HS_Code,
+                        'Unit' : Unit.Unit_Code,
+                        'Quantity':row['Quantity'],
+                        'Currency_Type' :row['Currency_Type'],
+                        'Amount':row['Amount'],
+                        'Tarrif' : 0.0 if row['Tarrif'] == 'nan' or (row['Tarrif']== '') else row['Tarrif'],
+                        'Origin_Destination' : Origin_Destination.Country_Name,
+                        'TradersName_ExporterImporter':row['TradersName_ExporterImporter'],
+                        'DocumentsLegalProcedural':row['DocumentsLegalProcedural']
+                    }
                         duplicate_data.append({
+                            
                             'row_index': index,
-                            'data': {key: str(trade_data[key]) if isinstance(trade_data[key], Calender) else trade_data[key] for key in trade_data}
+                            'data': {key: str(trade_data[key]) if isinstance(trade_data[key], date) else trade_data[key] for key in trade_data}
                         })
-                        print('duplicate data:')
-                        print(duplicate_data)
-                        print()
-                        print()
+                        rows_processed +=1
+                        print(f'{str(total_rows - rows_processed)} left')
+                        
                     else:
                         # Update the row with non-duplicate data
                         for key, value in trade_data.items():
@@ -390,18 +413,25 @@ def upload_trade_excel(request):
                         try:
                             existing_record.save()
                             updated_count += 1
+                            rows_processed +=1
+                            print(f'{str(total_rows - rows_processed)} left')
                         except IntegrityError as e:
-                            errors.append(f"Error updating row {index}: {e}")        
+                            errors.append(f"Error updating row {index}: {e}")
+                            rows_processed +=1
+                        print(f'{str(total_rows - rows_processed)} left')        
 
                 else:
                     try:
                         tradeData = TradeData(**trade_data)
                         tradeData.save()
                         added_count += 1
-                
+                        rows_processed +=1
+                        print(f'{str(total_rows - rows_processed)} left')
                     except Exception as e:
-                        errors.append(f"THIS IS ARKAI ERROR:: Error inserting row {index}: {e}")
-                        
+                        errors.append(f"Error inserting row {index}: {e}")
+                        rows_processed +=1
+                        print(f'{str(total_rows - rows_processed)} left')
+
             if added_count > 0:
                 messages.success(request, str(added_count) + ' records added.')
             
@@ -409,7 +439,6 @@ def upload_trade_excel(request):
                 messages.info(request, str(updated_count) + ' records updated.')
 
             if errors:
-                print('THERE IS SOME ERROR!!!!!!!!!!!!!!!!!')
                 request.session['errors'] = errors
                 return render(request, 'trade_data/error_template.html', {'errors': errors})
             
@@ -663,13 +692,30 @@ def download_duplicate_excel(request):
         return HttpResponse('No data to export.')
     
 def error_data_to_excel(error_data):
-    column_names = list(error_data[0]['data'].keys())
-    error_df = pd.DataFrame([d['data'] for d in error_data], columns=column_names)
+    if not error_data:
+        # Handle the case where error_data is empty
+        return HttpResponse("No data to export.")
+
+    # Extract column names from the first item in error_data
+    first_item = error_data[0]
+    
+    # Check if the first item has the expected structure
+    if isinstance(first_item, dict) and 'data' in first_item:
+        column_names = list(first_item['data'].keys())
+    else:
+        return HttpResponse("Invalid data structure.")
+
+    # Extract data from each dictionary in error_data
+    data_list = [d['data'] for d in error_data if isinstance(d, dict) and 'data' in d]
+
+    # Create a DataFrame using the extracted data and column names
+    error_df = pd.DataFrame(data_list, columns=column_names)
 
     # Create a response object with Excel content
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename=error_data.xlsx'
 
+    # Write the DataFrame to the Excel response
     error_df.to_excel(response, index=False, sheet_name='error_data')
 
     return response
