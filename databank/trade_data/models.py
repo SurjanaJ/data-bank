@@ -1,5 +1,5 @@
 from django.db import models
-
+from datetime import date
 # Create your models here.
 class Country_meta(models.Model):
     # id = models.IntegerField(primary_key=True, unique=True, editable=False)
@@ -50,8 +50,8 @@ class TradeData(models.Model):
     Unit = models.ForeignKey(Unit_meta, on_delete=models.CASCADE)
     Quantity = models.IntegerField(default=0, null=True, blank=True)
     Currency_Type = models.CharField(max_length=100, null=True, blank=True)
-    Amount = models.DecimalField(max_digits=100, decimal_places=3,null=True, blank=True)
-    Tarrif = models.DecimalField(max_digits=100, decimal_places=3, null=True, blank=True, default=None)
+    Amount = models.FloatField(max_length=100,null=True, blank=True)
+    Tarrif = models.FloatField(max_length=100, null=True, blank=True)
     Origin_Destination =  models.ForeignKey(Country_meta, on_delete=models.CASCADE, related_name='tradedata_origin_destination')
     TradersName_ExporterImporter = models.CharField(max_length=100, null=True, blank=True)
     DocumentsLegalProcedural = models.CharField(max_length=300, null=True, blank=True)

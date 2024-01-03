@@ -12,6 +12,8 @@ class UnitMeta_Admin(admin.ModelAdmin):
 
 class HSCodeMeta_Admin(admin.ModelAdmin):
     list_display = ('id', 'HS_Code', 'Product_Information')
+    search_fields = ['id','HS_Code','Product_Information']
+
 
 class TradeData_Admin(admin.ModelAdmin):
     list_display = ('id', 'Trade_Type', 'Calender', 'Country', 'HS_Code')
