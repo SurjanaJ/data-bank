@@ -1,7 +1,7 @@
 {% extends 'main.html' %} {% block content %}
 <div class="d-flex">
   <button
-  class="btn btn-sm px-4"
+  class="btn btn-md px-6"
   data-bs-toggle="collapse"
   data-bs-target="#collapseFilter"
   aria-expanded="false"
@@ -88,7 +88,7 @@
           <select id="area_unit" name="area_unit" class="form-control">
             <option selected>--</option>
             {% for area_unit in area_unit_categories %}
-            <option value="{{area_unit.id}}">{{area_unit}}</option>
+            <option value="{{area_unit}}">{{area_unit}}</option>
             {% endfor %}
           </select>
         </div>
@@ -230,7 +230,7 @@
     </div>
     </div>
   </form>
-</div>
+</div> 
 
 {% endif %}
 

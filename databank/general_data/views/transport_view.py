@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from django.db import DataError
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render,redirect
@@ -6,8 +6,8 @@ from django.core.paginator import Paginator
 from django.urls import reverse
 from django.db.models import Q
 import pandas as pd
-from ..models import Transport, Country_meta
-from ..forms import UploadForestDataForm,UploadTransportData
+from ..models import Transport, Country_meta,Transport_Meta
+from ..forms import UploadTransportDataForm,UploadTransportData
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -23,15 +23,39 @@ def display_transport_table(request):
     url = reverse('transport_table')
     data = Transport.objects.all()
     country_categories = Country_meta.objects.all()
-    # gender_option = [choice[1] for choice in Transport.Gender_Options]
-    # age_group_options=[choice[1] for choice in Transport.Age_Group_Options]
+    unit_options = [choice[1] for choice in Transport.Unit_Options]
+    transport_classification_codes = Transport_Meta.objects.all()
 
     date_min = request.GET.get('date_min')
     date_max = request.GET.get('date_max')
 
     country_category = request.GET.get('country_category')
-    gender=request.GET.get('gender')
-    age_group=request.GET.get('age_group')
+    transport_classification_code = request.GET.get('transport_classification_code')
+
+    quantity_unit=request.GET.get('quantity_unit')
+    min_quantity = request.GET.get('minimum_quantity')
+    max_quantity = request.GET.get('maximum_quantity')
+
+    if is_valid_queryparam(date_min):
+        data=data.filter(Year__gte=date_min)
+
+    if is_valid_queryparam(date_max):
+        data=data.filter(Year__lt=date_max)
+
+    if is_valid_queryparam(country_category) and country_category != '--':
+        data = data.filter(Country_id=country_category)
+
+    if is_valid_queryparam(transport_classification_code) and transport_classification_code != '--':
+        data = data.filter(Transport_Classification_Code_id=transport_classification_code)
+
+    if is_valid_queryparam(quantity_unit) and quantity_unit != '--':
+        data = data.filter(Unit=quantity_unit)
+
+    if is_valid_queryparam(min_quantity):
+        data = data.filter(Quantity__gte=min_quantity)
+
+    if is_valid_queryparam(max_quantity):
+        data = data.filter(Quantity__lt=max_quantity)
 
 
 
@@ -46,8 +70,8 @@ def display_transport_table(request):
         'page':page,
         'query_len': len(page),
         'country_categories':country_categories,
-        # 'gender_Options':gender_option,
-        # 'age_group_options':age_group_options
+        'unit_options':unit_options,
+        'transport_classification_codes':transport_classification_codes
     }
     return render(request, 'general_data/transport_templates/transport_table.html',context)
 
@@ -89,3 +113,146 @@ def update_transport_record(request,pk):
         
     context={'form':form,}
     return render(request,'general_data/transport_templates/update_transport_record.html',context)
+
+
+def upload_transport_excel(request):
+    errors = []
+    duplicate_data = []
+    updated_count = 0
+    added_count = 0
+
+
+    if request.method == 'POST':
+        form = UploadTransportDataForm(request.POST,request.FILES)
+        if form.is_valid():
+            excel_data = request.FILES['Transport_data_file']
+            df = pd.read_excel(excel_data)
+
+            if 'id' in df.columns or 'ID' in df.columns:
+                for index,row in df.iterrows():
+                    id_value = row['ID']
+
+                    try:
+                        transport_instance = Transport.objects.get(id = id_value)
+                    except:
+                        transport_instance = Transport()
+
+
+                    Year = row['Year']
+                    Country = row['Country']
+                    Transport_Classification_Code = row['Transport_Classification_Code']
+
+                    try:
+                        calender_year = pd.to_datetime(Year).date()
+                    except ValueError as e:
+                        print(f"Error converting date in row {index}: {e}")
+                        print(f"Problematic row data: {row}")
+                    # Handle the date conversion error, such as logging a message or skipping the row
+                        continue
+                    try:
+                        Year = calender_year
+                        Country = Country_meta.objects.get(Country_Name = Country )
+                        Transport_Classification_Code = Transport_Meta.objects.get(Code = Transport_Classification_Code)
+
+                    except DataError as e:
+                        print(f'error handling the row at {index}:{e}')
+                        continue
+
+                    transport_instance.Year = Year
+                    transport_instance.Country = Country
+                    transport_instance.Transport_Classification_Code = Transport_Classification_Code
+                    transport_instance.Unit = row['Unit']
+                    transport_instance.Quantity = row['Quantity']
+                    transport_instance.save()
+
+                    updated_count += 1 
+
+            else:
+                unit_options = [option[0] for option in Transport.Unit_Options]
+                for index, row in df.iterrows():
+                    transport_data = {
+                        'Year': row['Year'].date().strftime('%Y-%m-%d'),
+                        'Country': row['Country'],
+                        'Transport_Classification_Code': row['Transport_Classification_Code'],
+                        'Unit': row['Unit'],
+                        'Quantity': row['Quantity'],
+                    }
+                        # Check if the 'Unit' value is in the predefined options
+                    if transport_data['Unit'] not in unit_options:
+                        errors.append({
+                            'row_index': index,
+                            'data': transport_data,
+                            'reason': f'Error inserting row {index}: Invalid unit value'
+                        })
+                    else:
+                        
+                        try:
+                            calender_date = datetime.strptime(str(row['Year'].date().strftime('%Y-%m-%d')), '%Y-%m-%d').date()
+                        except:
+                            calender_date = datetime.strptime(f'{str(row["Year"].date().strftime("%Y-%m-%d"))}-01-01', '%Y-%m-%d').date()
+                        
+                        # if not initialize it shows server error else shows in error template
+                        Country = None
+                        Transport_Classification_Code = None
+                        try:
+                            Year = calender_date.strftime('%Y-%m-%d')
+                            Country = Country_meta.objects.get(Country_Name=row['Country'])
+                            Transport_Classification_Code = Transport_Meta.objects.get(Code=row['Transport_Classification_Code'])
+
+                            transport_data = {
+                                'Year': Year,
+                                'Country': Country,
+                                'Transport_Classification_Code': Transport_Classification_Code,
+                                'Unit': row['Unit'],
+                                'Quantity': row['Quantity']
+                            }
+
+                        except Exception as e:
+                            errors.append({
+                                'row_index': index,
+                                'data': transport_data,
+                                'reason': f'Error inserting row  {index}: {e}'
+                            })
+                            continue
+
+                        existing_record = Transport.objects.filter(
+                            Q(Year=Year) & Q(Country=Country) & Q(Transport_Classification_Code=Transport_Classification_Code)
+                            & Q(Unit=transport_data['Unit']) & Q(Quantity=transport_data['Quantity'])).first()
+
+                        if existing_record:
+                            duplicate_data.append({
+                                'row_index': index,
+                                'data': transport_data,
+                                'reason': 'Duplicate record found'
+                            })
+
+                        else:
+                            try:
+                                TransportData = Transport(**transport_data)
+                                TransportData.save()
+                                added_count += 1
+
+                            except Exception as e:
+                                errors.append({
+                                    'row_index': index,
+                                    'data': transport_data,
+                                    'reason': f'Error inserting row  {index}: {e}'
+                                })
+                    
+            if added_count > 0:
+                messages.success(request, f'{added_count} records added')
+
+            if updated_count > 0:
+                messages.success(request, f'{updated_count} records updated')
+
+            if errors:
+                request.session['errors'] = errors
+                return render(request, 'general_data/error_template.html', {'errors': errors})
+
+            if duplicate_data:
+                return render(request, 'general_data/duplicate_template.html', {'duplicate_data': duplicate_data})      
+
+    else:
+        form = UploadTransportDataForm()
+
+    return render(request,'general_data/transport_templates/upload_transport_form.html',{'form':form})

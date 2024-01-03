@@ -59,17 +59,6 @@
             name="date_max"
           />
         </div>
-  
-        <div class="col-md-3">
-          <label for="ViewNameOfPlant">Name of the plant </label>
-          <input
-            type="text"
-            class="form-control"
-            id="view_plant_Name"
-            placeholder="e.g. saal"
-            name="name_of_the_plant"
-          />
-        </div>
         <div class="form-group col-md-3">
           <label for="country_category">Country</label>
           <select
@@ -83,25 +72,49 @@
             {% endfor %}
           </select>
         </div>
-        <div class="col-md-3">
-          <label for="viewAreaUnit">Area Unit</label>
-          <select id="area_unit" name="area_unit" class="form-control">
+        <div class="form-group col-md-3">
+          <label for="transport_classification_code">Transpoort_Classification_Code</label>
+          <select
+            id="transport_classification_code"
+            class="form-control"
+            name="transport_classification_code"
+          >
             <option selected>--</option>
-            {% for area_unit in area_unit_categories %}
-            <option value="{{area_unit.id}}">{{area_unit}}</option>
+            {% for code in transport_classification_code %}
+            <option value="{{code.id}}">{{code.Code}} - {{code.Transport_Type}}</option>
             {% endfor %}
           </select>
         </div>
         <div class="col-md-3">
-          <label for="viewStockAvailable">Stock Available</label>
+          <label for="viewQuantityUnit">Quantity Unit</label>
+          <select id="quantity_unit" name="quantity_unit" class="form-control">
+            <option selected>--</option>
+            {% for unit in unit_options %}
+            <option value="{{unit}}">{{unit}}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label for="minimum_population">Minimum Quantity</label>
           <input
             type="number"
             min="0"
             class="form-control"
-            id="viewStockAvailable"
+            id="minimum_quantity"
             placeholder="1000"
-            name="stock_available"
+            name="minimum_quantity"
           />
+        </div>
+        <div class="col-md-3">
+          <label for="maximum_population">Maximum Quantity</label>
+          <input
+            type="number"
+            min="0"
+            class="form-control"
+            id="maximum_quantity"
+            placeholder="1000"
+            name="maximum_quantity"
+            />
         </div>
         <div class="col-md-3 d-flex align-items-end">
           <button type="submit" class=" btn btn-primary">
@@ -134,7 +147,7 @@
               <span class="fw-normal">Delete Selected</span>
           </button>
             <a
-              href="{% url 'export_forest_table_to_excel' %}?{{ request.GET.urlencode }}"
+              href="{% url 'export_transport_table_to_excel' %}?{{ request.GET.urlencode }}"
               class="border p-2 styled-link"
             >
             <i class="fa-solid fa-table"></i>

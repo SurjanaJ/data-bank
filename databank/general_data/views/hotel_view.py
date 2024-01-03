@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from django.db import DataError
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render,redirect
@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.db.models import Q
 import pandas as pd
 from ..models import Hotel, Country_meta
-from ..forms import UploadForestDataForm,UploadHotelData
+from ..forms import UploadHotelDataForm,UploadHotelData
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -47,13 +47,14 @@ def display_hotel_table(request):
     if is_valid_queryparam(name_of_the_city):
         data=data.filter(Q(City__icontains=name_of_the_city)).distinct()
  
-
+    if is_valid_queryparam(country_category) and country_category != '--':
+        data = data.filter(Country_id=country_category)
 
 
 
 
     paginator = Paginator(data, 10)
-    page_number = request.GET.get('page')
+    page_number = request.GET.get('page')   
     page = paginator.get_page(page_number)
     
 
@@ -107,3 +108,142 @@ def update_hotel_record(request,pk):
         
     context={'form':form,}
     return render(request,'general_data/hotel_templates/update_hotel_record.html',context)
+
+
+
+def upload_hotel_excel(request):
+
+    errors = []
+    duplicate_data = []
+    updated_count = 0
+    added_count = 0
+
+    if request.method == 'POST':
+        form = UploadHotelDataForm(request.POST, request.FILES)
+        if form.is_valid():
+            excel_data = request.FILES['Hotel_data_file']
+            df = pd.read_excel(excel_data)
+
+            if 'id' in df.columns or 'ID' in df.columns:
+                for index,row in df.iterrows():
+                    id_value = row['ID']
+
+                    try:
+                        hotel_instance = Hotel.objects.get(id = id_value)
+                    except:
+                        hotel_instance = Hotel()
+
+
+                    Year = row['Year']
+                    Country = row['Country']
+
+                    try:
+                        calender_year = pd.to_datetime(Year).date()
+
+                    except:
+                        print(f'Error converting date in row {index}:{e}')
+                        print(f'problematic row data {row}')
+
+                        continue
+
+                    try:
+
+                        Year =calender_year
+                        Country = Country_meta.objects.get(Country_Name = Country)
+
+                    except DataError as e:
+                        print(f'error handling the row at {index}:{e}')
+                        continue
+
+                    hotel_instance.Year = Year
+                    hotel_instance.Country = Country
+                    hotel_instance.Name_Of_The_Hotel = row['Name_Of_The_Hotel']
+                    hotel_instance.Capacity_Room = row['Capacity_Room']
+                    hotel_instance.Occupancy_In_Year = row['Occupancy_In_Year']
+                    hotel_instance.City = row['City']
+
+                    hotel_instance.save()
+
+                    updated_count +=1
+
+            else:
+
+                for index,row in df.iterrows():
+                    hotel_data = {
+                        'Year': row['Year'].date().strftime('%Y-%m-%d'),
+                        'Country': row['Country'],
+                        'Name_Of_The_Hotel': row['Name_Of_The_Hotel'],
+                        'Capacity_Room': row['Capacity_Room'],
+                        'Occupancy_In_Year': row['Occupancy_In_Year'],
+                        'City' : row['City'],                        
+                    }
+
+                    try:
+                        calender_date = datetime.strptime(str(row['Year'].date().strftime('%Y-%m-%d')), '%Y-%m-%d').date()
+                    except:
+                        calender_date = datetime.strptime(f'{str(row["Year"].date().strftime("%Y-%m-%d"))}-01-01', '%Y-%m-%d').date()
+
+                    Country = None
+                    try:
+                        Year = calender_date.strftime('%Y-%m-%d')
+                        Country = Country_meta.objects.get(Country_Name=row['Country'])
+
+                        hotel_data = {
+                            'Year':Year,
+                            'Country':Country,
+                            'Name_Of_The_Hotel': row['Name_Of_The_Hotel'],
+                            'Capacity_Room': row['Capacity_Room'],
+                            'Occupancy_In_Year': row['Occupancy_In_Year'],
+                            'City' : row['City'],
+                        }
+
+                    except Exception as e:
+                        errors.append({
+                            'row index': index,
+                            'data':hotel_data,
+                            'reason': f'Error inserting row  {index}: {e}'
+                        })
+                        continue
+
+                    existing_record = Hotel.objects.filter(Q(Year = Year) & Q(Country = Country) & Q(Name_Of_The_Hotel = hotel_data['Name_Of_The_Hotel']) & Q(City = hotel_data['City'])).first()
+
+                    if existing_record:
+                        duplicate_data.append({
+                            'row_index':index,
+                            'data':hotel_data,
+                            'reason': 'Duplicate record found'
+                        })
+
+                    else:
+                        try:
+                            HotelData=Hotel(**hotel_data)
+                            HotelData.save()
+                            added_count +=1
+
+                        except Exception as e:
+                            errors.append({
+                                'row_index': index,
+                                'data': hotel_data,
+                                'reason': f'Error inserting row  {index}: {e}'
+                            })
+
+            if added_count > 0:
+                messages.success(request,str(added_count)+'records added')
+
+
+            if updated_count > 0:
+                messages.success(request,str(updated_count)+'records updated')
+
+            if errors:
+                request.session['errors']= errors
+                return render(request, 'general_data/error_template.html', {'errors': errors})
+            
+
+            if duplicate_data:
+                return  render (request,'general_data/duplicate_template.html',{'duplicate_data':duplicate_data})
+
+    else:
+        form = UploadHotelDataForm()
+
+    return render(request,'general_data/hotel_templates/upload_hotel_form.html',{'form':form}) 
+                             

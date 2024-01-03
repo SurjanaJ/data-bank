@@ -23,7 +23,7 @@ class ForestData(models.Model):
         
 class PopulationData(models.Model):
 
-    Gender_Options=(
+    Gender_Options=(        
         ('Male','Male'),
         ('Female','Female')
     )
@@ -76,7 +76,6 @@ class Transport(models.Model):
         ('Metric Ton', 'Metric Ton'),
     )
 
-
     id=models.AutoField(primary_key=True)
     Year=models.DateField(null=True, blank=True)
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
@@ -90,6 +89,9 @@ class Tourism_Meta(models.Model):
     id=models.AutoField(primary_key=True)
     Code=models.CharField(max_length=100)
     Arrival_Mode=models.TextField(null=True,blank=True)
+
+    def __str__(self):
+        return self.Code
 
 class Tourism(models.Model):
     id=models.AutoField(primary_key=True)
@@ -116,6 +118,9 @@ class Water_Meta(models.Model):
     Code=models.CharField(max_length=100)
     Water_Type=models.TextField(null=True,blank=True)
 
+    def __str__(self):
+        return self.Code
+
 
 class Water(models.Model):
 
@@ -131,6 +136,182 @@ class Water(models.Model):
     Unit=models.CharField(max_length=10, choices=Unit_Options , null=True, blank=True)
     Volume = models.DecimalField(max_digits=100,decimal_places=3,null=True,blank=True)
     Name_Of_The_River = models.CharField(max_length=100,null=True,blank=True)
+
+
+class Public_Unitillity(models.Model):
+    id = models.AutoField(primary_key=True)
+    Year=models.DateField(null=True,blank=True)
+    Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    Type_Of_Public_Utility = models.CharField(max_length = 100,null= True,blank = True)
+    Number = models.IntegerField(default=0,null=True,blank=True)
+
+
+
+class Mine_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    Code=models.CharField(max_length=100)
+    Mine_Type=models.TextField(null=True,blank=True)
+
+    def __str__(self):
+        return self.Mine_Type
+    
+
+class Mining(models.Model):
+
+    Unit_Options = (
+        ('Mt', 'Mt'),
+    )
+
+    id = models.AutoField(primary_key=True)
+    Year=models.DateField(null=True,blank=True)
+    Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    Name_Of_Mine=models.ForeignKey(Mine_Meta,on_delete=models.CASCADE)
+    Unit = models.CharField(max_length = 10, choices=Unit_Options , null=True, blank=True)
+    Current_Production = models.IntegerField(default=0,null=True,blank=True)
+    Potential_Stock = models.IntegerField(default=0,null=True,blank=True)
+    Mining_Company_Name = models.CharField(max_length=100,null=True,blank=True)
+
+class Energy_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    Code = Code=models.CharField(max_length=100)
+    Energy_Type = models.TextField(null=True,blank=True)
+
+
+class Energy(models.Model):
+
+    Potential_Unit_Options = (
+        ('Mt','Mt'),
+    )
+
+    Unit_Production_Options = (
+        ('Megawat','Megawat'),
+    )
+
+    id = models.AutoField(primary_key=True)
+    Year=models.DateField(null=True,blank=True)
+    Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    Power_Category_Code = models.ForeignKey(Energy_Meta,on_delete = models.CASCADE)
+    Potential_Unit = models.CharField(max_length = 10, choices = Potential_Unit_Options, null = True , blank = True)
+    Potential_Capacity_MW = models.IntegerField(default = 0 , blank=True , null = True)
+    Unit_Production = models.CharField(max_length = 20, choices = Unit_Production_Options , blank = True , null = True)
+    Current_Production_In_MW = models.IntegerField(default = 0 , null = True , blank = True)
+    Name_Of_The_Generating_Company = models.CharField(max_length = 100 , null = True , blank = True)
+
+class Road_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    Code = Code=models.CharField(max_length=100)
+    Road_Type = models.TextField(null=True,blank=True)
+
+
+class Road(models.Model):
+
+    Length_Unit = (
+        ('KM','KM'),
+    )
+
+    id = models.AutoField(primary_key=True)
+    Year=models.DateField(null=True,blank=True)
+    Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    Highway_No = models.CharField(max_length = 50 , null = True , blank = True)
+    Name_Of_The_Road = models.CharField(max_length = 50 , null = True , blank = True)
+    Code_Type_Of_Road = models.ForeignKey(Road_Meta, on_delete = models.CASCADE)
+    Length_Unit = models.CharField(max_length=20, choices = Length_Unit, blank = True ,null = True)
+    Length = models.IntegerField(default = 0 , null = True , blank = True)
+
+
+
+class Housing_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    Code = Code=models.CharField(max_length=100)
+    House_Type = models.TextField(null=True,blank=True)
+
+class Housing(models.Model):
+
+    id = models.AutoField(primary_key=True)
+    Year=models.DateField(null=True,blank=True)
+    Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    House_Code = models.ForeignKey(Housing_Meta,on_delete = models.CASCADE)
+    City = models.CharField(null=True,blank=True)
+    Number = models.IntegerField(default = 0 , null = True , blank = True)
+
+
+class Health_disease_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    Code = Code=models.CharField(max_length=100)
+    Deasease_Type = models.TextField(null=True,blank=True)
+
+
+class Health_disease(models.Model):
+
+    Unit_Options = (
+        ('Person','Person'),
+    )
+
+    id = models.AutoField(primary_key=True)
+    Year=models.DateField(null=True,blank=True)
+    Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    Desease_Code = models.ForeignKey( Health_disease_Meta, on_delete = models.CASCADE )
+    Unit = models.CharField(max_length = 20 , choices = Unit_Options , blank = True , null= True)
+    Number_Of_Case = models.IntegerField(default = 0 , null = True , blank = True)
+
+
+class Budgetary_Data(models.Model):
+    id = models.AutoField(primary_key=True)
+    Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    Fiscal_Year = models.CharField(max_length=10, null=True, blank=True)
+    Amount_In_USD = models.IntegerField(default = 0 , null = True ,blank = True)
+    Prefered_Denomination = models.CharField(max_length = 30 , null = True , blank = True)
+
+
+
+    
+
+class Political_Data(models.Model):
+    id = models.AutoField(primary_key=True)
+    Year=models.DateField(null=True,blank=True)
+    Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    Political_Party_Name = models.CharField(max_length = 30,null = True , blank = True)
+    Number_Of_Member = models.IntegerField(default = 0 ,null = True ,blank = True)
+    Province =  models.CharField(max_length = 30,null = True , blank = True)
+    District =  models.CharField(max_length = 30,null = True , blank = True)
+    Municipality = models.CharField(max_length = 30 ,null = True ,blank = True)
+    Wards =  models.CharField(max_length = 30,null = True , blank = True)
+
+
+class Disaster_Data_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    Code = Code=models.CharField(max_length=100)
+    Disaster_Type = models.TextField(null=True,blank=True)
+    
+
+class Disaster_Data(models.Model):
+    id = models.AutoField(primary_key=True)
+    Year=models.DateField(null=True,blank=True)
+    Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    Disaster_Code = models.ForeignKey(Disaster_Data_Meta,on_delete= models.CASCADE)
+    Human_Loss = models.IntegerField(default = 0 ,null = True ,blank = True)
+    Animal_Loss = models.IntegerField(default = 0 ,null = True ,blank = True)
+    Physical_Properties_Loss_In_USD = models.IntegerField(default = 0 ,null = True ,blank = True)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+
+
+
+    
 
 
 

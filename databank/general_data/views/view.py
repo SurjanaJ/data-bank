@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from django.db import DataError
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render,redirect
@@ -19,77 +19,167 @@ def is_valid_queryparam(param):
     
 
 def upload_forest_excel(request):
+
+    errors = []
+    duplicate_data = []
+    updated_count = 0
+    added_count = 0
+
     if request.method == 'POST':
         form = UploadForestDataForm(request.POST, request.FILES)
         if form.is_valid():
             excel_data = request.FILES['forest_data_file']
             df = pd.read_excel(excel_data)
 
-            for index, row in df.iterrows():
-                Country = row['Country']
-                Year = str(row['Year'])
-                Name_Of_The_Plant=row['Name_Of_The_Plant']
 
-                try:
-                    Country = Country_meta.objects.get(Country_Name=Country)
-                    
-                # except (Country_meta.DoesNotExist, HS_Code_meta.DoesNotExist, Unit_meta.DoesNotExist):
-                #     return HttpResponse('could not upload the file.')
-                except DataError as e:
-                    print(f"Error inserting row {index}: {e}")
-                    print(f"Problematic row data: {row}")
-                
-                try:
-                    if len(Year) == 4:
-                        Year = datetime.date(int(Year), 1, 1)
+            if 'id' in df.columns or 'ID' in df.columns:
+                for index,row in df.iterows():
+                    id_value = row['ID']
+
+                    try:
+                        forest_instance = ForestData.objects.get(id = id_value)
+                    except:
+                        forest_instance = ForestData()
+
+                    Year = row['Year']
+                    Country = row['Country']
+
+                    try:
+                        calender_year = pd.to_datetime(Year).date()
+
+                    except ValueError as e:
+                        print(f'Error converting date in row {index}:{e}')
+                        print(f"Problematic row data:{row}")
+                        continue
+
+                    try:
+                        Year = calender_year
+                        Country = Country_meta.objects.get(Country_name = Country)
+
+                    except DataError as e:
+                        print(f"Error handling the row at {index}:{e}")
+
+                    forest_instance.Year = Year
+                    forest_instance.Country = Country
+                    forest_instance.Name_Of_The_Plant=row['Name_Of_The_Plant']
+                    forest_instance.Scientific_Name = row['Scientific_Name']
+                    forest_instance.Local_Name = row['Local_Name']
+                    forest_instance.Stock_Unit = row['Stock_Unit']
+                    forest_instance.Stock_Available = row['Stock_Available']
+                    forest_instance.Area_Unit = row['Area_Unit']
+                    forest_instance.Area_Covered = row['Area_Covered']
+                    forest_instance.save()
+
+                    updated_count +=1
+
+            else:
+
+                Stock_unit_options = [option[0] for option in ForestData.Stock_Unit_Options]
+                Area_unit_options = [option[0] for option in ForestData.Area_Unit_Options]
+                for index, row in df.iterrows():
+                    forest_data = {
+                        'Year': row['Year'],
+                        'Country': row['Country'],
+                        'Name_of_the_plant': row['Name_Of_The_Plant'],
+                        'Scientific_Name' : row['Scientific_Name'],
+                        'Local_Name' : row['Local_Name'],
+                        'Stock_Unit' : row['Stock_Unit'],
+                        'Stock_Available' : row['Stock_Available'],
+                        'Area_Unit' : row['Area_Unit'],
+                        'Area_Covered' : row['Area_Covered']
+                    }
+
+                    if forest_data['Stock_Unit'] not in Stock_unit_options:
+                        errors.append({
+                            'row_index': index,
+                            'data': forest_data,
+                            'reason': f'Error inserting row {index}: Invalid Stock unit value'
+                        })
+
+                    elif forest_data['Area_Unit'] not in Area_unit_options:
+                        errors.append({
+                            'row_index': index,
+                            'data': forest_data,
+                            'reason': f'Error inserting row {index}: Invalid Area unit value'
+                        })
+
                     else:
-                        Year = pd.to_datetime(Year).date()
-                except ValueError as e:
-                    print(f"Error converting date in row {index}: {e}")
-                    print(f"Problematic row data: {row}")
-                    # Handle the date conversion error, such as logging a message or skipping the row
-                    continue
 
-                existing_forest_data = ForestData.objects.filter(
-                    Year=Year,
-                    Country=Country,
-                    Name_Of_The_Plant=Name_Of_The_Plant
-                ).first()
+                        try:
+                            calender_date = datetime.strptime(str(row['Year'].date().strftime('%Y-%m-%d')), '%Y-%m-%d').date()
+                        except:
+                            calender_date = datetime.strptime(f'{str(row["Year"].date().strftime("%Y-%m-%d"))}-01-01', '%Y-%m-%d').date()
 
-                if existing_forest_data:
-                    update_existing_record(existing_forest_data, row)
-                    # Handle duplicate data, such as logging a message or skipping the row
-                    print(request, f"updated data found for Year '{Year}', Country '{Country}', Name_Of_The_Plant '{Name_Of_The_Plant}'")
-                    continue
-                
-                forest_data = ForestData (
-                    Year = Year,
-                    Country = Country,
-                    Name_Of_The_Plant=row['Name_Of_The_Plant'],
-                    Scientific_Name=row['Scientific_Name'],
-                    Local_Name=row['Local_Name'],
-                    Stock_Unit=row['Stock_Unit'],
-                    Stock_Available=row['Stock_Available'],
-                    Area_Unit=row['Area_Unit'],
-                    Area_Covered=row['Area_Covered'],
-                )
-                forest_data.save()
+                        Country = None
 
-            return HttpResponse('success')
+                        try:
+                            Year = calender_date.strftime('%Y-%m-%d')
+                            Country = Country_meta.objects.get(Country_Name=row['Country'])
+
+                            forest_data = {
+                                    'Year': Year,
+                                    'Country': Country,
+                                    'Name_Of_The_Plant': row['Name_Of_The_Plant'],
+                                    'Scientific_Name' : row['Scientific_Name'],
+                                    'Local_Name' : row['Local_Name'],
+                                    'Stock_Unit' : row['Stock_Unit'],
+                                    'Stock_Available' : row['Stock_Available'],
+                                    'Area_Unit' : row['Area_Unit'],
+                                    'Area_Covered' : row['Area_Covered']
+                            }
+                        except Exception as e:
+                                errors.append({
+                                    'row_index': index,
+                                    'data': forest_data,
+                                    'reason': f'Error inserting row {index}: {e}'
+                                })
+                                continue
+
+                        existing_record = ForestData.objects.filter(
+                            Q(Year=Year) & Q(Country=Country) & Q(Name_Of_The_Plant = forest_data['Name_Of_The_Plant']) & Q(Stock_Unit = forest_data['Stock_Unit']) & Q(Area_Unit = forest_data['Area_Unit'])).first()        
+
+                        if existing_record:
+                            duplicate_data.append({
+                                'row_index':index,
+                                'data': forest_data,
+                                'reason': 'Duplicate data found'
+                            })
+
+
+                        else:
+                            try:
+                                Forestdata = ForestData(**forest_data)
+                                ForestData.save()
+                                added_count +=1
+
+                            except Exception as e:
+                                errors.append({
+                                    'row_index': index,
+                                    'data': forest_data,
+                                    'reason': f"Error inserting row {index}: {e}"
+                                })
+
+                if added_count > 0:
+                    messages.success(request, f'{added_count} records added')
+
+                if updated_count > 0:
+                    messages.success(request, f'{updated_count} records updated')
+
+                if errors:
+                    request.session['errors'] = errors
+                    return render(request, 'general_data/error_template.html', {'errors': errors})
+
+                if duplicate_data:
+                    return render(request, 'general_data/duplicate_template.html', {'duplicate_data': duplicate_data})
+
+
 
     else:
         form = UploadForestDataForm()
 
     return render(request, 'general_data/upload_form.html', {'form': form, 'tables':tables})
 
-def update_existing_record(existing_record, row):
-    existing_record.Scientific_Name = row['Scientific_Name']
-    existing_record.Local_Name = row['Local_Name']
-    existing_record.Stock_Unit = row['Stock_Unit']
-    existing_record.Stock_Available = row['Stock_Available']
-    existing_record.Area_Unit = row['Area_Unit']
-    existing_record.Area_Covered = row['Area_Covered']
-    existing_record.save()
+
 
 
 def update_forest_record(request,pk):
@@ -189,5 +279,53 @@ def delete_selected_forest(request):
     except Exception as e:
         messages.error(request, f'Error deleting items: {e}')
 
-    return redirect('forest_table') 
+    return redirect('forest_table')
 
+def duplicate_data_to_excel(duplicate_data):
+    column_names = list(duplicate_data[0]['data'].keys())
+    duplicate_df = pd.DataFrame([d['data'] for d in duplicate_data], columns=column_names)
+
+    # Create a response object with Excel content
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=duplicate_data.xlsx'
+
+    duplicate_df.to_excel(response, index=False, sheet_name='duplicate_data')
+
+    return response
+
+# Get the data from session storage
+def download_duplicate_excel(request):
+    duplicate_data = request.session.get('duplicate_data', [])
+    print('DUPLICATE DATA!!!!')
+    print(duplicate_data)
+    print()
+    if duplicate_data:
+        response = duplicate_data_to_excel(duplicate_data)
+        request.session.pop('duplicate_data', None)
+        return response
+    else:
+        return HttpResponse('No data to export.')
+    
+def error_data_to_excel(error_data):
+    column_names = list(error_data[0]['data'].keys())
+    error_df = pd.DataFrame([d['data'] for d in error_data], columns=column_names)
+
+    # Create a response object with Excel content
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=error_data.xlsx'
+
+    error_df.to_excel(response, index=False, sheet_name='error_data')
+
+    return response
+
+
+
+def download_error_excel(request):
+    error_data = request.session.get('errors', [])
+
+    if error_data:
+        response = error_data_to_excel(error_data)
+        request.session.pop('error_data', None)
+        return response
+    else:
+        return HttpResponse('No data to export.')

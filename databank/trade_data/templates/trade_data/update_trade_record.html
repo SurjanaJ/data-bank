@@ -8,9 +8,9 @@
 </form> -->
 <div class="container bg-light p-3 shadow">
   
+    {% for field in form %}
     <form method="POST" >
       {% csrf_token %}<div class="row">
-      {% for field in form %}
         <div class="col-6 mb-2">
           <label for="{{field.label}}"> {{field.label}} </label>
           

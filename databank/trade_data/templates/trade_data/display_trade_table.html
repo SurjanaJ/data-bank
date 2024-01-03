@@ -151,114 +151,115 @@
           </a>
         </div>
       </div>
-
-      <table class="table table-striped table-bordered table-sm">
-        <thead>
-          <tr>
-            <th class="text-white fw-semibold fs-6 " scope="col" style="background:#12486B;" >
-              <input
-                type="checkbox"
-                id="select-all"
-                onclick="toggleSelectAll()"
-              />
-            </th>
-            <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
-              Trade_Types
-            </th>
-            <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
-              Calender
-            </th>
-            <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
-              Fiscal_Year
-            </th>
-            <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
-              Duration
-            </th>
-            <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
-              Country_Name
-            </th>
-            <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
-              HS_Code
-            </th>
-            <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
-              Product_Information
-            </th>
-            <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
-              Unit
-            </th>
-            <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
-              Quantity
-            </th>
-            <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
-              Currency_Type
-            </th>
-            <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
-              Amount
-            </th>
-            <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
-              Tarrif
-            </th>
-            <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
-              Origin_Destination
-            </th>
-            <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
-              TradersName_ExporterImporter
-            </th>
-            <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
-              Documents
-            </th>
-            <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
-              Action
-            </th>
-          </tr>
-        </thead>
-        <tbody class="table-hover">
-          {% for record in page %}
-          <tr>
-            <td class=" text-white fw-semibold fs-6" scope="col" >
-              <input
-                type="checkbox"
-                class="item-checkbox"
-                name="selected_items"
-                value="{{ record.id }}"
-              />
-            </td>
-            <td>{{ record.Trade_Type }}</td>
-            <td>{{ record.Calender }}</td>
-            <td>{{ record.Fiscal_Year }}</td>
-            <td>{{ record.Duration }}</td>
-            <td>{{ record.Country }}</td>
-            <td>{{ record.HS_Code }}</td>
-            <td>{{ record.HS_Code.Product_Information }}</td>
-            <td>{{ record.Unit }}</td>
-            <td>{{ record.Quantity }}</td>
-            <td>{{ record.Currency_Type }}</td>
-            <td>{{ record.Amount }}</td>
-            <td>{{ record.Tarrif }}</td>
-            <td>{{ record.Origin_Destination }}</td>
-            <td>{{ record.TradersName_ExporterImporter }}</td>
-            <td>{{ record.DocumentsLegalProcedural }}</td>
-            <td class="d-flex">
-              <div class="btn">
-                <a
-                  class=""
-                  id="delete_forest"
-                  onclick="confirmDelete('{{record.id}}')"
-                  ><i class="fa-regular fa-trash-can" style="color: #ff0000"></i></a>
-                  
-              </div>
-              <div class="btn ">
-                <a
-                  class=""
-                  href="{% url 'update_trade_record' record.id %}"
-                  ><i class="fa-regular fa-pen-to-square" style="color: rgb(3, 10, 86)"></i></a>
-              </div>
-            </td> 
-          </tr>
-
-          {% endfor %}
-        </tbody>
-      </table>
+      <div class="">
+        <table class="table table-striped table-bordered table-sm w-100 ">
+          <thead style="position: sticky; top: 0;">
+            <tr>
+              <th class="text-white fw-semibold fs-6 " scope="col" style="background:#12486B; " >
+                <input
+                  type="checkbox"
+                  id="select-all"
+                  onclick="toggleSelectAll()"
+                />
+              </th>
+              <th class="text-white fst-normal  " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;" scope="col">
+                Trade_Types
+              </th>
+              <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
+                Calender
+              </th>
+              <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
+                Fiscal_Year
+              </th>
+              <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
+                Duration
+              </th>
+              <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
+                Country_Name
+              </th>
+              <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
+                HS_Code
+              </th>
+              <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
+                Product_Information
+              </th>
+              <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
+                Unit
+              </th>
+              <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
+                Quantity
+              </th>
+              <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
+                Currency_Type
+              </th>
+              <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
+                Amount
+              </th>
+              <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
+                Tarrif
+              </th>
+              <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
+                Origin_Destination
+              </th>
+              <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
+                TradersName_ExporterImporter
+              </th>
+              <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
+                Documents
+              </th>
+              <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
+                Action
+              </th>
+            </tr>
+          </thead>
+          <tbody class="table-hover">
+            {% for record in page %}
+            <tr>
+              <td class=" text-white fw-semibold fs-6" scope="col" >
+                <input
+                  type="checkbox"
+                  class="item-checkbox"
+                  name="selected_items"
+                  value="{{ record.id }}"
+                />
+              </td>
+              <td>{{ record.Trade_Type }}</td>
+              <td>{{ record.Calender }}</td>
+              <td>{{ record.Fiscal_Year }}</td>
+              <td>{{ record.Duration }}</td>
+              <td>{{ record.Country }}</td>
+              <td>{{ record.HS_Code }}</td>
+              <td>{{ record.HS_Code.Product_Information }}</td>
+              <td>{{ record.Unit }}</td>
+              <td>{{ record.Quantity }}</td>
+              <td>{{ record.Currency_Type }}</td>
+              <td>{{ record.Amount }}</td>
+              <td>{{ record.Tarrif }}</td>
+              <td>{{ record.Origin_Destination }}</td>
+              <td>{{ record.TradersName_ExporterImporter }}</td>
+              <td>{{ record.DocumentsLegalProcedural }}</td>
+              <td class="d-flex">
+                <div class="btn">
+                  <a
+                    class=""
+                    id="delete_forest"
+                    onclick="confirmDelete('{{record.id}}')"
+                    ><i class="fa-regular fa-trash-can" style="color: #ff0000"></i></a>
+                    
+                </div>
+                <div class="btn ">
+                  <a
+                    class=""
+                    href="{% url 'update_trade_record' record.id %}"
+                    ><i class="fa-regular fa-pen-to-square" style="color: rgb(3, 10, 86)"></i></a>
+                </div>
+              </td> 
+            </tr>
+  
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
     <div class="pagination m-3 d-flex justify-content-center">
       <span

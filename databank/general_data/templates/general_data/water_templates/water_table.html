@@ -59,17 +59,7 @@
             name="date_max"
           />
         </div>
-  
-        <div class="col-md-3">
-          <label for="ViewNameOfPlant">Name of the plant </label>
-          <input
-            type="text"
-            class="form-control"
-            id="view_plant_Name"
-            placeholder="e.g. saal"
-            name="name_of_the_plant"
-          />
-        </div>
+
         <div class="form-group col-md-3">
           <label for="country_category">Country</label>
           <select
@@ -83,26 +73,61 @@
             {% endfor %}
           </select>
         </div>
-        <div class="col-md-3">
-          <label for="viewAreaUnit">Area Unit</label>
-          <select id="area_unit" name="area_unit" class="form-control">
+        <div class="form-group col-md-3">
+          <label for="water_code">Code_Type</label>
+          <select
+            id="water_code"
+            class="form-control"
+            name="water_code"
+          >
             <option selected>--</option>
-            {% for area_unit in area_unit_categories %}
-            <option value="{{area_unit.id}}">{{area_unit}}</option>
+            {% for code in water_options %}
+            <option value="{{code.id}}">{{code.Code}} - {{code.Water_Type}}</option>
             {% endfor %}
           </select>
         </div>
         <div class="col-md-3">
-          <label for="viewStockAvailable">Stock Available</label>
+          <label for="viewUnit">Unit</label>
+          <select id="unit" name="unit" class="form-control">
+            <option selected>--</option>
+            {% for unit in unit_options %}
+            <option value="{{unit}}">{{unit}}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label for="ViewNameOfPlant">Name of the River </label>
+          <input
+            type="text"
+            class="form-control"
+            id="view_river_Name"
+            placeholder="e.g. bagmati"
+            name="name_of_the_river"
+          />
+        </div>
+        <div class="col-md-3">
+          <label for="minimum_population">Minimum Volume</label>
           <input
             type="number"
             min="0"
             class="form-control"
-            id="viewStockAvailable"
+            id="minimum_volume"
             placeholder="1000"
-            name="stock_available"
+            name="minimum_volume"
           />
         </div>
+        <div class="col-md-3">
+          <label for="maximum_population">Maximum Volume</label>
+          <input
+            type="number"
+            min="0"
+            class="form-control"
+            id="maximum_volume"
+            placeholder="1000"
+            name="maximum_volume"
+            />
+        </div>
+
         <div class="col-md-3 d-flex align-items-end">
           <button type="submit" class=" btn btn-primary">
             Search
@@ -112,7 +137,7 @@
     </div>
   </div>
 </div>
-<div class="fs-4 fw-bold text-center">Forest Data</div>
+<div class="fs-4 fw-bold text-center">Water Data</div>
 
 {% if query_len == 0 %}
 <div class="bg-light p-4 text-center fw-normal mt-4 text-danger">
@@ -134,7 +159,7 @@
               <span class="fw-normal">Delete Selected</span>
           </button>
             <a
-              href="{% url 'export_forest_table_to_excel' %}?{{ request.GET.urlencode }}"
+              href="{% url 'export_water_table_to_excel' %}?{{ request.GET.urlencode }}"
               class="border p-2 styled-link"
             >
             <i class="fa-solid fa-table"></i>
@@ -145,14 +170,14 @@
       <table class="table table-striped table-bordered table-sm">
         <thead>
           <tr>
-            <th class="text-white fw-semibold fs-6  " scope="col"  style="background:#12486B;">
+            <th class="text-white fw-semibold fs-6" scope="col"  style="background:#12486B;">
               <input
               type="checkbox"
               id="select-all"
               onclick="toggleSelectAll()"
             />
             </th>
-            <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;">
+            <th class="text-white fst-normal  " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;">
               Year
             </th>
             <th class="text-white fst-normal  " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;" >
