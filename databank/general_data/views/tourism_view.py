@@ -170,7 +170,7 @@ def upload_tourism_excel(request):
             else:
                 for index,row in df.iterrows():
                     tourism_data ={
-                        'Year':row['Year'].date().strftime('%Y-%m-%d'),
+                        'Year':row['Year'].date(),
                         'Country': row['Country'],
                         'Number_Of_Tourist': row['Number_Of_Tourist'],
                         'Nationality_Of_Tourism':row['Nationality_Of_Tourism'],
@@ -178,7 +178,7 @@ def upload_tourism_excel(request):
                         'Number': row['Number']
                     }
                     try:
-                        calender_date = datetime.strptime(str(row['Year'].date().strftime('%Y-%m-%d')), '%Y-%m-%d').date()
+                        calender_date = pd.to_datetime(Year).date()
                     except:
                         calender_date = datetime.strptime(f'{str(row["Year"].date().strftime("%Y-%m-%d"))}-01-01', '%Y-%m-%d').date()
 

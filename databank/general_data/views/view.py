@@ -78,7 +78,7 @@ def upload_forest_excel(request):
                 Area_unit_options = [option[0] for option in ForestData.Area_Unit_Options]
                 for index, row in df.iterrows():
                     forest_data = {
-                        'Year': row['Year'].date().strftime('%Y-%m-%d'),
+                        'Year': row['Year'],
                         'Country': row['Country'],
                         'Name_of_the_plant': row['Name_Of_The_Plant'],
                         'Scientific_Name' : row['Scientific_Name'],
