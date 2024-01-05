@@ -13,13 +13,14 @@ from django.db import IntegrityError, transaction
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 
+from trade_data import views
+
 
 def is_valid_queryparam(param):
     return param !='' and param is not None
 
 
 def display_tourism_table(request):
-
     url = reverse('tourism_table')
     data = Tourism.objects.all()
     country_categories = Country_meta.objects.all()
@@ -95,9 +96,7 @@ def delete_tourism_record(request,item_id):
         return redirect('tourism_table')
     except Exception as e:
         return HttpResponse(f"An error occurred: {str(e)}")
-    
-
-
+ 
 def update_tourism_record(request,pk):
     tourism_record = Tourism.objects.get(id=pk)
     form = UploadTourismData(instance=tourism_record)
@@ -110,8 +109,6 @@ def update_tourism_record(request,pk):
         
     context={'form':form,}
     return render(request,'general_data/tourism_templates/update_tourism_record.html',context)
-
-
 
 def upload_tourism_excel(request):
     errors = []
@@ -249,3 +246,12 @@ def upload_tourism_excel(request):
         form = UploadTourismDataForm()
 
     return render(request,'general_data/tourism_templates/upload_tourism_form.html',{'form':form})
+
+def display_tourism_meta(request):
+    data = Tourism_Meta.objects.all()
+    total_data = data.count()
+
+    column_names = Tourism_Meta._meta.fields
+
+    context = {'data': data, 'total_data':total_data, 'meta_tables':views.meta_tables, 'tables':tables, 'column_names':column_names}
+    return render(request, 'general_data/display_meta.html', context)

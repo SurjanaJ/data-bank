@@ -65,7 +65,24 @@ meta_tables =[
      {
         "name": "Unit Meta",
         "url":"unit"
-    }
+    }, 
+    {
+        "name" : "Land Meta",
+        "url":"land_meta"
+    },
+    {
+        "name" : "Transport Meta",
+        "url":"transport_meta"
+    },
+    {
+        "name": "Water Meta",
+        "url": "water_meta"
+    },
+    {
+        "name":"Tourism Meta",
+        "url": "tourism_meta"
+    },
+  
     ]
 
 def is_valid_queryparam(param):

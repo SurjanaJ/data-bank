@@ -13,6 +13,7 @@ from django.db import IntegrityError, transaction
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 
+from trade_data import views
 
 def is_valid_queryparam(param):
     return param !='' and param is not None
@@ -100,7 +101,6 @@ def delete_land_record(request,item_id):
         return redirect('land_table')
     except Exception as e:
         return HttpResponse(f"An error occurred: {str(e)}")
-
 
     
 def update_land_record(request,pk):
@@ -255,3 +255,11 @@ def upload_land_excel(request):
         form = UploadLandDataForm()
     return render(request,'general_data/land_templates/upload_land_form.html',{'form':form})
         
+def display_land_meta(request):
+    data = Land_Code_Meta.objects.all()
+    total_data = data.count()
+
+    column_names = Land_Code_Meta._meta.fields
+
+    context = {'data': data, 'total_data':total_data, 'meta_tables':views.meta_tables, 'tables':tables, 'column_names':column_names}
+    return render(request, 'general_data/display_meta.html', context)

@@ -1,0 +1,31 @@
+{% extends 'main.html' %}
+{% block content %}
+{% load custom_filters %}
+
+<div class="container">
+    <span class="text-danger">* {{total_data}} records found. </span>
+    
+    <table class="table table-striped table-bordered table-sm">
+        <thead>
+            <tr>
+                {% for column in column_names %}
+                {% if column.name != 'id' and column.name != 'modified_date' and column.name !=  'created_date' %}
+                <th scope="col" class="p-2">{{ column.verbose_name }}</th>
+                {% endif %}
+                {% endfor %} 
+            </tr>
+        </thead>
+        <tbody class="table-group-divider">
+            {% for item in data %}
+                <tr class="">
+                    {% for column in column_names %}
+                        {% if column.name != 'id' and column.name != 'modified_date' and column.name !=  'created_date' %}
+                            <td class="px-2"> {{ item|get_key:column.name }} </td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+    </table>
+</div>
+
+{% endblock content %}
