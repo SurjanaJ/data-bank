@@ -234,8 +234,6 @@ def display_forest_table(request):
         data=data.filter(Stock_Available__gte=stock_available)
         
     
-
-
     #get form data for filteration
 
     paginator = Paginator(data, 10)
@@ -347,6 +345,16 @@ def upload_meta_excel(request):
         UploadWaterMetaForm: Water_Meta,
     }
     model_class = model_mapping.get(form_class)
+
+    view_mapping = {
+    Land_Code_Meta: 'land_meta',
+    Transport_Meta: 'transport_meta',
+    Tourism_Meta: 'tourism_meta',
+    Water_Meta: 'water_meta',
+    # Add other models as needed
+}
+    model_view = view_mapping.get(model_class)
+
     if request.method == 'POST':
         form = form_class(request.POST, request.FILES)
 
@@ -354,7 +362,6 @@ def upload_meta_excel(request):
             excel_data = request.FILES['meta_file']
 
             df = pd.read_excel(excel_data,dtype={'Code': str})
-            print(df)
             cols = df.columns.tolist()
             
             for index, row in df.iterrows():
@@ -402,7 +409,7 @@ def upload_meta_excel(request):
                 request.session['duplicate_data'] = duplicate_data
                 return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data})
             else:
-                return redirect('land_meta')
+                return redirect(f'{model_view}')
 
     else:
         form = form_class()
