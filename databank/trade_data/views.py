@@ -56,31 +56,39 @@ tables =[
 meta_tables =[
     {
         "name":"HS Code Meta",
-        "url":"hs_code"    
+        "url":"hs_code",
+        "upload_url": "upload_hs_code_meta_excel"    
     },
     {
         "name": "Country Meta",
-        "url":"country"
+        "url":"country",
+        "upload_url": "upload_country_meta_excel"    
     },
      {
         "name": "Unit Meta",
-        "url":"unit"
+        "url":"unit",
+        "upload_url": "upload_unit_meta_excel" 
     }, 
     {
         "name" : "Land Meta",
-        "url":"land_meta"
+        "url":"land_meta",
+        "upload_url": "upload_land_meta_excel" 
     },
     {
         "name" : "Transport Meta",
-        "url":"transport_meta"
+        "url":"transport_meta",
+        "upload_url": "upload_transport_meta_excel" 
+
     },
     {
         "name": "Water Meta",
-        "url": "water_meta"
+        "url": "water_meta",
+        "upload_url": "upload_water_meta_excel" 
     },
     {
         "name":"Tourism Meta",
-        "url": "tourism_meta"
+        "url": "tourism_meta",
+        "upload_url": "upload_tourism_meta_excel"  
     },
   
     ]

@@ -45,6 +45,9 @@ class UploadLandData(ModelForm):
         model = Land
         fields='__all__'
 
+class UploadLandMetaForm(forms.Form):
+    meta_file = forms.FileField()
+
 # Population Data
 class UploadPopulationDataForm(forms.Form):
     population_data_file = forms.FileField()
@@ -66,6 +69,9 @@ class UploadWaterData(ModelForm):
         model = Water 
         fields='__all__'
 
+class UploadWaterMetaForm(forms.Form):
+    meta_file = forms.FileField()
+
 # Tourism data
 class UploadTourismDataForm(forms.Form):
     Tourism_data_file = forms.FileField()
@@ -75,6 +81,9 @@ class UploadTourismData(ModelForm):
     class Meta:
         model = Tourism
         fields='__all__'
+
+class UploadTourismMetaForm(forms.Form):
+    meta_file = forms.FileField()
 
 # transport data
 class UploadTransportDataForm(forms.Form):
@@ -86,4 +95,5 @@ class UploadTransportData(ModelForm):
         model = Transport
         fields='__all__'
 
-
+class UploadTransportMetaForm(forms.Form):
+    meta_file = forms.FileField()

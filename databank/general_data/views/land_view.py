@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.db.models import Q
 import pandas as pd
 from ..models import Land, Country_meta,Land_Code_Meta
-from ..forms import UploadLandData,UploadLandDataForm
+from ..forms import UploadLandData,UploadLandDataForm, UploadLandMetaForm
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages

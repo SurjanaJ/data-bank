@@ -38,6 +38,8 @@ urlpatterns = [
     path('export_water_table_to_excel/', export_views.export_water_table_to_excel, name='export_water_table_to_excel'),
     path('upload_water_excel', water_view.upload_water_excel, name='upload_water_excel'),
     path('water_meta', water_view.display_water_meta, name='water_meta'),
+    path('upload_water_meta_excel', view.upload_meta_excel, name="upload_water_meta_excel"),
+
 
 
     path('land_table', land_view.display_land_table, name='land_table'),
@@ -47,6 +49,8 @@ urlpatterns = [
     path('export_land_table_to_excel/', export_views.export_land_table_to_excel, name='export_land_table_to_excel'),
     path('upload_land_excel', land_view.upload_land_excel, name='upload_land_excel'),
     path('land_meta', land_view.display_land_meta, name='land_meta'),
+    path('upload_land_meta_excel', view.upload_meta_excel, name="upload_land_meta_excel"),
+    
 
     path('tourism_table', tourism_view.display_tourism_table, name='tourism_table'),
     path('delete_selected_tourism/', tourism_view.delete_selected_tourism, name='delete_selected_tourism'),
@@ -55,6 +59,7 @@ urlpatterns = [
     path('export_tourism_table_to_excel/', export_views.export_tourism_table_to_excel, name='export_tourism_table_to_excel'),
     path('upload_tourism_excel', tourism_view.upload_tourism_excel, name='upload_tourism_excel'),
     path('tourism_meta', tourism_view.display_tourism_meta, name='tourism_meta'),
+    path('upload_tourism_meta_excel', view.upload_meta_excel, name="upload_tourism_meta_excel"),
 
 
     path('transport_table', transport_view.display_transport_table, name='transport_table'),    
@@ -64,5 +69,7 @@ urlpatterns = [
     path('export_transport_table_to_excel/', export_views.export_transport_table_to_excel, name='export_transport_table_to_excel'),
     path('upload_transport_excel', transport_view.upload_transport_excel, name='upload_transport_excel'),
     path('transport_meta',  transport_view.display_transport_meta, name='transport_meta'),
+    path('upload_transport_meta_excel', view.upload_meta_excel, name="upload_transport_meta_excel"),
+
 
 ]
