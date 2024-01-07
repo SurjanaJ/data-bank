@@ -13,6 +13,8 @@ from django.db import IntegrityError, transaction
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 
+from trade_data import views
+
 
 def is_valid_queryparam(param):
     return param !='' and param is not None
@@ -276,4 +278,12 @@ def upload_water_excel(request):
         form = UploadWaterDataForm()
 
     return render(request,'general_data/water_templates/upload_water_form.html',{'form':form})
- 
+
+def display_water_meta(request):
+    data = Water_Meta.objects.all()
+    total_data = data.count()
+
+    column_names = Water_Meta._meta.fields
+
+    context = {'data': data, 'total_data':total_data, 'meta_tables':views.meta_tables, 'tables':tables, 'column_names':column_names}
+    return render(request, 'general_data/display_meta.html', context)

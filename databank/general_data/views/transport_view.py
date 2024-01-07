@@ -13,6 +13,7 @@ from django.db import IntegrityError, transaction
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 
+from trade_data import views
 
 def is_valid_queryparam(param):
     return param !='' and param is not None
@@ -256,3 +257,18 @@ def upload_transport_excel(request):
         form = UploadTransportDataForm()
 
     return render(request,'general_data/transport_templates/upload_transport_form.html',{'form':form})
+
+
+def display_transport_meta(request):
+    data = Transport_Meta.objects.all()
+    total_data = data.count()
+
+    column_names = Transport_Meta._meta.fields
+
+    for item in data:
+        for field in item._meta.fields: 
+            print(field.name)
+            print()
+    context = {'data': data, 'total_data':total_data, 'meta_tables':views.meta_tables, 'tables':tables, 'column_names':column_names}
+    
+    return render(request, 'general_data/display_meta.html', context)

@@ -6,8 +6,8 @@ from django.core.paginator import Paginator
 from django.urls import reverse
 from django.db.models import Q
 import pandas as pd
-from ..models import ForestData, Country_meta
-from ..forms import UploadForestDataForm,UploadForestData
+from ..models import ForestData, Country_meta, Land_Code_Meta, Tourism_Meta, Transport_Meta, Water_Meta
+from ..forms import UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -19,7 +19,6 @@ def is_valid_queryparam(param):
     
 
 def upload_forest_excel(request):
-
     errors = []
     duplicate_data = []
     updated_count = 0
@@ -179,9 +178,6 @@ def upload_forest_excel(request):
 
     return render(request, 'general_data/upload_form.html', {'form': form, 'tables':tables})
 
-
-
-
 def update_forest_record(request,pk):
     forest_record = ForestData.objects.get(id=pk)
     form = UploadForestData(instance=forest_record)
@@ -318,8 +314,6 @@ def error_data_to_excel(error_data):
 
     return response
 
-
-
 def download_error_excel(request):
     error_data = request.session.get('errors', [])
 
@@ -329,3 +323,88 @@ def download_error_excel(request):
         return response
     else:
         return HttpResponse('No data to export.')
+    
+
+def upload_meta_excel(request):
+    errors = []
+    duplicate_data = []
+    added_count = 0
+    updated_count = 0
+
+    form_mapping = {
+        '/others/upload_land_meta_excel': UploadLandMetaForm,
+        '/others/upload_transport_meta_excel': UploadTransportMetaForm,
+        '/others/upload_tourism_meta_excel' : UploadTourismMetaForm,
+        '/others/upload_water_meta_excel':UploadWaterMetaForm,        
+    }
+
+    form_class = form_mapping.get(request.path)
+
+    model_mapping = {
+        UploadLandMetaForm: Land_Code_Meta,
+        UploadTransportMetaForm : Transport_Meta,
+        UploadTourismMetaForm : Tourism_Meta,
+        UploadWaterMetaForm: Water_Meta,
+    }
+    model_class = model_mapping.get(form_class)
+    if request.method == 'POST':
+        form = form_class(request.POST, request.FILES)
+
+        if form.is_valid():
+            excel_data = request.FILES['meta_file']
+
+            df = pd.read_excel(excel_data,dtype={'Code': str})
+            print(df)
+            cols = df.columns.tolist()
+            
+            for index, row in df.iterrows():
+                data = {col: row[col] for col in cols}
+                
+                conditions = {f"{key}": value for key, value in data.items()}
+
+                existing_record = model_class.objects.filter(Q(**conditions)).first()
+                
+                if existing_record:
+                    if all(getattr(existing_record, key) == value for key, value in data.items()):
+                        duplicate_data.append({'row_index': index, 'data': data})
+                    
+                    else:
+                        # Update the row with non-duplicate data
+                        for key, value in data.items():
+                            setattr(existing_record, key, value)
+                        try:
+                            existing_record.save()
+                            updated_count += 1
+                        except IntegrityError as e:
+                            errors.append(f"Error updating row {index}: {e}")
+
+                else:
+                    try:
+                        model_instance = model_class(**data)
+                        model_instance.save()
+                        added_count += 1
+
+                        existing_record = model_class.objects.filter()
+                    except IntegrityError as e:
+                        errors.append(f"Error inserting row {index}: {e}")
+
+            if added_count > 0:
+                messages.success(request, str(added_count) + ' records added.')
+            
+            if updated_count > 0:
+                messages.info(request, str(updated_count) + ' records updated.')
+
+            if errors:
+                # If there are errors, return them as a response
+                return render(request, 'trade_data/error_template.html', {'errors': errors})
+            
+            elif duplicate_data:
+                request.session['duplicate_data'] = duplicate_data
+                return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data})
+            else:
+                return redirect('land_meta')
+
+    else:
+        form = form_class()
+    return render(request, 'general_data/upload_form.html',  {'form': form, 'tables': tables})
+   

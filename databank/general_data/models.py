@@ -83,8 +83,6 @@ class Transport(models.Model):
     Unit=models.CharField(max_length=10, choices=Unit_Options, null=True,blank=True)
     Quantity=models.DecimalField(max_digits=100,decimal_places=3,blank=True,null=True)
 
-
-
 class Tourism_Meta(models.Model):
     id=models.AutoField(primary_key=True)
     Code=models.CharField(max_length=100)
@@ -102,7 +100,6 @@ class Tourism(models.Model):
     Arrival_code=models.ForeignKey(Tourism_Meta,on_delete=models.CASCADE)
     Number=models.IntegerField(default=0,null=True,blank=True)
 
-
 class Hotel(models.Model):
     id=models.AutoField(primary_key=True)
     Year=models.DateField(null=True,blank=True)
@@ -111,7 +108,6 @@ class Hotel(models.Model):
     Capacity_Room=models.IntegerField(default=0,null=True,blank=True)
     Occupancy_In_Year=models.IntegerField(default=0,null=True,blank=True)
     City = models.CharField(null=True,blank=True)
-
 
 class Water_Meta(models.Model):
     id=models.AutoField(primary_key=True)
@@ -144,7 +140,6 @@ class Public_Unitillity(models.Model):
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
     Type_Of_Public_Utility = models.CharField(max_length = 100,null= True,blank = True)
     Number = models.IntegerField(default=0,null=True,blank=True)
-
 
 
 class Mine_Meta(models.Model):
@@ -261,10 +256,7 @@ class Budgetary_Data(models.Model):
     Fiscal_Year = models.CharField(max_length=10, null=True, blank=True)
     Amount_In_USD = models.IntegerField(default = 0 , null = True ,blank = True)
     Prefered_Denomination = models.CharField(max_length = 30 , null = True , blank = True)
-
-
-
-    
+ 
 
 class Political_Data(models.Model):
     id = models.AutoField(primary_key=True)
