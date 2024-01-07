@@ -366,7 +366,6 @@ def upload_meta_excel(request):
                 
                 if existing_record:
                     if all(getattr(existing_record, key) == value for key, value in data.items()):
-                        print("Duplicate Data Found:", data)
                         duplicate_data.append({'row_index': index, 'data': data})
                     
                     else:
