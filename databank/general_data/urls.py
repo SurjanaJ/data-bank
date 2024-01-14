@@ -71,5 +71,7 @@ urlpatterns = [
     path('transport_meta',  transport_view.display_transport_meta, name='transport_meta'),
     path('upload_transport_meta_excel', view.upload_meta_excel, name="upload_transport_meta_excel"),
 
+    path('budgetary_table', view.display_table, name='budgetary_table'),    
+    path('upload_budgetary_excel', view.upload_excel, name='upload_budgetary_excel'),
 
 ]

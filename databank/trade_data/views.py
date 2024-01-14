@@ -23,32 +23,44 @@ from .forms import UploadCountryMetaForm, UploadHSCodeMetaForm, UploadTradeDataF
 tables =[
     {
         "name":"Forest Data",
-        "url":"forest_table"    
+        "url":"forest_table",
+        "upload_url": "upload_forest_excel"     
     },
 
     {
         "name":"Population Data",
-        "url":"population_table"    
+        "url":"population_table",
+        "upload_url": "upload_population_excel"     
     },
         {
         "name":"Land Data",
-        "url":"land_table"    
+        "url":"land_table",
+        "upload_url": "upload_land_excel"    
     },
         {
         "name":"Transport Data",
-        "url":"transport_table"    
+        "url":"transport_table",
+        "upload_url": "upload_transport_excel"    
     },
         {
         "name":"Hotel Data",
-        "url":"hotel_table"    
+        "url":"hotel_table",
+        "upload_url": "upload_hotel_excel"    
     },
         {
         "name":"Water Data",
-        "url":"water_table"    
+        "url":"water_table",
+        "upload_url": "upload_water_excel"    
     },
         {
         "name":"Tourism Data",
-        "url":"tourism_table"    
+        "url":"tourism_table",
+        "upload_url": "upload_tourism_excel"    
+    },
+    {
+        "name":"Budgetary Data",
+        "url":"budgetary_table",
+        "upload_url": "upload_budgetary_excel"    
     },
     ]
 

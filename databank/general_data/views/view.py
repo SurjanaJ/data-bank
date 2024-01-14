@@ -6,12 +6,14 @@ from django.core.paginator import Paginator
 from django.urls import reverse
 from django.db.models import Q
 import pandas as pd
-from ..models import ForestData, Country_meta, Land_Code_Meta, Tourism_Meta, Transport_Meta, Water_Meta
-from ..forms import UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
+from ..models import Budgetary_Data, ForestData, Country_meta, Land_Code_Meta, Tourism_Meta, Transport_Meta, Water_Meta
+from ..forms import UploadBudgetaryDataForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
 from django.views.decorators.http import require_POST
+
+from django.db.models import ForeignKey
 
 
 def is_valid_queryparam(param):
@@ -415,3 +417,96 @@ def upload_meta_excel(request):
         form = form_class()
     return render(request, 'general_data/upload_form.html',  {'form': form, 'tables': tables})
    
+def display_table(request):
+    return HttpResponse('Display table')
+
+
+def upload_excel(request):
+    errors = []
+    duplicate_data = []
+    updated_count = 0
+    added_count = 0 
+
+    form_mapping = {
+        '/others/upload_budgetary_excel': UploadBudgetaryDataForm,
+    }
+
+    form_class = form_mapping.get(request.path)
+
+    model_mapping = {
+        UploadBudgetaryDataForm: Budgetary_Data,
+    }
+
+    model_class = model_mapping.get(form_class)
+
+    view_mapping = {
+    Budgetary_Data : 'Budgetary_Data'
+}
+    model_view = view_mapping.get(model_class)
+
+
+    if request.method == 'POST':
+        form = form_class(request.POST, request.FILES)
+        if form.is_valid():
+            excel_data = request.FILES['data_file']
+            df = pd.read_excel(excel_data)
+            cols = df.columns.tolist()
+            
+            for index, row in df.iterrows():
+                data = {col: row[col] for col in cols}
+                for col in cols:
+                    try:
+                        field = model_class._meta.get_field(col)
+                        if isinstance(field, ForeignKey):
+                            # Do something with the foreign key column
+                            pass
+                    except model_class._meta.fields.FieldDoesNotExist:
+                        # Handle the case where the field does not exist in the model
+                        pass
+                # conditions = {f"{key}": value for key, value in data.items()}
+
+                # existing_record = model_class.objects.filter(Q(**conditions)).first()
+
+                # if existing_record:
+                #     if all(getattr(existing_record, key) == value for key, value in data.items()):
+                #         duplicate_data.append({'row_index': index, 'data': data})
+                    
+                #     else:
+                #         # Update the row with non-duplicate data
+                #         for key, value in data.items():
+                #             setattr(existing_record, key, value)
+                #         try:
+                #             existing_record.save()
+                #             updated_count += 1
+                #         except IntegrityError as e:
+                #             errors.append(f"Error updating row {index}: {e}")
+
+                # else:
+                try:
+                    model_instance = model_class(**data)
+                    model_instance.save()
+                    added_count += 1
+
+                    existing_record = model_class.objects.filter()
+                except IntegrityError as e:
+                    errors.append(f"Error inserting row {index}: {e}")
+
+                if added_count > 0:
+                    messages.success(request, str(added_count) + ' records added.')
+            
+                if updated_count > 0:
+                    messages.info(request, str(updated_count) + ' records updated.')
+
+                if errors:
+                    # If there are errors, return them as a response
+                    return render(request, 'trade_data/error_template.html', {'errors': errors})
+                
+                elif duplicate_data:
+                    request.session['duplicate_data'] = duplicate_data
+                    return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data})
+                else:
+                    return redirect('display_transport_meta')
+    
+    else:
+        form = form_class()
+    return render(request, 'general_data/upload_form.html',  {'form': form, 'tables': tables})

@@ -97,3 +97,6 @@ class UploadTransportData(ModelForm):
 
 class UploadTransportMetaForm(forms.Form):
     meta_file = forms.FileField()
+
+class UploadBudgetaryDataForm(forms.Form):
+    data_file = forms.FileField()

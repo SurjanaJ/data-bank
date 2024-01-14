@@ -214,7 +214,6 @@ class Road(models.Model):
     Length = models.IntegerField(default = 0 , null = True , blank = True)
 
 
-
 class Housing_Meta(models.Model):
     id = models.AutoField(primary_key=True)
     Code = Code=models.CharField(max_length=100)
