@@ -6,8 +6,8 @@ from django.core.paginator import Paginator
 from django.urls import reverse
 from django.db.models import Q
 import pandas as pd
-from ..models import ForestData, Country_meta, Land_Code_Meta, Tourism_Meta, Transport_Meta, Water_Meta
-from ..forms import UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
+from ..models import ForestData, Country_meta, Land_Code_Meta, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
+from ..forms import UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -333,7 +333,8 @@ def upload_meta_excel(request):
         '/others/upload_land_meta_excel': UploadLandMetaForm,
         '/others/upload_transport_meta_excel': UploadTransportMetaForm,
         '/others/upload_tourism_meta_excel' : UploadTourismMetaForm,
-        '/others/upload_water_meta_excel':UploadWaterMetaForm,        
+        '/others/upload_water_meta_excel':UploadWaterMetaForm,   
+        '/others/upload_services_meta_excel': UploadServicesMetaForm,     
     }
 
     form_class = form_mapping.get(request.path)
@@ -343,6 +344,7 @@ def upload_meta_excel(request):
         UploadTransportMetaForm : Transport_Meta,
         UploadTourismMetaForm : Tourism_Meta,
         UploadWaterMetaForm: Water_Meta,
+        UploadServicesMetaForm : Services_Meta,
     }
     model_class = model_mapping.get(form_class)
 
@@ -351,7 +353,7 @@ def upload_meta_excel(request):
     Transport_Meta: 'transport_meta',
     Tourism_Meta: 'tourism_meta',
     Water_Meta: 'water_meta',
-    # Add other models as needed
+    Services_Meta: 'services_meta'
 }
     model_view = view_mapping.get(model_class)
 

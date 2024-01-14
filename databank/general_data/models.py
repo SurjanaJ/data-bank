@@ -117,7 +117,6 @@ class Water_Meta(models.Model):
     def __str__(self):
         return self.Code
 
-
 class Water(models.Model):
 
     Unit_Options = (
@@ -286,20 +285,13 @@ class Disaster_Data(models.Model):
     Physical_Properties_Loss_In_USD = models.IntegerField(default = 0 ,null = True ,blank = True)
 
 
+class Services_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    Code = models.CharField(max_length=100)
+    Services_Type = models.TextField(null=True,blank=True)
 
-
-
-
-
-
-
-
-
-
-
-
-    
-    
+    def __str__(self):
+        return self.Code
 
 
 

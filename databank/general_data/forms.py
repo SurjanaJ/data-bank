@@ -76,7 +76,6 @@ class UploadWaterMetaForm(forms.Form):
 class UploadTourismDataForm(forms.Form):
     Tourism_data_file = forms.FileField()
 
-
 class UploadTourismData(ModelForm):
     class Meta:
         model = Tourism
@@ -96,4 +95,8 @@ class UploadTransportData(ModelForm):
         fields='__all__'
 
 class UploadTransportMetaForm(forms.Form):
+    meta_file = forms.FileField()
+
+# service data
+class UploadServicesMetaForm(forms.Form):
     meta_file = forms.FileField()
