@@ -100,3 +100,6 @@ class UploadTransportMetaForm(forms.Form):
 # service data
 class UploadServicesMetaForm(forms.Form):
     meta_file = forms.FileField()
+
+class UploadServicesForm(forms.Form):
+    meta_file = forms.FileField()

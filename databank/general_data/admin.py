@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import ForestData,PopulationData,Land_Code_Meta,Land,Transport_Meta,Transport,Tourism,Tourism_Meta,Hotel,Water,Water_Meta,Public_Unitillity,Mine_Meta,Mining,Energy_Meta,Energy,Road_Meta,Road,Housing_Meta,Housing,Health_disease_Meta,Health_disease,Budgetary_Data,Political_Data,Disaster_Data_Meta,Disaster_Data
+from .models import ForestData,PopulationData,Land_Code_Meta,Land, Services, Services_Meta,Transport_Meta,Transport,Tourism,Tourism_Meta,Hotel,Water,Water_Meta,Public_Unitillity,Mine_Meta,Mining,Energy_Meta,Energy,Road_Meta,Road,Housing_Meta,Housing,Health_disease_Meta,Health_disease,Budgetary_Data,Political_Data,Disaster_Data_Meta,Disaster_Data
 
 class LandCodeMeta_Admin(admin.ModelAdmin ):
     list_display=('id','Code','Land_Type')
@@ -27,12 +27,13 @@ admin.site.register(PopulationData,PopulationData_Admin)
 class Transport_Admin(admin.ModelAdmin):
     list_display=['id','Year','Country','Transport_Classification_Code','Unit','Quantity']
     
-    
 
 class Water_Admin(admin.ModelAdmin):
     list_display=['id','Year','Country','Water_Type_Code','Unit','Volume','Name_Of_The_River']
 
-
+class Services_Admin(admin.ModelAdmin):
+    list_display = ['id','Country','Direction','Code', 'Value']
+admin.site.register(Services, Services_Admin)
 
 
 

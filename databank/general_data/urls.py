@@ -75,6 +75,8 @@ urlpatterns = [
     
     path('upload_services_meta_excel', view.upload_meta_excel, name="upload_services_meta_excel"),
     path('services_meta',  services_view.display_services_meta, name='services_meta'),
+    path('services_table', services_view.display_services_table, name='services_table'),    
+
 
 
 

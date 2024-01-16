@@ -50,6 +50,10 @@ tables =[
         "name":"Tourism Data",
         "url":"tourism_table"    
     },
+    {
+        "name":"Services Data",
+        "url":"services_table"    
+    },
     ]
 
 
