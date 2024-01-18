@@ -78,5 +78,5 @@ urlpatterns = [
     path('services_table', services_view.display_services_table, name='services_table'),    
     path('upload_services_excel', services_view.upload_services_excel, name="upload_services_excel"),
     path('update_services_record/<int:pk>/', view.update_record, name = 'update_services_record'),
-
+    path('delete_services_record/<int:pk>/', view.delete_record, name ='delete_services_record' )
 ]

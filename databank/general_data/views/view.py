@@ -444,5 +444,22 @@ def update_record(request,pk):
     context = {'form': form, 'meta_tables': views.meta_tables}
     return render(request, 'general_data/update_forest_record.html', context)
    
+def delete_record(request,pk):
+    resolved =  resolve(request.path_info)
+    view_name = resolved.url_name
+    model_mapping = {
+        'delete_services_record': Services,
+    }
+
+    model_class = model_mapping.get(view_name)
+
+    try:
+        item_to_delete = get_object_or_404(model_class, id=pk)
+        item_to_delete.delete()
+        messages.success(request, 'Deleted successfully')
+        return redirect('services_table')
+    except Exception as e:
+        return HttpResponse(f"An error occurred: {str(e)}")
+    
 
 
