@@ -8,8 +8,8 @@ from django.db.models import Q
 import pandas as pd
 
 from trade_data import views
-from ..models import ForestData, Country_meta, Land_Code_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
-from ..forms import UpdateServices, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
+from ..models import Crime_Meta, ForestData, Country_meta, Land_Code_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
+from ..forms import UpdateServices, UploadCrimeMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -291,9 +291,7 @@ def duplicate_data_to_excel(duplicate_data):
 # Get the data from session storage
 def download_duplicate_excel(request):
     duplicate_data = request.session.get('duplicate_data', [])
-    print('DUPLICATE DATA!!!!')
-    print(duplicate_data)
-    print()
+    
     if duplicate_data:
         response = duplicate_data_to_excel(duplicate_data)
         request.session.pop('duplicate_data', None)
@@ -334,7 +332,8 @@ def upload_meta_excel(request):
         '/others/upload_transport_meta_excel': UploadTransportMetaForm,
         '/others/upload_tourism_meta_excel' : UploadTourismMetaForm,
         '/others/upload_water_meta_excel':UploadWaterMetaForm,   
-        '/others/upload_services_meta_excel': UploadServicesMetaForm,     
+        '/others/upload_services_meta_excel': UploadServicesMetaForm,  
+        '/others/upload_crime_meta_excel': UploadCrimeMetaForm,     
     }
 
     form_class = form_mapping.get(request.path)
@@ -345,6 +344,7 @@ def upload_meta_excel(request):
         UploadTourismMetaForm : Tourism_Meta,
         UploadWaterMetaForm: Water_Meta,
         UploadServicesMetaForm : Services_Meta,
+        UploadCrimeMetaForm : Crime_Meta,
     }
     model_class = model_mapping.get(form_class)
 
@@ -353,9 +353,10 @@ def upload_meta_excel(request):
     Transport_Meta: 'transport_meta',
     Tourism_Meta: 'tourism_meta',
     Water_Meta: 'water_meta',
-    Services_Meta: 'services_meta'
+    Services_Meta: 'services_meta',
+    Crime_Meta: 'crime_meta'
 }
-    model_view = view_mapping.get(model_class)
+    model_view = view_mapping.get(model_class)            
 
     if request.method == 'POST':
         form = form_class(request.POST, request.FILES)

@@ -95,7 +95,7 @@ class UploadTransportData(ModelForm):
 class UploadTransportMetaForm(forms.Form):
     meta_file = forms.FileField()
 
-# service data
+# SERVICE DATA
 class UploadServicesMetaForm(forms.Form):
     meta_file = forms.FileField()
 
@@ -116,3 +116,7 @@ class UpdateServices(ModelForm):
             'Value': forms.NumberInput(attrs={'class': 'form-control  '}),
             'Origin Destination': forms.Select(attrs={'class': 'form-control '}),
         }
+
+# CRIME DATA
+class UploadCrimeMetaForm(forms.Form):
+    meta_file = forms.FileField()
