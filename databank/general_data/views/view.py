@@ -3,11 +3,13 @@ from django.db import DataError
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render,redirect
 from django.core.paginator import Paginator
-from django.urls import reverse
+from django.urls import resolve, reverse
 from django.db.models import Q
 import pandas as pd
-from ..models import ForestData, Country_meta, Land_Code_Meta, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
-from ..forms import UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
+
+from trade_data import views
+from ..models import ForestData, Country_meta, Land_Code_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
+from ..forms import UpdateServices, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -148,7 +150,7 @@ def upload_forest_excel(request):
                         else:
                             try:
                                 Forestdata = ForestData(**forest_data)
-                                ForestData.save()
+                                Forestdata.save()
                                 added_count +=1
 
                             except Exception as e:
@@ -322,7 +324,6 @@ def download_error_excel(request):
     else:
         return HttpResponse('No data to export.')
     
-
 def upload_meta_excel(request):
     errors = []
     duplicate_data = []
@@ -416,4 +417,32 @@ def upload_meta_excel(request):
     else:
         form = form_class()
     return render(request, 'general_data/upload_form.html',  {'form': form, 'tables': tables})
+
+
+def update_record(request,pk):
+    resolved =  resolve(request.path_info)
+    view_name = resolved.url_name
+    model_mapping = {
+        'update_services_record': Services,
+    }
+
+    form_mapping = {
+        Services : UpdateServices
+    }
+    model_class = model_mapping.get(view_name)
+    model_form = form_mapping.get(model_class)
+
+    record = model_class.objects.get(id= pk)
+    form = model_form(instance=record)
+
+    if request.method == 'POST':
+        form = model_form(request.POST, instance=record)
+        if form.is_valid():
+            form.save()
+            return redirect('services_table')
+
+    context = {'form': form, 'meta_tables': views.meta_tables}
+    return render(request, 'general_data/update_forest_record.html', context)
    
+
+

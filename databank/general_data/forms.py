@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import ForestData,Hotel,Tourism,Transport,PopulationData,Water,Land
+from .models import ForestData,Hotel, Services,Tourism,Transport,PopulationData,Water,Land
 
 class UploadForestDataForm(forms.Form):
     forest_data_file = forms.FileField()
@@ -9,7 +9,6 @@ class UploadForestData(ModelForm):
     class Meta:
         model = ForestData
         fields='__all__'
-
 
         widgets={
             'Year': forms.DateInput(attrs={'class': 'form-control '}),
@@ -21,7 +20,6 @@ class UploadForestData(ModelForm):
             'Stock_Available': forms.NumberInput(attrs={'class': 'form-control  '}),
             'Area_Unit': forms.Select(attrs={'class': 'form-control  '}),
             'Area_Covered': forms.NumberInput(attrs={'class': 'form-control  '}),
-
         }
 
 # Hotel Data
@@ -102,4 +100,19 @@ class UploadServicesMetaForm(forms.Form):
     meta_file = forms.FileField()
 
 class UploadServicesForm(forms.Form):
-    meta_file = forms.FileField()
+    file = forms.FileField()
+
+
+class UpdateServices(ModelForm):
+    class Meta:
+        model = Services
+        fields='__all__'
+
+        widgets={
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Year': forms.DateInput(attrs={'class': 'form-control '}),
+            'Direction': forms.Select(attrs={'class': 'form-control  '}),
+            'Code': forms.Select(attrs={'class': 'form-control  '}),
+            'Value': forms.NumberInput(attrs={'class': 'form-control  '}),
+            'Origin Destination': forms.Select(attrs={'class': 'form-control '}),
+        }
