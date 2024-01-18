@@ -253,7 +253,6 @@ def display_forest_table(request):
 
     return render(request, 'general_data/forest_table.html', context)
 
-
 def delete_forest_record(request, item_id):
     try:
         item_to_delete = get_object_or_404(ForestData, id=item_id)
@@ -418,7 +417,6 @@ def upload_meta_excel(request):
         form = form_class()
     return render(request, 'general_data/upload_form.html',  {'form': form, 'tables': tables})
 
-
 def update_record(request,pk):
     resolved =  resolve(request.path_info)
     view_name = resolved.url_name
@@ -461,5 +459,26 @@ def delete_record(request,pk):
     except Exception as e:
         return HttpResponse(f"An error occurred: {str(e)}")
     
+def delete_selected(request):
+    resolved =  resolve(request.path_info)
+    view_name = resolved.url_name
+    model_mapping = {
+        'delete_selected_services': Services,
+    }
 
+    view_mapping = {
+        Services: 'services_table'
+    }
+    model_class = model_mapping.get(view_name)
+    model_view = view_mapping.get(model_class)
+    selected_ids = request.POST.getlist('selected_items')
+    if not selected_ids:
+        messages.error(request, 'No items selected for deletion.')
+        return redirect(model_view)
+    try:
+        model_class.objects.filter(id__in=selected_ids).delete()
+        messages.success(request, 'Selected items deleted successfully.')
+    except Exception as e:
+        messages.error(request, f'Error deleting items: {e}')
 
+    return redirect(model_view)

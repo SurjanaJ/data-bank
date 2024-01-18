@@ -90,7 +90,7 @@
 
 <!-- TODO: add id here -->
 
-<form action="" method="post" id="delete-form-services">
+<form action="{% url 'delete_selected_services' %}" method="post" id="delete-form-services">
     {% csrf_token %}
     <div class="table-responsive mt-4 bg-light p-3">
         <div class="d-flex align-items-center justify-content-between px-2">
