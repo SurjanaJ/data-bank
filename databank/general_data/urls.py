@@ -1,5 +1,6 @@
 from django.urls import include, path
-from .views import view,population_view,hotel_view,land_view,tourism_view,water_view,transport_view
+
+from .views import view,population_view,hotel_view,land_view,tourism_view,water_view,transport_view,services_view
 from .views import export_views
 
 urlpatterns = [
@@ -71,5 +72,13 @@ urlpatterns = [
     path('transport_meta',  transport_view.display_transport_meta, name='transport_meta'),
     path('upload_transport_meta_excel', view.upload_meta_excel, name="upload_transport_meta_excel"),
 
+    
+    path('upload_services_meta_excel', view.upload_meta_excel, name="upload_services_meta_excel"),
+    path('services_meta',  services_view.display_services_meta, name='services_meta'),
+    path('services_table', services_view.display_services_table, name='services_table'),    
+    path('upload_services_excel', services_view.upload_services_excel, name="upload_services_excel"),
+    path('update_services_record/<int:pk>/', view.update_record, name = 'update_services_record'),
+    path('delete_services_record/<int:pk>/', view.delete_record, name ='delete_services_record' ),
+    path('delete_selected_services/', view.delete_selected, name='delete_selected_services'),
 
-]
+]   

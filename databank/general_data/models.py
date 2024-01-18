@@ -117,7 +117,6 @@ class Water_Meta(models.Model):
     def __str__(self):
         return self.Code
 
-
 class Water(models.Model):
 
     Unit_Options = (
@@ -286,21 +285,26 @@ class Disaster_Data(models.Model):
     Physical_Properties_Loss_In_USD = models.IntegerField(default = 0 ,null = True ,blank = True)
 
 
+class Services_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    Code = models.CharField(max_length=100)
+    Services_Type = models.TextField(null=True,blank=True)
 
+    def __str__(self):
+        return self.Code
 
-
-
-
-
-
-
-
-
-
-
-    
-    
-
+class Services(models.Model):
+    DIRECTION_OPTIONS = (
+        ('Import', 'Import'),
+        ('Export', 'Export')
+    )
+    id = models.AutoField(primary_key=True)
+    Country = models.ForeignKey(Country_meta, on_delete=models.CASCADE, related_name='services_country')
+    Year = models.DateField(null=True, blank=True)
+    Direction = models.CharField(max_length= 10, choices = DIRECTION_OPTIONS, null=True, blank=True )
+    Code = models.ForeignKey(Services_Meta, on_delete = models.CASCADE)
+    Value = models.FloatField(max_length=100,null=True, blank=True)
+    Origin_Destination = models.ForeignKey(Country_meta, on_delete=models.CASCADE, related_name='services_origin_destination')
 
 
     

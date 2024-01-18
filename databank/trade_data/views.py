@@ -50,6 +50,10 @@ tables =[
         "name":"Tourism Data",
         "url":"tourism_table"    
     },
+    {
+        "name":"Services Data",
+        "url":"services_table"    
+    },
     ]
 
 
@@ -90,6 +94,11 @@ meta_tables =[
         "url": "tourism_meta",
         "upload_url": "upload_tourism_meta_excel"  
     },
+    {
+        "name" : "Services Meta",
+        "url": "services_meta",
+        "upload_url": "upload_services_meta_excel"
+    }
   
     ]
 
