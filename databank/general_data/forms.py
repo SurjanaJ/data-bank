@@ -120,3 +120,6 @@ class UpdateServices(ModelForm):
 # CRIME DATA
 class UploadCrimeMetaForm(forms.Form):
     meta_file = forms.FileField()
+
+class UploadCrimeForm(forms.Form):
+    file = forms.FileField()
