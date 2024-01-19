@@ -323,9 +323,9 @@ class Crime(models.Model):
     id = models.AutoField(primary_key=True)
     Country = models.ForeignKey(Country_meta, on_delete=models.CASCADE)
     Year = models.DateField(null=True, blank=True)
-    Offence_Code = models.ForeignKey(Crime_Meta, on_delete= models.CASCADE)
+    Code = models.ForeignKey(Crime_Meta, on_delete= models.CASCADE)
     Gender = models.CharField(max_length= 10, choices = GENDER_OPTIONS, null=True, blank=True )
     Age = models.IntegerField(null=True, blank=True)
-    District = models.CharField(max_length= 50, choices = GENDER_OPTIONS, null=True, blank=True )
+    District = models.CharField(max_length= 50, null=True, blank=True )
 
 

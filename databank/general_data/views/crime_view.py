@@ -2,14 +2,15 @@ from django.forms import model_to_dict
 from django.shortcuts import redirect, render
 import pandas as pd
 from django.contrib import messages
-
+from django.core.paginator import Paginator, Page
+from trade_data.views import is_valid_queryparam, tables
+from django.db.models import Q
 
 from trade_data.models import Country_meta
 from ..forms import UploadCrimeForm
 from trade_data import views
 from ..models import Crime, Crime_Meta
-from trade_data.views import is_valid_queryparam, tables
-from django.db.models import Q
+
 
 
 def display_crime_meta(request):
@@ -33,7 +34,7 @@ def upload_crime_excel(request):
         form = UploadCrimeForm(request.POST,request.FILES)
         if form.is_valid():
             excel_data = request.FILES['file']
-            df = pd.read_excel(excel_data)
+            df = pd.read_excel(excel_data, dtype={'Code': str})
             df.fillna('', inplace=True)
             df['Year'] = pd.to_datetime(df['Year']).dt.date
 
@@ -51,14 +52,21 @@ def upload_crime_excel(request):
                     crime_data = {
                         'Country':Country,
                         'Year':Year,
-                        'Offence_Code':Code,
+                        'Code':Code,
                         'Gender': row['Gender'],
                         'Age': row['Age'],
                         'District': row['District']
                     }
 
                 except Exception as e:
-                    crime_data['Year']=Year.isoformat()
+                    crime_data = {
+                        'Country':Country,
+                        'Year':Year.isoformat(),
+                        'Code':Code,
+                        'Gender': row['Gender'],
+                        'Age': row['Age'],
+                        'District': row['District']
+                    }
                     errors.append({'row_index': index, 'data': crime_data, 'reason': str(e)})
                     continue
                 
@@ -86,9 +94,55 @@ def upload_crime_excel(request):
                 return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data})
                 
             else:
-                return redirect('crime_table')  
+                return redirect('services_table')  
             
     else:
         form = UploadCrimeForm()
 
     return render(request,'general_data/transport_templates/upload_transport_form.html',{'form':form})
+
+
+def display_crime_table(request):
+    data = Crime.objects.all()
+    column_names = Crime._meta.fields
+
+    country_categories = Country_meta.objects.all()
+    gender_categories = [choice[1] for choice in Crime.GENDER_OPTIONS]
+    crime_code = Crime_Meta.objects.all()
+
+    year_min = request.GET.get('year_min')
+    year_max = request.GET.get('year_max')
+    age_min = request.GET.get('age_min')
+    age_max = request.GET.get('age_max')
+    gender = request.GET.get('gender')
+    country = request.GET.get('country')
+    code = request.GET.get('code')
+
+    if is_valid_queryparam(year_min):
+        data = data.filter(Year__gte=year_min)
+
+    if is_valid_queryparam(year_max):
+        data = data.filter(Year__lt = year_max)
+
+    if is_valid_queryparam(country) and country != '--':
+        data = data.filter(Country_id=country)
+
+    if is_valid_queryparam(age_min):
+        data = data.filter(Age__gte=age_min)
+
+    if is_valid_queryparam(age_max):
+        data = data.filter(Age__lt=age_max)
+
+    if is_valid_queryparam(gender) and gender != '--':
+        data = data.filter(Gender = gender)
+
+    if is_valid_queryparam(code) and code != '--':
+        data = data.filter(Code = code)
+
+    paginator = Paginator(data, 40)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+
+    context = {'data_len': len(data), 'country_categories': country_categories, 'gender_categories': gender_categories, 'crime_code':crime_code ,'page':page, 'query_len': len(page), 'tables':tables, 'meta_tables':views.meta_tables, 'column_names':column_names}
+
+    return render(request, 'general_data/crime_templates/crime_table.html', context)

@@ -84,5 +84,8 @@ urlpatterns = [
     
     path('upload_crime_meta_excel', view.upload_meta_excel, name='upload_crime_meta_excel'),
     path('crime_meta',  crime_view.display_crime_meta, name='crime_meta'),
+    path('upload_crime_excel', crime_view.upload_crime_excel, name = 'upload_crime_excel'),
+    path('crime_table', crime_view.display_crime_table, name='crime_table'),    
+
 
 ]   
