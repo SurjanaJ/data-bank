@@ -89,6 +89,7 @@ urlpatterns = [
     path('delete_selected_crime/', view.delete_selected, name='delete_selected_crime'),
     path('delete_crime_record/<int:pk>/', view.delete_record, name ='delete_crime_record' ),
     path('update_crime_record/<int:pk>/', view.update_record, name = 'update_crime_record'),
+    path('export_excel', crime_view.export_excel, name='export_excel'),
     
 
 ]   

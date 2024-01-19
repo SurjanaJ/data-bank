@@ -1,10 +1,12 @@
+from io import BytesIO
 from django.forms import model_to_dict
 from django.shortcuts import redirect, render
 import pandas as pd
 from django.contrib import messages
-from django.core.paginator import Paginator, Page
+from django.core.paginator import Paginator
 from trade_data.views import is_valid_queryparam, tables
-from django.db.models import Q
+from django.http import HttpResponse
+from django.db.models import F
 
 from trade_data.models import Country_meta
 from ..forms import UploadCrimeForm
@@ -146,3 +148,54 @@ def display_crime_table(request):
     context = {'data_len': len(data), 'country_categories': country_categories, 'gender_categories': gender_categories, 'crime_code':crime_code ,'page':page, 'query_len': len(page), 'tables':tables, 'meta_tables':views.meta_tables, 'column_names':column_names}
 
     return render(request, 'general_data/crime_templates/crime_table.html', context)
+
+
+def export_excel(request):
+
+    year_min = request.GET.get('year_min')
+    year_max = request.GET.get('year_max')
+    age_min = request.GET.get('age_min')
+    age_max = request.GET.get('age_max')
+    gender = request.GET.get('gender')
+    country = request.GET.get('country')
+    code = request.GET.get('code')
+
+    filter_conditions = {}
+    if is_valid_queryparam(year_min):
+        filter_conditions['Year__gte'] = year_min
+    if is_valid_queryparam(year_max):
+        filter_conditions['Year__lt'] = year_max
+    if is_valid_queryparam(age_min):
+        filter_conditions['Age__gte'] = age_min
+    if is_valid_queryparam(age_max):
+        filter_conditions['Age__lt'] = age_max
+    if is_valid_queryparam(gender) and gender != '--':
+        filter_conditions['Gender'] = gender
+    if is_valid_queryparam(country) and country != '--':
+        filter_conditions['Country'] = country
+    if is_valid_queryparam(code) and code != '--':
+        filter_conditions['Code'] = code
+
+    queryset = Crime.objects.filter(**filter_conditions)
+    queryset = queryset.annotate(
+        country_name = F('Country__Country_Name'),
+        code_name = F('Code__Code')
+    )
+    data = pd.DataFrame(list(queryset.values('country_name','Year','code_name', 'Gender','Age', 'District')))
+    
+    data.rename(columns={'country_name': 'Country', 'code_name': 'Code'}, inplace=True)
+
+
+    output = BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')  
+    data.to_excel(writer, sheet_name='Sheet1', index=False)
+
+    writer.close()  
+    output.seek(0)
+
+    response = HttpResponse(
+        output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
+    return response
+
