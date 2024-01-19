@@ -8,7 +8,7 @@ from django.db.models import Q
 import pandas as pd
 
 from trade_data import views
-from ..models import Crime_Meta, ForestData, Country_meta, Land_Code_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
+from ..models import Crime, Crime_Meta, ForestData, Country_meta, Land_Code_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
 from ..forms import UpdateServices, UploadCrimeMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
@@ -465,10 +465,12 @@ def delete_selected(request):
     view_name = resolved.url_name
     model_mapping = {
         'delete_selected_services': Services,
+        'delete_selected_crime': Crime,
     }
 
     view_mapping = {
-        Services: 'services_table'
+        Services: 'services_table',
+        Crime: 'crime_table'
     }
     model_class = model_mapping.get(view_name)
     model_view = view_mapping.get(model_class)
