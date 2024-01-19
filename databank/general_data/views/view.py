@@ -448,15 +448,22 @@ def delete_record(request,pk):
     view_name = resolved.url_name
     model_mapping = {
         'delete_services_record': Services,
+        'delete_crime_record': Crime,
+    }
+
+    view_mapping = {
+        Services: 'services_table',
+        Crime: 'crime_table'
     }
 
     model_class = model_mapping.get(view_name)
+    model_view = view_mapping.get(model_class)
 
     try:
         item_to_delete = get_object_or_404(model_class, id=pk)
         item_to_delete.delete()
         messages.success(request, 'Deleted successfully')
-        return redirect('services_table')
+        return redirect(model_view)
     except Exception as e:
         return HttpResponse(f"An error occurred: {str(e)}")
     
