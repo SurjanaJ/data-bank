@@ -9,7 +9,7 @@ import pandas as pd
 
 from trade_data import views
 from ..models import Crime, Crime_Meta, ForestData, Country_meta, Land_Code_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
-from ..forms import UpdateServices, UploadCrimeMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
+from ..forms import UpdateCrime, UpdateServices, UploadCrimeMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -423,13 +423,22 @@ def update_record(request,pk):
     view_name = resolved.url_name
     model_mapping = {
         'update_services_record': Services,
+        'update_crime_record': Crime
     }
 
     form_mapping = {
-        Services : UpdateServices
+        Services : UpdateServices,
+        Crime: UpdateCrime
     }
+
+    view_mapping = {
+        Services: 'services_table',
+        Crime: 'crime_table'
+    }
+
     model_class = model_mapping.get(view_name)
     model_form = form_mapping.get(model_class)
+    model_view = view_mapping.get(model_class)
 
     record = model_class.objects.get(id= pk)
     form = model_form(instance=record)
@@ -438,7 +447,7 @@ def update_record(request,pk):
         form = model_form(request.POST, instance=record)
         if form.is_valid():
             form.save()
-            return redirect('services_table')
+            return redirect(model_view)
 
     context = {'form': form, 'meta_tables': views.meta_tables}
     return render(request, 'general_data/update_forest_record.html', context)
