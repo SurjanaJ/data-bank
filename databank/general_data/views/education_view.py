@@ -144,3 +144,43 @@ def display_education_table(request):
 
     context ={'data_len':len(data),'level_categories':level_categories, 'degree_categories':degree_categories, 'page':page, 'query_len':len(page), 'tables': tables, 'meta_tables': views.meta_tables}
     return render(request, 'general_data/education_templates/education_table.html', context)
+
+def export_education_excel(request):
+    education_level = request.GET.get('education_level')
+    education_degree = request.GET.get('education_degree')
+
+    filter_conditions = {}
+    if is_valid_queryparam(education_level) and education_level != '--':
+        filter_conditions['Level_Code']=education_level
+
+    if is_valid_queryparam(education_degree) and education_degree != '--':
+        filter_conditions['Degree_Code']=education_degree
+
+    queryset = Education.objects.filter(**filter_conditions)
+    queryset = queryset.annotate(
+        education_level = F('Level_Code__Code'),
+        level_name = F('Level_Code__Level'),
+        education_degree = F('Degree_Code__Code'),
+        degree_name = F('Degree_Code__Degree'),
+    )
+
+    data = pd.DataFrame(list(queryset.values('education_level','level_name', 'education_degree','degree_name','Male', 'Female')))
+
+    data.rename(columns={'education_degree':'Degree Code','education_level': 'Level Code', 'level_name':'Level Code Name', 'degree_name':'Degree Code Name'}, inplace=True)
+
+    column_order = ['Level Code', 'Level Code Name', 'Degree Code', 'Degree Code Name', 'Male', 'Female']
+
+    data = data[column_order]
+        
+    output = BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')  
+    data.to_excel(writer, sheet_name='Sheet1', index=False)
+
+    writer.close()  
+    output.seek(0)
+
+    response = HttpResponse(
+        output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
+    return response
