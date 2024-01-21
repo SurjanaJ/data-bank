@@ -137,3 +137,10 @@ class UpdateCrime(ModelForm):
             'Age': forms.NumberInput(attrs={'class': 'form-control  '}),
             'District': forms.TextInput(attrs={'class': 'form-control '}),
         }
+
+# EDUCATION DATA
+class UploadEducationLevelMetaForm(forms.Form):
+    meta_file = forms.FileField()
+
+class UploadEducationDegreeMetaForm(forms.Form):
+    meta_file = forms.FileField()

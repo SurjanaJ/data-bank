@@ -104,6 +104,16 @@ meta_tables =[
         "url": "crime_meta",
         "upload_url": "upload_crime_meta_excel"
     },
+    {
+        "name":"Education Level Meta",
+        "url": "education_level_meta",
+        "upload_url":"upload_education_level_meta_excel"
+    },
+    {
+        "name":"Education Degree Meta",
+        "url": "education_degree_meta",
+        "upload_url":"upload_education_degree_meta_excel"
+    }
   
     ]
 

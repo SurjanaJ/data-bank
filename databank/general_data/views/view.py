@@ -8,8 +8,8 @@ from django.db.models import Q
 import pandas as pd
 
 from trade_data import views
-from ..models import Crime, Crime_Meta, ForestData, Country_meta, Land_Code_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
-from ..forms import UpdateCrime, UpdateServices, UploadCrimeMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
+from ..models import Crime, Crime_Meta, Education_Degree_Meta, Education_Level_Meta, ForestData, Country_meta, Land_Code_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
+from ..forms import UpdateCrime, UpdateServices, UploadCrimeMetaForm, UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -333,7 +333,9 @@ def upload_meta_excel(request):
         '/others/upload_tourism_meta_excel' : UploadTourismMetaForm,
         '/others/upload_water_meta_excel':UploadWaterMetaForm,   
         '/others/upload_services_meta_excel': UploadServicesMetaForm,  
-        '/others/upload_crime_meta_excel': UploadCrimeMetaForm,     
+        '/others/upload_crime_meta_excel': UploadCrimeMetaForm,  
+        '/others/upload_education_level_meta_excel':UploadEducationLevelMetaForm,
+        '/others/upload_education_degree_meta_excel': UploadEducationDegreeMetaForm,   
     }
 
     form_class = form_mapping.get(request.path)
@@ -345,6 +347,8 @@ def upload_meta_excel(request):
         UploadWaterMetaForm: Water_Meta,
         UploadServicesMetaForm : Services_Meta,
         UploadCrimeMetaForm : Crime_Meta,
+        UploadEducationLevelMetaForm : Education_Level_Meta,
+        UploadEducationDegreeMetaForm : Education_Degree_Meta,
     }
     model_class = model_mapping.get(form_class)
 
@@ -354,7 +358,9 @@ def upload_meta_excel(request):
     Tourism_Meta: 'tourism_meta',
     Water_Meta: 'water_meta',
     Services_Meta: 'services_meta',
-    Crime_Meta: 'crime_meta'
+    Crime_Meta: 'crime_meta',
+    Education_Level_Meta : 'education_level_meta',
+    Education_Degree_Meta : 'education_degree_meta',
 }
     model_view = view_mapping.get(model_class)            
 
