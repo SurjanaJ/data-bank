@@ -8,7 +8,7 @@ from django.db.models import Q
 import pandas as pd
 
 from trade_data import views
-from ..models import Crime, Crime_Meta, Education_Degree_Meta, Education_Level_Meta, ForestData, Country_meta, Land_Code_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
+from ..models import Crime, Crime_Meta, Education, Education_Degree_Meta, Education_Level_Meta, ForestData, Country_meta, Land_Code_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
 from ..forms import UpdateCrime, UpdateServices, UploadCrimeMetaForm, UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
@@ -429,12 +429,13 @@ def update_record(request,pk):
     view_name = resolved.url_name
     model_mapping = {
         'update_services_record': Services,
-        'update_crime_record': Crime
+        'update_crime_record': Crime,
+        'update_education_record': Education,
     }
 
     form_mapping = {
         Services : UpdateServices,
-        Crime: UpdateCrime
+        Crime: UpdateCrime,
     }
 
     view_mapping = {
@@ -464,11 +465,13 @@ def delete_record(request,pk):
     model_mapping = {
         'delete_services_record': Services,
         'delete_crime_record': Crime,
+        'delete_education_record': Education,
     }
 
     view_mapping = {
         Services: 'services_table',
-        Crime: 'crime_table'
+        Crime: 'crime_table',
+        Education: 'education_table'
     }
 
     model_class = model_mapping.get(view_name)
@@ -488,11 +491,13 @@ def delete_selected(request):
     model_mapping = {
         'delete_selected_services': Services,
         'delete_selected_crime': Crime,
+        'delete_selected_education': Education
     }
 
     view_mapping = {
         Services: 'services_table',
-        Crime: 'crime_table'
+        Crime: 'crime_table',
+        Education: 'education_table'
     }
     model_class = model_mapping.get(view_name)
     model_view = view_mapping.get(model_class)

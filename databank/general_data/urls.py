@@ -97,5 +97,7 @@ urlpatterns = [
     path('education_degree_meta',  education_view.display_education_degree_meta, name='education_degree_meta'),
     path('upload_education_excel', education_view.upload_education_excel, name = 'upload_education_excel'),
     path('education_table', education_view.display_education_table, name='education_table'),    
+    path('delete_selected_education/', view.delete_selected, name='delete_selected_education'),
+    path('delete_education_record/<int:pk>/', view.delete_record, name ='delete_education_record' ),
 
 ]   
