@@ -149,7 +149,6 @@ def display_crime_table(request):
 
     return render(request, 'general_data/crime_templates/crime_table.html', context)
 
-
 def export_excel(request):
 
     year_min = request.GET.get('year_min')

@@ -1,6 +1,6 @@
 from django.urls import include, path
 
-from .views import view,population_view,hotel_view,land_view,tourism_view,water_view,transport_view,services_view, crime_view
+from .views import education_view, view,population_view,hotel_view,land_view,tourism_view,water_view,transport_view,services_view, crime_view
 from .views import export_views
 
 urlpatterns = [
@@ -91,5 +91,15 @@ urlpatterns = [
     path('update_crime_record/<int:pk>/', view.update_record, name = 'update_crime_record'),
     path('export_excel', crime_view.export_excel, name='export_excel'),
     
+    path('upload_education_level_meta_excel', view.upload_meta_excel, name = 'upload_education_level_meta_excel'),
+    path('upload_education_degree_meta_excel', view.upload_meta_excel, name = 'upload_education_degree_meta_excel'),
+    path('education_level_meta',  education_view.display_education_level_meta, name='education_level_meta'),
+    path('education_degree_meta',  education_view.display_education_degree_meta, name='education_degree_meta'),
+    path('upload_education_excel', education_view.upload_education_excel, name = 'upload_education_excel'),
+    path('education_table', education_view.display_education_table, name='education_table'),    
+    path('delete_selected_education/', view.delete_selected, name='delete_selected_education'),
+    path('delete_education_record/<int:pk>/', view.delete_record, name ='delete_education_record' ),
+    path('update_education_record/<int:pk>/', view.update_record, name = 'update_education_record'),
+    path('export_education_excel', education_view.export_education_excel, name='export_education_excel'),
 
 ]   
