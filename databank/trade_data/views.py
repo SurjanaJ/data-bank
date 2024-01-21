@@ -98,7 +98,12 @@ meta_tables =[
         "name" : "Services Meta",
         "url": "services_meta",
         "upload_url": "upload_services_meta_excel"
-    }
+    },
+    {
+        "name" : "Crime Meta",
+        "url": "crime_meta",
+        "upload_url": "upload_crime_meta_excel"
+    },
   
     ]
 
@@ -753,8 +758,6 @@ def error_data_to_excel(error_data):
     error_df.to_excel(response, index=False, sheet_name='error_data')
 
     return response
-
-
 
 def download_error_excel(request):
     error_data = request.session.get('errors', [])

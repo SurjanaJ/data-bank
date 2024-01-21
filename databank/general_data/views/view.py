@@ -8,8 +8,8 @@ from django.db.models import Q
 import pandas as pd
 
 from trade_data import views
-from ..models import ForestData, Country_meta, Land_Code_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
-from ..forms import UpdateServices, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
+from ..models import Crime, Crime_Meta, ForestData, Country_meta, Land_Code_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
+from ..forms import UpdateCrime, UpdateServices, UploadCrimeMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -291,9 +291,7 @@ def duplicate_data_to_excel(duplicate_data):
 # Get the data from session storage
 def download_duplicate_excel(request):
     duplicate_data = request.session.get('duplicate_data', [])
-    print('DUPLICATE DATA!!!!')
-    print(duplicate_data)
-    print()
+    
     if duplicate_data:
         response = duplicate_data_to_excel(duplicate_data)
         request.session.pop('duplicate_data', None)
@@ -334,7 +332,8 @@ def upload_meta_excel(request):
         '/others/upload_transport_meta_excel': UploadTransportMetaForm,
         '/others/upload_tourism_meta_excel' : UploadTourismMetaForm,
         '/others/upload_water_meta_excel':UploadWaterMetaForm,   
-        '/others/upload_services_meta_excel': UploadServicesMetaForm,     
+        '/others/upload_services_meta_excel': UploadServicesMetaForm,  
+        '/others/upload_crime_meta_excel': UploadCrimeMetaForm,     
     }
 
     form_class = form_mapping.get(request.path)
@@ -345,6 +344,7 @@ def upload_meta_excel(request):
         UploadTourismMetaForm : Tourism_Meta,
         UploadWaterMetaForm: Water_Meta,
         UploadServicesMetaForm : Services_Meta,
+        UploadCrimeMetaForm : Crime_Meta,
     }
     model_class = model_mapping.get(form_class)
 
@@ -353,9 +353,10 @@ def upload_meta_excel(request):
     Transport_Meta: 'transport_meta',
     Tourism_Meta: 'tourism_meta',
     Water_Meta: 'water_meta',
-    Services_Meta: 'services_meta'
+    Services_Meta: 'services_meta',
+    Crime_Meta: 'crime_meta'
 }
-    model_view = view_mapping.get(model_class)
+    model_view = view_mapping.get(model_class)            
 
     if request.method == 'POST':
         form = form_class(request.POST, request.FILES)
@@ -422,13 +423,22 @@ def update_record(request,pk):
     view_name = resolved.url_name
     model_mapping = {
         'update_services_record': Services,
+        'update_crime_record': Crime
     }
 
     form_mapping = {
-        Services : UpdateServices
+        Services : UpdateServices,
+        Crime: UpdateCrime
     }
+
+    view_mapping = {
+        Services: 'services_table',
+        Crime: 'crime_table'
+    }
+
     model_class = model_mapping.get(view_name)
     model_form = form_mapping.get(model_class)
+    model_view = view_mapping.get(model_class)
 
     record = model_class.objects.get(id= pk)
     form = model_form(instance=record)
@@ -437,7 +447,7 @@ def update_record(request,pk):
         form = model_form(request.POST, instance=record)
         if form.is_valid():
             form.save()
-            return redirect('services_table')
+            return redirect(model_view)
 
     context = {'form': form, 'meta_tables': views.meta_tables}
     return render(request, 'general_data/update_forest_record.html', context)
@@ -447,15 +457,22 @@ def delete_record(request,pk):
     view_name = resolved.url_name
     model_mapping = {
         'delete_services_record': Services,
+        'delete_crime_record': Crime,
+    }
+
+    view_mapping = {
+        Services: 'services_table',
+        Crime: 'crime_table'
     }
 
     model_class = model_mapping.get(view_name)
+    model_view = view_mapping.get(model_class)
 
     try:
         item_to_delete = get_object_or_404(model_class, id=pk)
         item_to_delete.delete()
         messages.success(request, 'Deleted successfully')
-        return redirect('services_table')
+        return redirect(model_view)
     except Exception as e:
         return HttpResponse(f"An error occurred: {str(e)}")
     
@@ -464,10 +481,12 @@ def delete_selected(request):
     view_name = resolved.url_name
     model_mapping = {
         'delete_selected_services': Services,
+        'delete_selected_crime': Crime,
     }
 
     view_mapping = {
-        Services: 'services_table'
+        Services: 'services_table',
+        Crime: 'crime_table'
     }
     model_class = model_mapping.get(view_name)
     model_view = view_mapping.get(model_class)
