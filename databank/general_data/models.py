@@ -331,3 +331,16 @@ class Crime(models.Model):
     modified_date = models.DateTimeField(auto_now=True)
 
 
+class Education_Level_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    Code = models.CharField(max_length= 20)
+    Level = models.TextField(blank= True, null= True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
+
+class Education_Degree_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    Code = models.CharField(max_length= 20)
+    Degree = models.TextField(null=True, blank= True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
