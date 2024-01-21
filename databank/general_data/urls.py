@@ -96,5 +96,6 @@ urlpatterns = [
     path('education_level_meta',  education_view.display_education_level_meta, name='education_level_meta'),
     path('education_degree_meta',  education_view.display_education_degree_meta, name='education_degree_meta'),
     path('upload_education_excel', education_view.upload_education_excel, name = 'upload_education_excel'),
+    path('education_table', education_view.display_education_table, name='education_table'),    
 
 ]   

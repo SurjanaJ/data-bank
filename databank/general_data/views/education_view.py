@@ -82,7 +82,7 @@ def upload_education_excel(request):
 
                         duplicate_data.append({
                              'row_index': index,
-                            'data': { education_data[key] for key in education_data}
+                                'data': {key: str(value) for key, value in education_data.items()}
                         })
                 
                     else:
@@ -117,9 +117,30 @@ def upload_education_excel(request):
                 return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data})
             
             else:
-                return redirect('display_education_table')
+                return redirect('education_table')
     else:
         form = UploadEducationForm()
 
     return render(request,'general_data/transport_templates/upload_transport_form.html',{'form':form})
 
+def display_education_table(request):
+    data = Education.objects.all()
+
+    level_categories = Education_Level_Meta.objects.all()
+    degree_categories = Education_Degree_Meta.objects.all()
+
+    education_level = request.GET.get('education_level')
+    education_degree = request.GET.get('education_degree')
+
+    if is_valid_queryparam(education_level) and education_level != '--':
+        data = data.filter(Level_Code_id = education_level)
+
+    if is_valid_queryparam(education_degree) and education_degree != '--':
+        data = data.filter(Degree_Code_id = education_degree)
+    
+    paginator = Paginator(data, 40)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+
+    context ={'data_len':len(data),'level_categories':level_categories, 'degree_categories':degree_categories, 'page':page, 'query_len':len(page), 'tables': tables, 'meta_tables': views.meta_tables}
+    return render(request, 'general_data/education_templates/education_table.html', context)
