@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Crime, Crime_Meta, ForestData,PopulationData,Land_Code_Meta,Land, Services, Services_Meta,Transport_Meta,Transport,Tourism,Tourism_Meta,Hotel,Water,Water_Meta,Public_Unitillity,Mine_Meta,Mining,Energy_Meta,Energy,Road_Meta,Road,Housing_Meta,Housing,Health_disease_Meta,Health_disease,Budgetary_Data,Political_Data,Disaster_Data_Meta,Disaster_Data
+from .models import Crime, Crime_Meta, Education, Education_Degree_Meta, Education_Level_Meta, ForestData,PopulationData,Land_Code_Meta,Land, Services, Services_Meta,Transport_Meta,Transport,Tourism,Tourism_Meta,Hotel,Water,Water_Meta,Public_Unitillity,Mine_Meta,Mining,Energy_Meta,Energy,Road_Meta,Road,Housing_Meta,Housing,Health_disease_Meta,Health_disease,Budgetary_Data,Political_Data,Disaster_Data_Meta,Disaster_Data
 
 class LandCodeMeta_Admin(admin.ModelAdmin ):
     list_display=('id','Code','Land_Type')
@@ -41,6 +41,12 @@ class Crime_Admin(admin.ModelAdmin):
     list_display = ['id', 'Country', 'Year', 'Code','Gender','Age','District','created_date','modified_date']
 admin.site.register(Crime, Crime_Admin)
 admin.site.register(Crime_Meta)
+
+class Education_Admin(admin.ModelAdmin):
+    list_display = ['id', 'Level_Code', 'Degree_Code', 'Male','Female','created_date','modified_date']
+admin.site.register(Education,Education_Admin)
+admin.site.register(Education_Level_Meta)
+admin.site.register(Education_Degree_Meta)
 
 
 
