@@ -99,5 +99,6 @@ urlpatterns = [
     path('education_table', education_view.display_education_table, name='education_table'),    
     path('delete_selected_education/', view.delete_selected, name='delete_selected_education'),
     path('delete_education_record/<int:pk>/', view.delete_record, name ='delete_education_record' ),
+    path('update_education_record/<int:pk>/', view.update_record, name = 'update_education_record'),
 
 ]   
