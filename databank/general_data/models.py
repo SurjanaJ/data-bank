@@ -327,5 +327,7 @@ class Crime(models.Model):
     Gender = models.CharField(max_length= 10, choices = GENDER_OPTIONS, null=True, blank=True )
     Age = models.IntegerField(null=True, blank=True)
     District = models.CharField(max_length= 50, null=True, blank=True )
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
 
 

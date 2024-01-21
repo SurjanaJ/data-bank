@@ -38,7 +38,7 @@ admin.site.register(Services_Meta)
 
 
 class Crime_Admin(admin.ModelAdmin):
-    list_display = ['id', 'Country', 'Year', 'Code','Gender','Age','District']
+    list_display = ['id', 'Country', 'Year', 'Code','Gender','Age','District','created_date','modified_date']
 admin.site.register(Crime, Crime_Admin)
 admin.site.register(Crime_Meta)
 

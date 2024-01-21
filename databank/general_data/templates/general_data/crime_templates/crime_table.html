@@ -132,10 +132,10 @@
                                 />
                               </td>
     
-                            {% for col in column_names %}
-                                {% if col.name != 'id'  %}
+                            {% for column in column_names %}
+                                {% if column.name != 'id' and column.name != 'modified_date' and column.name != 'created_date'  %}
                                     <td class="px-2">
-                                        {{record|get_key:col.name}}
+                                        {{record|get_key:column.name}}
                                     </td>
                                     
                                 {% endif %}
