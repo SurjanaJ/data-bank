@@ -144,3 +144,6 @@ class UploadEducationLevelMetaForm(forms.Form):
 
 class UploadEducationDegreeMetaForm(forms.Form):
     meta_file = forms.FileField()
+
+class UploadEducationForm(forms.Form):
+    file = forms.FileField()
