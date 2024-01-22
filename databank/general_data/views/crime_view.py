@@ -7,10 +7,10 @@ from django.core.paginator import Paginator
 from trade_data.views import is_valid_queryparam, tables
 from django.http import HttpResponse
 from django.db.models import F
+from trade_data import views
 
 from trade_data.models import Country_meta
 from ..forms import UploadCrimeForm
-from trade_data import views
 from ..models import Crime, Crime_Meta
 
 

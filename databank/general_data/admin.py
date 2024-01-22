@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Crime, Crime_Meta, Education, Education_Degree_Meta, Education_Level_Meta, ForestData,PopulationData,Land_Code_Meta,Land, Services, Services_Meta,Transport_Meta,Transport,Tourism,Tourism_Meta,Hotel,Water,Water_Meta,Public_Unitillity,Mine_Meta,Mining,Energy_Meta,Energy,Road_Meta,Road,Housing_Meta,Housing,Health_disease_Meta,Health_disease,Budgetary_Data,Political_Data,Disaster_Data_Meta,Disaster_Data
+from .models import Crime, Crime_Meta, Education, Education_Degree_Meta, Education_Level_Meta, ForestData, Occupation, Occupation_Meta,PopulationData,Land_Code_Meta,Land, Services, Services_Meta,Transport_Meta,Transport,Tourism,Tourism_Meta,Hotel,Water,Water_Meta,Public_Unitillity,Mine_Meta,Mining,Energy_Meta,Energy,Road_Meta,Road,Housing_Meta,Housing,Health_disease_Meta,Health_disease,Budgetary_Data,Political_Data,Disaster_Data_Meta,Disaster_Data
 
 class LandCodeMeta_Admin(admin.ModelAdmin ):
     list_display=('id','Code','Land_Type')
@@ -48,6 +48,13 @@ admin.site.register(Education,Education_Admin)
 admin.site.register(Education_Level_Meta)
 admin.site.register(Education_Degree_Meta)
 
+class Occupation_Meta_Admin(admin.ModelAdmin):
+    list_display = ['id', 'SOC_Code', 'SOC_Group', 'SOC_Title']
+class Occupation_Admin(admin.ModelAdmin):
+    list_display = ['id', 'Country','Year','Code','Number']
+
+admin.site.register(Occupation_Meta, Occupation_Meta_Admin)
+admin.site.register(Occupation, Occupation_Admin)
 
 
 admin.site.register(Transport_Meta)

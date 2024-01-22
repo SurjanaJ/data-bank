@@ -58,6 +58,11 @@ tables =[
         "name": "Education Data",
         "url": "education_table"
     }
+    ,
+    {
+        "name": "Occupation Data",
+        "url": "occupation_table"
+    }
     ]
 
 
@@ -117,6 +122,11 @@ meta_tables =[
         "name":"Education Degree Meta",
         "url": "education_degree_meta",
         "upload_url":"upload_education_degree_meta_excel"
+    },
+    {
+        "name":"Occupation Meta",
+        "url": "occupation_meta",
+        "upload_url":"upload_occupation_meta_excel"
     }
   
     ]

@@ -8,8 +8,8 @@ from django.db.models import Q
 import pandas as pd
 
 from trade_data import views
-from ..models import Crime, Crime_Meta, Education, Education_Degree_Meta, Education_Level_Meta, ForestData, Country_meta, Land_Code_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
-from ..forms import UpdateCrime, UpdateEducation, UpdateServices, UploadCrimeMetaForm, UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
+from ..models import Crime, Crime_Meta, Education, Education_Degree_Meta, Education_Level_Meta, ForestData, Country_meta, Land_Code_Meta, Occupation, Occupation_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
+from ..forms import UpdateCrime, UpdateEducation, UpdateOccupation, UpdateServices, UploadCrimeMetaForm, UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadOccupationMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -336,6 +336,7 @@ def upload_meta_excel(request):
         '/others/upload_crime_meta_excel': UploadCrimeMetaForm,  
         '/others/upload_education_level_meta_excel':UploadEducationLevelMetaForm,
         '/others/upload_education_degree_meta_excel': UploadEducationDegreeMetaForm,   
+        '/others/upload_occupation_meta_excel': UploadOccupationMetaForm,
     }
 
     form_class = form_mapping.get(request.path)
@@ -349,6 +350,7 @@ def upload_meta_excel(request):
         UploadCrimeMetaForm : Crime_Meta,
         UploadEducationLevelMetaForm : Education_Level_Meta,
         UploadEducationDegreeMetaForm : Education_Degree_Meta,
+        UploadOccupationMetaForm :Occupation_Meta,
     }
     model_class = model_mapping.get(form_class)
 
@@ -361,6 +363,7 @@ def upload_meta_excel(request):
     Crime_Meta: 'crime_meta',
     Education_Level_Meta : 'education_level_meta',
     Education_Degree_Meta : 'education_degree_meta',
+    Occupation_Meta : 'occupation_meta'
 }
     model_view = view_mapping.get(model_class)            
 
@@ -431,18 +434,21 @@ def update_record(request,pk):
         'update_services_record': Services,
         'update_crime_record': Crime,
         'update_education_record': Education,
+        'update_occupation_record': Occupation,
     }
 
     form_mapping = {
         Services : UpdateServices,
         Crime: UpdateCrime,
         Education: UpdateEducation,
+        Occupation: UpdateOccupation,
     }
 
     view_mapping = {
         Services: 'services_table',
         Crime: 'crime_table',
-        Education: 'education_table'
+        Education: 'education_table',
+        Occupation:'occupation_table',
     }
 
     model_class = model_mapping.get(view_name)
@@ -468,12 +474,14 @@ def delete_record(request,pk):
         'delete_services_record': Services,
         'delete_crime_record': Crime,
         'delete_education_record': Education,
+        'delete_occupation_record': Occupation,
     }
 
     view_mapping = {
         Services: 'services_table',
         Crime: 'crime_table',
-        Education: 'education_table'
+        Education: 'education_table',
+        Occupation: 'occupation_table',
     }
 
     model_class = model_mapping.get(view_name)
@@ -493,13 +501,15 @@ def delete_selected(request):
     model_mapping = {
         'delete_selected_services': Services,
         'delete_selected_crime': Crime,
-        'delete_selected_education': Education
+        'delete_selected_education': Education,
+        'delete_selected_occupation': Occupation,
     }
 
     view_mapping = {
         Services: 'services_table',
         Crime: 'crime_table',
-        Education: 'education_table'
+        Education: 'education_table',
+        Occupation:'occupation_table',
     }
     model_class = model_mapping.get(view_name)
     model_view = view_mapping.get(model_class)

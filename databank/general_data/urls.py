@@ -1,6 +1,7 @@
 from django.urls import include, path
 
-from .views import education_view, view,population_view,hotel_view,land_view,tourism_view,water_view,transport_view,services_view, crime_view
+
+from .views import occupation_view,education_view, view,population_view,hotel_view,land_view,tourism_view,water_view,transport_view,services_view, crime_view
 from .views import export_views
 
 urlpatterns = [
@@ -101,5 +102,15 @@ urlpatterns = [
     path('delete_education_record/<int:pk>/', view.delete_record, name ='delete_education_record' ),
     path('update_education_record/<int:pk>/', view.update_record, name = 'update_education_record'),
     path('export_education_excel', education_view.export_education_excel, name='export_education_excel'),
+
+    path('upload_occupation_meta_excel', view.upload_meta_excel, name='upload_occupation_meta_excel'),
+    path('occupation_meta',  occupation_view.display_occupation_meta, name='occupation_meta'),
+    path('upload_occupation_excel', occupation_view.upload_occupation_excel, name = 'upload_occupation_excel'),
+    path('occupation_table', occupation_view.display_occupation_table, name='occupation_table'),    
+    path('delete_occupation_record/<int:pk>/', view.delete_record, name ='delete_occupation_record' ),
+    path('delete_selected_occupation/', view.delete_selected, name='delete_selected_occupation'),
+    path('update_occupation_record/<int:pk>/', view.update_record, name = 'update_occupation_record'),
+    path('export_occupation_excel', occupation_view.export_occupation_excel, name='export_occupation_excel'),
+
 
 ]   
