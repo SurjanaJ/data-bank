@@ -146,3 +146,54 @@ def display_occupation_table(request):
 
     context ={'data_len':len(data),'code_categories':code_categories, 'country_categories':country_categories, 'page':page, 'query_len':len(page), 'tables': tables, 'meta_tables': views.meta_tables, 'year_categories':year_categories}
     return render(request, 'general_data/occupation_templates/occupation_table.html', context)
+
+
+def export_occupation_excel(request):
+    country = request.GET.get('country')
+    code = request.GET.get('code')
+    year_min = request.GET.get('year_min')
+    year_max = request.GET.get('year_max')
+
+    filter_conditions = {}
+    if is_valid_queryparam(year_min) and year_min != '--':
+        filter_conditions['Year__gte'] = year_min
+
+    if is_valid_queryparam(year_max) and year_max != '--':
+        filter_conditions['Year__lt'] = year_max
+
+    if is_valid_queryparam(country) and country != '--':
+        filter_conditions['Country'] = country
+
+    if is_valid_queryparam(code) and code != '--':
+        filter_conditions['Code'] = code
+
+    queryset = Occupation.objects.filter(**filter_conditions)
+    queryset = queryset.annotate(
+        country = F('Country__Country_Name'),
+        code = F('Code__SOC_Code'),
+        Group = F('Code__SOC_Group'),
+        Title = F('Code__SOC_Title'),
+    )
+
+    data = pd.DataFrame(list(queryset.values('country','code', 'Group','Title','Year', 'Number')))
+
+    data.rename(columns={'country':'Country','code': 'Code'}, inplace=True)
+
+    column_order = ['Country', 'Code', 'Group', 'Title', 'Year', 'Number']
+
+    data = data[column_order]
+
+    output = BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')  
+    data.to_excel(writer, sheet_name='Sheet1', index=False)
+
+    writer.close()  
+    output.seek(0)
+
+    response = HttpResponse(
+        output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
+    return response
+
+

@@ -110,5 +110,7 @@ urlpatterns = [
     path('delete_occupation_record/<int:pk>/', view.delete_record, name ='delete_occupation_record' ),
     path('delete_selected_occupation/', view.delete_selected, name='delete_selected_occupation'),
     path('update_occupation_record/<int:pk>/', view.update_record, name = 'update_occupation_record'),
+    path('export_occupation_excel', occupation_view.export_occupation_excel, name='export_occupation_excel'),
+
 
 ]   
