@@ -120,9 +120,22 @@ def display_occupation_table(request):
 
     code_categories = Occupation_Meta.objects.all()
     country_categories = Country_meta.objects.all()
+    year_categories = Occupation.objects.values_list('Year', flat=True).distinct()
 
     country = request.GET.get('country')
     code = request.GET.get('code')
+    year_min = request.GET.get('year_min')
+    print('YEAR MIN --> ', year_min)
+
+    year_max = request.GET.get('year_max')
+    print('YEAR MAX --> ', year_max)
+
+
+    if is_valid_queryparam(year_min) and year_min != '--':
+        data = data.filter(Year__gte=year_min)
+
+    if is_valid_queryparam(year_max) and year_max != '--':
+        data = data.filter(Year__lt = year_max)
 
     if is_valid_queryparam(country) and country != '--':
         data = data.filter(Country = country)
@@ -135,5 +148,5 @@ def display_occupation_table(request):
     page = paginator.get_page(page_number)
 
 
-    context ={'data_len':len(data),'code_categories':code_categories, 'country_categories':country_categories, 'page':page, 'query_len':len(page), 'tables': tables, 'meta_tables': views.meta_tables}
+    context ={'data_len':len(data),'code_categories':code_categories, 'country_categories':country_categories, 'page':page, 'query_len':len(page), 'tables': tables, 'meta_tables': views.meta_tables, 'year_categories':year_categories}
     return render(request, 'general_data/occupation_templates/occupation_table.html', context)

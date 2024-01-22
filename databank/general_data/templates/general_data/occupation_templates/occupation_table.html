@@ -19,7 +19,24 @@
                         {% endfor %}
                     </select>
                 </div>
-
+                <div class="col-md-3">
+                    <label for="year_min">Calender Date Minimum</label>
+                    <select id="year_min" class="form-control" name="year_min">
+                        <option selected>--</option>
+                        {% for year in year_categories %}
+                        <option value="{{year}}">{{year}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="year_max">Calender Date Maximum</label>
+                    <select id="year_max" class="form-control" name="year_max">
+                        <option selected>--</option>
+                        {% for year in year_categories %}
+                        <option value="{{year}}">{{year}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
                 <div class="form-group col-md-3">
                     <label for="code">Code</label>
                     <select id="code" class="form-control" name="code">
