@@ -164,3 +164,6 @@ class UpdateEducation(ModelForm):
 # OCCUPATION DATA
 class UploadOccupationMetaForm(forms.Form):
     meta_file = forms.FileField()
+    
+class UploadOccupationForm(forms.Form):
+    file = forms.FileField()

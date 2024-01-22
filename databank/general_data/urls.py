@@ -105,6 +105,8 @@ urlpatterns = [
 
     path('upload_occupation_meta_excel', view.upload_meta_excel, name='upload_occupation_meta_excel'),
     path('occupation_meta',  occupation_view.display_occupation_meta, name='occupation_meta'),
+    path('upload_occupation_excel', occupation_view.upload_occupation_excel, name = 'upload_occupation_excel'),
+
 
 
 ]   

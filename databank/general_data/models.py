@@ -367,4 +367,14 @@ class Occupation_Meta(models.Model):
     SOC_Title = models.TextField(blank= True, null = True)
     
     def __str__(self):
+        return self.SOC_Code
+    
+class Occupation(models.Model):
+    id = models.AutoField(primary_key=True)
+    Country = models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    Year = models.IntegerField()
+    Code = models.ForeignKey(Occupation_Meta, on_delete= models.CASCADE)
+    Number = models.IntegerField()
+
+    def __str__(self):
         return self.Code
