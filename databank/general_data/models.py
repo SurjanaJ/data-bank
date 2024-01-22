@@ -360,3 +360,11 @@ class Education(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
 
+class Occupation_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    SOC_Code = models.CharField(max_length= 100)
+    SOC_Group = models.TextField(blank= True, null = True)
+    SOC_Title = models.TextField(blank= True, null = True)
+    
+    def __str__(self):
+        return self.Code
