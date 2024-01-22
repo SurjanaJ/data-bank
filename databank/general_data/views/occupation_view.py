@@ -34,7 +34,7 @@ def upload_occupation_excel(request):
     added_count = 0
 
     if request.method == 'POST':
-        form = UploadOccupationForm(request.post, request.FILES)
+        form = UploadOccupationForm(request.POST, request.FILES)
         if form.is_valid():
             excel_data = request.FILES['file']
             df = pd.read_excel(excel_data, dtype={'Code': str})
@@ -115,4 +115,25 @@ def upload_occupation_excel(request):
 
     return render(request,'general_data/transport_templates/upload_transport_form.html',{'form':form})
     
+def display_occupation_table(request):
+    data = Occupation.objects.all()
 
+    code_categories = Occupation_Meta.objects.all()
+    country_categories = Country_meta.objects.all()
+
+    country = request.GET.get('country')
+    code = request.GET.get('code')
+
+    if is_valid_queryparam(country) and country != '--':
+        data = data.filter(Country = country)
+
+    if is_valid_queryparam(code) and code != '--':
+        data = data.filter(Code = code)
+
+    paginator = Paginator(data, 40)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+
+
+    context ={'data_len':len(data),'code_categories':code_categories, 'country_categories':country_categories, 'page':page, 'query_len':len(page), 'tables': tables, 'meta_tables': views.meta_tables}
+    return render(request, 'general_data/occupation_templates/occupation_table.html', context)
