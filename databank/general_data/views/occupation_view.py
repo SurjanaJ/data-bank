@@ -109,7 +109,7 @@ def upload_occupation_excel(request):
                 return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data})
             
             else:
-                return redirect('education_table')
+                return redirect('occupation_table')
     else:
         form = UploadOccupationForm()    
 

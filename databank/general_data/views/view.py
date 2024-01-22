@@ -8,7 +8,7 @@ from django.db.models import Q
 import pandas as pd
 
 from trade_data import views
-from ..models import Crime, Crime_Meta, Education, Education_Degree_Meta, Education_Level_Meta, ForestData, Country_meta, Land_Code_Meta, Occupation_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
+from ..models import Crime, Crime_Meta, Education, Education_Degree_Meta, Education_Level_Meta, ForestData, Country_meta, Land_Code_Meta, Occupation, Occupation_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
 from ..forms import UpdateCrime, UpdateEducation, UpdateServices, UploadCrimeMetaForm, UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadOccupationMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
@@ -471,12 +471,14 @@ def delete_record(request,pk):
         'delete_services_record': Services,
         'delete_crime_record': Crime,
         'delete_education_record': Education,
+        'delete_occupation_record': Occupation,
     }
 
     view_mapping = {
         Services: 'services_table',
         Crime: 'crime_table',
-        Education: 'education_table'
+        Education: 'education_table',
+        Occupation: 'occupation_table',
     }
 
     model_class = model_mapping.get(view_name)
