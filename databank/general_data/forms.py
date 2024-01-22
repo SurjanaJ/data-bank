@@ -160,3 +160,7 @@ class UpdateEducation(ModelForm):
             'Female': forms.NumberInput(attrs={'class': 'form-control  '}),
             'District': forms.TextInput(attrs={'class': 'form-control '}),
         }
+
+# OCCUPATION DATA
+class UploadOccupationMetaForm(forms.Form):
+    meta_file = forms.FileField()
