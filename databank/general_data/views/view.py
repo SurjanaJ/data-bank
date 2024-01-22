@@ -498,13 +498,15 @@ def delete_selected(request):
     model_mapping = {
         'delete_selected_services': Services,
         'delete_selected_crime': Crime,
-        'delete_selected_education': Education
+        'delete_selected_education': Education,
+        'delete_selected_occupation': Occupation,
     }
 
     view_mapping = {
         Services: 'services_table',
         Crime: 'crime_table',
-        Education: 'education_table'
+        Education: 'education_table',
+        Occupation:'occupation_table',
     }
     model_class = model_mapping.get(view_name)
     model_view = view_mapping.get(model_class)
