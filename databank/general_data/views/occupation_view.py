@@ -125,11 +125,7 @@ def display_occupation_table(request):
     country = request.GET.get('country')
     code = request.GET.get('code')
     year_min = request.GET.get('year_min')
-    print('YEAR MIN --> ', year_min)
-
     year_max = request.GET.get('year_max')
-    print('YEAR MAX --> ', year_max)
-
 
     if is_valid_queryparam(year_min) and year_min != '--':
         data = data.filter(Year__gte=year_min)
