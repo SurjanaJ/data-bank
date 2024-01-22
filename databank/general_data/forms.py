@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Crime, Education, ForestData,Hotel, Services,Tourism,Transport,PopulationData,Water,Land
+from .models import Crime, Education, ForestData,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land
 
 class UploadForestDataForm(forms.Form):
     forest_data_file = forms.FileField()
@@ -167,3 +167,15 @@ class UploadOccupationMetaForm(forms.Form):
     
 class UploadOccupationForm(forms.Form):
     file = forms.FileField()
+
+class UpdateOccupation(ModelForm):
+    class Meta:
+        model = Occupation
+        fields='__all__'
+
+        widgets={
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Year': forms.NumberInput(attrs={'class': 'form-control  '}),
+            'Code': forms.Select(attrs={'class': 'form-control  '}),
+            'Number': forms.NumberInput(attrs={'class': 'form-control  '}),
+        }
