@@ -1,5 +1,7 @@
 from django.urls import include, path
-from .views import view,population_view,hotel_view,land_view,political_views,tourism_view,mining_views,water_view,housing_views,road_views,transport_view,public_unitillity_views,health_diseases_views,disaster_views
+
+
+from .views import occupation_view,education_view, view,population_view,hotel_view,land_view,political_views,tourism_view,mining_views,water_view,housing_views,road_views,transport_view,services_view, crime_view,public_unitillity_views,health_diseases_views,disaster_views
 from .views import export_views
 
 urlpatterns = [
@@ -100,5 +102,44 @@ urlpatterns = [
 
     
     
+    
+    path('upload_services_meta_excel', view.upload_meta_excel, name="upload_services_meta_excel"),
+    path('services_meta',  services_view.display_services_meta, name='services_meta'),
+    path('services_table', services_view.display_services_table, name='services_table'),    
+    path('upload_services_excel', services_view.upload_services_excel, name="upload_services_excel"),
+    path('update_services_record/<int:pk>/', view.update_record, name = 'update_services_record'),
+    path('delete_services_record/<int:pk>/', view.delete_record, name ='delete_services_record' ),
+    path('delete_selected_services/', view.delete_selected, name='delete_selected_services'),
 
-]
+    
+    path('upload_crime_meta_excel', view.upload_meta_excel, name='upload_crime_meta_excel'),
+    path('crime_meta',  crime_view.display_crime_meta, name='crime_meta'),
+    path('upload_crime_excel', crime_view.upload_crime_excel, name = 'upload_crime_excel'),
+    path('crime_table', crime_view.display_crime_table, name='crime_table'),    
+    path('delete_selected_crime/', view.delete_selected, name='delete_selected_crime'),
+    path('delete_crime_record/<int:pk>/', view.delete_record, name ='delete_crime_record' ),
+    path('update_crime_record/<int:pk>/', view.update_record, name = 'update_crime_record'),
+    path('export_excel', crime_view.export_excel, name='export_excel'),
+    
+    path('upload_education_level_meta_excel', view.upload_meta_excel, name = 'upload_education_level_meta_excel'),
+    path('upload_education_degree_meta_excel', view.upload_meta_excel, name = 'upload_education_degree_meta_excel'),
+    path('education_level_meta',  education_view.display_education_level_meta, name='education_level_meta'),
+    path('education_degree_meta',  education_view.display_education_degree_meta, name='education_degree_meta'),
+    path('upload_education_excel', education_view.upload_education_excel, name = 'upload_education_excel'),
+    path('education_table', education_view.display_education_table, name='education_table'),    
+    path('delete_selected_education/', view.delete_selected, name='delete_selected_education'),
+    path('delete_education_record/<int:pk>/', view.delete_record, name ='delete_education_record' ),
+    path('update_education_record/<int:pk>/', view.update_record, name = 'update_education_record'),
+    path('export_education_excel', education_view.export_education_excel, name='export_education_excel'),
+
+    path('upload_occupation_meta_excel', view.upload_meta_excel, name='upload_occupation_meta_excel'),
+    path('occupation_meta',  occupation_view.display_occupation_meta, name='occupation_meta'),
+    path('upload_occupation_excel', occupation_view.upload_occupation_excel, name = 'upload_occupation_excel'),
+    path('occupation_table', occupation_view.display_occupation_table, name='occupation_table'),    
+    path('delete_occupation_record/<int:pk>/', view.delete_record, name ='delete_occupation_record' ),
+    path('delete_selected_occupation/', view.delete_selected, name='delete_selected_occupation'),
+    path('update_occupation_record/<int:pk>/', view.update_record, name = 'update_occupation_record'),
+    path('export_occupation_excel', occupation_view.export_occupation_excel, name='export_occupation_excel'),
+
+
+]   

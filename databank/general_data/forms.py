@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import ForestData,Hotel,Tourism,Transport,PopulationData,Water,Land,Public_Unitillity
+from .models import Crime, Education, ForestData,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land,Public_Unitillity
 
 class UploadForestDataForm(forms.Form):
     forest_data_file = forms.FileField()
@@ -9,7 +9,6 @@ class UploadForestData(ModelForm):
     class Meta:
         model = ForestData
         fields='__all__'
-
 
         widgets={
             'Year': forms.DateInput(attrs={'class': 'form-control '}),
@@ -21,7 +20,6 @@ class UploadForestData(ModelForm):
             'Stock_Available': forms.NumberInput(attrs={'class': 'form-control  '}),
             'Area_Unit': forms.Select(attrs={'class': 'form-control  '}),
             'Area_Covered': forms.NumberInput(attrs={'class': 'form-control  '}),
-
         }
 
 # Hotel Data
@@ -76,7 +74,6 @@ class UploadWaterMetaForm(forms.Form):
 class UploadTourismDataForm(forms.Form):
     Tourism_data_file = forms.FileField()
 
-
 class UploadTourismData(ModelForm):
     class Meta:
         model = Tourism
@@ -107,3 +104,87 @@ class UploadPublicUnitillityData(ModelForm):
     class Meta:
         model = Public_Unitillity
         fields='__all__'
+# SERVICE DATA
+class UploadServicesMetaForm(forms.Form):
+    meta_file = forms.FileField()
+
+class UploadServicesForm(forms.Form):
+    file = forms.FileField()
+
+
+class UpdateServices(ModelForm):
+    class Meta:
+        model = Services
+        fields='__all__'
+
+        widgets={
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Year': forms.DateInput(attrs={'class': 'form-control '}),
+            'Direction': forms.Select(attrs={'class': 'form-control  '}),
+            'Code': forms.Select(attrs={'class': 'form-control  '}),
+            'Value': forms.NumberInput(attrs={'class': 'form-control  '}),
+            'Origin Destination': forms.Select(attrs={'class': 'form-control '}),
+        }
+
+# CRIME DATA
+class UploadCrimeMetaForm(forms.Form):
+    meta_file = forms.FileField()
+
+class UploadCrimeForm(forms.Form):
+    file = forms.FileField()
+
+class UpdateCrime(ModelForm):
+    class Meta:
+        model = Crime
+        fields='__all__'
+
+        widgets={
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Year': forms.DateInput(attrs={'class': 'form-control '}),
+            'Gender': forms.Select(attrs={'class': 'form-control  '}),
+            'Code': forms.Select(attrs={'class': 'form-control  '}),
+            'Age': forms.NumberInput(attrs={'class': 'form-control  '}),
+            'District': forms.TextInput(attrs={'class': 'form-control '}),
+        }
+
+# EDUCATION DATA
+class UploadEducationLevelMetaForm(forms.Form):
+    meta_file = forms.FileField()
+
+class UploadEducationDegreeMetaForm(forms.Form):
+    meta_file = forms.FileField()
+
+class UploadEducationForm(forms.Form):
+    file = forms.FileField()
+
+class UpdateEducation(ModelForm):
+    class Meta:
+        model = Education
+        fields='__all__'
+
+        widgets={
+            'Level_Code': forms.Select(attrs={'class': 'form-control '}),
+            'Degree_Code': forms.Select(attrs={'class': 'form-control  '}),
+            'Male': forms.NumberInput(attrs={'class': 'form-control  '}),
+            'Female': forms.NumberInput(attrs={'class': 'form-control  '}),
+            'District': forms.TextInput(attrs={'class': 'form-control '}),
+        }
+
+# OCCUPATION DATA
+class UploadOccupationMetaForm(forms.Form):
+    meta_file = forms.FileField()
+    
+class UploadOccupationForm(forms.Form):
+    file = forms.FileField()
+
+class UpdateOccupation(ModelForm):
+    class Meta:
+        model = Occupation
+        fields='__all__'
+
+        widgets={
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Year': forms.NumberInput(attrs={'class': 'form-control  '}),
+            'Code': forms.Select(attrs={'class': 'form-control  '}),
+            'Number': forms.NumberInput(attrs={'class': 'form-control  '}),
+        }

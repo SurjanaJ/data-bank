@@ -117,7 +117,6 @@ class Water_Meta(models.Model):
     def __str__(self):
         return self.Code
 
-
 class Water(models.Model):
 
     Unit_Options = (
@@ -291,26 +290,96 @@ class Disaster_Data(models.Model):
     Physical_Properties_Loss_In_USD = models.IntegerField(default = 0 ,null = True ,blank = True)
 
 
+class Services_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    Code = models.CharField(max_length=100)
+    Services_Type = models.TextField(null=True,blank=True)
+
+    def __str__(self):
+        return self.Code
+
+class Services(models.Model):
+    DIRECTION_OPTIONS = (
+        ('Import', 'Import'),
+        ('Export', 'Export')
+    )
+    id = models.AutoField(primary_key=True)
+    Country = models.ForeignKey(Country_meta, on_delete=models.CASCADE, related_name='services_country')
+    Year = models.DateField(null=True, blank=True)
+    Direction = models.CharField(max_length= 10, choices = DIRECTION_OPTIONS, null=True, blank=True )
+    Code = models.ForeignKey(Services_Meta, on_delete = models.CASCADE)
+    Value = models.FloatField(max_length=100,null=True, blank=True)
+    Origin_Destination = models.ForeignKey(Country_meta, on_delete=models.CASCADE, related_name='services_origin_destination')
 
 
-
-
-
-
-
-
-
-
-
-
+class Crime_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    Code = models.CharField(max_length= 100)
+    Name = models.TextField(blank= True, null = True)
     
+    def __str__(self):
+        return self.Code
     
+class Crime(models.Model):
+    GENDER_OPTIONS = (
+        ('Male', 'Male'),
+        ('Female', 'Female')
+    )
+    id = models.AutoField(primary_key=True)
+    Country = models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    Year = models.DateField(null=True, blank=True)
+    Code = models.ForeignKey(Crime_Meta, on_delete= models.CASCADE)
+    Gender = models.CharField(max_length= 10, choices = GENDER_OPTIONS, null=True, blank=True )
+    Age = models.IntegerField(null=True, blank=True)
+    District = models.CharField(max_length= 50, null=True, blank=True )
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
 
 
+class Education_Level_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    Code = models.CharField(max_length= 20)
+    Level = models.TextField(blank= True, null= True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.Code
+
+class Education_Degree_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    Code = models.CharField(max_length= 20)
+    Degree = models.TextField(null=True, blank= True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.Code
+
+class Education(models.Model):
+    id = models.AutoField(primary_key=True)
+    Level_Code = models.ForeignKey(Education_Level_Meta, on_delete= models.CASCADE)
+    Degree_Code = models.ForeignKey(Education_Degree_Meta, on_delete = models.CASCADE)
+    Male = models.BigIntegerField(default = 0)
+    Female = models.BigIntegerField(default = 0)
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
+
+class Occupation_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    SOC_Code = models.CharField(max_length= 100)
+    SOC_Group = models.TextField(blank= True, null = True)
+    SOC_Title = models.TextField(blank= True, null = True)
     
+    def __str__(self):
+        return self.SOC_Code
+    
+class Occupation(models.Model):
+    id = models.AutoField(primary_key=True)
+    Country = models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    Year = models.IntegerField()
+    Code = models.ForeignKey(Occupation_Meta, on_delete= models.CASCADE)
+    Number = models.IntegerField()
 
-
-
-
-
+    def __str__(self):
+        return self.Code

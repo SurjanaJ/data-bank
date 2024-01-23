@@ -50,6 +50,19 @@ tables =[
         "name":"Tourism Data",
         "url":"tourism_table"    
     },
+    {
+        "name":"Services Data",
+        "url":"services_table"    
+    },
+    {
+        "name": "Education Data",
+        "url": "education_table"
+    }
+    ,
+    {
+        "name": "Occupation Data",
+        "url": "occupation_table"
+    }
     ]
 
 
@@ -90,6 +103,31 @@ meta_tables =[
         "url": "tourism_meta",
         "upload_url": "upload_tourism_meta_excel"  
     },
+    {
+        "name" : "Services Meta",
+        "url": "services_meta",
+        "upload_url": "upload_services_meta_excel"
+    },
+    {
+        "name" : "Crime Meta",
+        "url": "crime_meta",
+        "upload_url": "upload_crime_meta_excel"
+    },
+    {
+        "name":"Education Level Meta",
+        "url": "education_level_meta",
+        "upload_url":"upload_education_level_meta_excel"
+    },
+    {
+        "name":"Education Degree Meta",
+        "url": "education_degree_meta",
+        "upload_url":"upload_education_degree_meta_excel"
+    },
+    {
+        "name":"Occupation Meta",
+        "url": "occupation_meta",
+        "upload_url":"upload_occupation_meta_excel"
+    }
   
     ]
 
@@ -744,8 +782,6 @@ def error_data_to_excel(error_data):
     error_df.to_excel(response, index=False, sheet_name='error_data')
 
     return response
-
-
 
 def download_error_excel(request):
     error_data = request.session.get('errors', [])

@@ -3,11 +3,13 @@ from django.db import DataError
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render,redirect
 from django.core.paginator import Paginator
-from django.urls import reverse
+from django.urls import resolve, reverse
 from django.db.models import Q
 import pandas as pd
-from ..models import ForestData, Country_meta, Land_Code_Meta, Tourism_Meta, Transport_Meta, Water_Meta
-from ..forms import UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
+
+from trade_data import views
+from ..models import Crime, Crime_Meta, Education, Education_Degree_Meta, Education_Level_Meta, ForestData, Country_meta, Land_Code_Meta, Occupation, Occupation_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
+from ..forms import UpdateCrime, UpdateEducation, UpdateOccupation, UpdateServices, UploadCrimeMetaForm, UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadOccupationMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -148,7 +150,7 @@ def upload_forest_excel(request):
                         else:
                             try:
                                 Forestdata = ForestData(**forest_data)
-                                ForestData.save()
+                                Forestdata.save()
                                 added_count +=1
 
                             except Exception as e:
@@ -234,8 +236,6 @@ def display_forest_table(request):
         data=data.filter(Stock_Available__gte=stock_available)
         
     
-
-
     #get form data for filteration
 
     paginator = Paginator(data, 10)
@@ -252,7 +252,6 @@ def display_forest_table(request):
     }
 
     return render(request, 'general_data/forest_table.html', context)
-
 
 def delete_forest_record(request, item_id):
     try:
@@ -292,9 +291,7 @@ def duplicate_data_to_excel(duplicate_data):
 # Get the data from session storage
 def download_duplicate_excel(request):
     duplicate_data = request.session.get('duplicate_data', [])
-    print('DUPLICATE DATA!!!!')
-    print(duplicate_data)
-    print()
+    
     if duplicate_data:
         response = duplicate_data_to_excel(duplicate_data)
         request.session.pop('duplicate_data', None)
@@ -324,7 +321,6 @@ def download_error_excel(request):
     else:
         return HttpResponse('No data to export.')
     
-
 def upload_meta_excel(request):
     errors = []
     duplicate_data = []
@@ -335,7 +331,12 @@ def upload_meta_excel(request):
         '/others/upload_land_meta_excel': UploadLandMetaForm,
         '/others/upload_transport_meta_excel': UploadTransportMetaForm,
         '/others/upload_tourism_meta_excel' : UploadTourismMetaForm,
-        '/others/upload_water_meta_excel':UploadWaterMetaForm,        
+        '/others/upload_water_meta_excel':UploadWaterMetaForm,   
+        '/others/upload_services_meta_excel': UploadServicesMetaForm,  
+        '/others/upload_crime_meta_excel': UploadCrimeMetaForm,  
+        '/others/upload_education_level_meta_excel':UploadEducationLevelMetaForm,
+        '/others/upload_education_degree_meta_excel': UploadEducationDegreeMetaForm,   
+        '/others/upload_occupation_meta_excel': UploadOccupationMetaForm,
     }
 
     form_class = form_mapping.get(request.path)
@@ -345,8 +346,27 @@ def upload_meta_excel(request):
         UploadTransportMetaForm : Transport_Meta,
         UploadTourismMetaForm : Tourism_Meta,
         UploadWaterMetaForm: Water_Meta,
+        UploadServicesMetaForm : Services_Meta,
+        UploadCrimeMetaForm : Crime_Meta,
+        UploadEducationLevelMetaForm : Education_Level_Meta,
+        UploadEducationDegreeMetaForm : Education_Degree_Meta,
+        UploadOccupationMetaForm :Occupation_Meta,
     }
     model_class = model_mapping.get(form_class)
+
+    view_mapping = {
+    Land_Code_Meta: 'land_meta',
+    Transport_Meta: 'transport_meta',
+    Tourism_Meta: 'tourism_meta',
+    Water_Meta: 'water_meta',
+    Services_Meta: 'services_meta',
+    Crime_Meta: 'crime_meta',
+    Education_Level_Meta : 'education_level_meta',
+    Education_Degree_Meta : 'education_degree_meta',
+    Occupation_Meta : 'occupation_meta'
+}
+    model_view = view_mapping.get(model_class)            
+
     if request.method == 'POST':
         form = form_class(request.POST, request.FILES)
 
@@ -354,7 +374,6 @@ def upload_meta_excel(request):
             excel_data = request.FILES['meta_file']
 
             df = pd.read_excel(excel_data,dtype={'Code': str})
-            print(df)
             cols = df.columns.tolist()
             
             for index, row in df.iterrows():
@@ -402,9 +421,106 @@ def upload_meta_excel(request):
                 request.session['duplicate_data'] = duplicate_data
                 return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data})
             else:
-                return redirect('land_meta')
+                return redirect(f'{model_view}')
 
     else:
         form = form_class()
     return render(request, 'general_data/upload_form.html',  {'form': form, 'tables': tables})
+
+def update_record(request,pk):
+    resolved =  resolve(request.path_info)
+    view_name = resolved.url_name
+    model_mapping = {
+        'update_services_record': Services,
+        'update_crime_record': Crime,
+        'update_education_record': Education,
+        'update_occupation_record': Occupation,
+    }
+
+    form_mapping = {
+        Services : UpdateServices,
+        Crime: UpdateCrime,
+        Education: UpdateEducation,
+        Occupation: UpdateOccupation,
+    }
+
+    view_mapping = {
+        Services: 'services_table',
+        Crime: 'crime_table',
+        Education: 'education_table',
+        Occupation:'occupation_table',
+    }
+
+    model_class = model_mapping.get(view_name)
+    model_form = form_mapping.get(model_class)
+    model_view = view_mapping.get(model_class)
+
+    record = model_class.objects.get(id= pk)
+    form = model_form(instance=record)
+
+    if request.method == 'POST':
+        form = model_form(request.POST, instance=record)
+        if form.is_valid():
+            form.save()
+            return redirect(model_view)
+
+    context = {'form': form, 'meta_tables': views.meta_tables}
+    return render(request, 'general_data/update_forest_record.html', context)
    
+def delete_record(request,pk):
+    resolved =  resolve(request.path_info)
+    view_name = resolved.url_name
+    model_mapping = {
+        'delete_services_record': Services,
+        'delete_crime_record': Crime,
+        'delete_education_record': Education,
+        'delete_occupation_record': Occupation,
+    }
+
+    view_mapping = {
+        Services: 'services_table',
+        Crime: 'crime_table',
+        Education: 'education_table',
+        Occupation: 'occupation_table',
+    }
+
+    model_class = model_mapping.get(view_name)
+    model_view = view_mapping.get(model_class)
+
+    try:
+        item_to_delete = get_object_or_404(model_class, id=pk)
+        item_to_delete.delete()
+        messages.success(request, 'Deleted successfully')
+        return redirect(model_view)
+    except Exception as e:
+        return HttpResponse(f"An error occurred: {str(e)}")
+    
+def delete_selected(request):
+    resolved =  resolve(request.path_info)
+    view_name = resolved.url_name
+    model_mapping = {
+        'delete_selected_services': Services,
+        'delete_selected_crime': Crime,
+        'delete_selected_education': Education,
+        'delete_selected_occupation': Occupation,
+    }
+
+    view_mapping = {
+        Services: 'services_table',
+        Crime: 'crime_table',
+        Education: 'education_table',
+        Occupation:'occupation_table',
+    }
+    model_class = model_mapping.get(view_name)
+    model_view = view_mapping.get(model_class)
+    selected_ids = request.POST.getlist('selected_items')
+    if not selected_ids:
+        messages.error(request, 'No items selected for deletion.')
+        return redirect(model_view)
+    try:
+        model_class.objects.filter(id__in=selected_ids).delete()
+        messages.success(request, 'Selected items deleted successfully.')
+    except Exception as e:
+        messages.error(request, f'Error deleting items: {e}')
+
+    return redirect(model_view)
