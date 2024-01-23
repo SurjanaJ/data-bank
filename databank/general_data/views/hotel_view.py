@@ -107,7 +107,7 @@ def update_hotel_record(request,pk):
             return redirect('hotel_table')
         
     context={'form':form,}
-    return render(request,'general_data/hotel_templates/update_hotel_record.html',context)
+    return render(request,'general_data/update_record.html',context)
 
 
 
@@ -245,5 +245,5 @@ def upload_hotel_excel(request):
     else:
         form = UploadHotelDataForm()
 
-    return render(request,'general_data/hotel_templates/upload_hotel_form.html',{'form':form}) 
+    return render(request,'general_data/upload_form.html',{'form':form}) 
                              

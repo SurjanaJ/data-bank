@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import ForestData,Hotel,Tourism,Transport,PopulationData,Water,Land
+from .models import ForestData,Hotel,Tourism,Transport,PopulationData,Water,Land,Public_Unitillity
 
 class UploadForestDataForm(forms.Form):
     forest_data_file = forms.FileField()
@@ -97,3 +97,13 @@ class UploadTransportData(ModelForm):
 
 class UploadTransportMetaForm(forms.Form):
     meta_file = forms.FileField()
+
+# public unitillity data
+class UploadPublicUnitillityDataForm(forms.Form):
+    Public_Unitillity_data_file = forms.FileField()
+
+
+class UploadPublicUnitillityData(ModelForm):
+    class Meta:
+        model = Public_Unitillity
+        fields='__all__'

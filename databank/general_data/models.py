@@ -197,6 +197,9 @@ class Road_Meta(models.Model):
     Code = Code=models.CharField(max_length=100)
     Road_Type = models.TextField(null=True,blank=True)
 
+    def __str__(self):
+        return self.Code
+
 
 class Road(models.Model):
 
@@ -210,7 +213,7 @@ class Road(models.Model):
     Highway_No = models.CharField(max_length = 50 , null = True , blank = True)
     Name_Of_The_Road = models.CharField(max_length = 50 , null = True , blank = True)
     Code_Type_Of_Road = models.ForeignKey(Road_Meta, on_delete = models.CASCADE)
-    Length_Unit = models.CharField(max_length=20, choices = Length_Unit, blank = True ,null = True)
+    Length_Unit_Options = models.CharField(max_length=20, choices = Length_Unit, blank = True ,null = True)
     Length = models.IntegerField(default = 0 , null = True , blank = True)
 
 
@@ -219,6 +222,8 @@ class Housing_Meta(models.Model):
     id = models.AutoField(primary_key=True)
     Code = Code=models.CharField(max_length=100)
     House_Type = models.TextField(null=True,blank=True)
+    def __str__(self):
+        return self.Code
 
 class Housing(models.Model):
 
@@ -233,7 +238,7 @@ class Housing(models.Model):
 class Health_disease_Meta(models.Model):
     id = models.AutoField(primary_key=True)
     Code = Code=models.CharField(max_length=100)
-    Deasease_Type = models.TextField(null=True,blank=True)
+    Disease_Type = models.TextField(null=True,blank=True)
 
 
 class Health_disease(models.Model):
@@ -245,7 +250,7 @@ class Health_disease(models.Model):
     id = models.AutoField(primary_key=True)
     Year=models.DateField(null=True,blank=True)
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
-    Desease_Code = models.ForeignKey( Health_disease_Meta, on_delete = models.CASCADE )
+    Disease_Code = models.ForeignKey( Health_disease_Meta, on_delete = models.CASCADE )
     Unit = models.CharField(max_length = 20 , choices = Unit_Options , blank = True , null= True)
     Number_Of_Case = models.IntegerField(default = 0 , null = True , blank = True)
 
@@ -260,10 +265,10 @@ class Budgetary_Data(models.Model):
 
 class Political_Data(models.Model):
     id = models.AutoField(primary_key=True)
-    Year=models.DateField(null=True,blank=True)
+    Year=models.IntegerField(null=True,blank=True)
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
     Political_Party_Name = models.CharField(max_length = 30,null = True , blank = True)
-    Number_Of_Member = models.IntegerField(default = 0 ,null = True ,blank = True)
+    Number_Of_Member = models.IntegerField()
     Province =  models.CharField(max_length = 30,null = True , blank = True)
     District =  models.CharField(max_length = 30,null = True , blank = True)
     Municipality = models.CharField(max_length = 30 ,null = True ,blank = True)

@@ -343,7 +343,7 @@ def filter_water(request):
     water_code = request.GET.get('water_code')
     name_of_the_river = request.GET.get('name_of_the_river')
     unit=request.GET.get('unit')
-    min_volume = request.GET.get('minimum_volume')
+    min_volume = request.GET.get('minimum_volume')  
     max_volume = request.GET.get('maximum_volume')
 
 
@@ -465,3 +465,7 @@ def export_transport_table_to_excel(request):
     )
     response['content-Disposition'] = 'attachment; filename=transport_data.xlsx'
     return response
+
+
+def export_public_unitillity_table_to_excel(request):
+    pass

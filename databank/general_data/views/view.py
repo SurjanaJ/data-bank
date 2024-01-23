@@ -22,7 +22,7 @@ def upload_forest_excel(request):
     errors = []
     duplicate_data = []
     updated_count = 0
-    added_count = 0
+    added_count = 0 
 
     if request.method == 'POST':
         form = UploadForestDataForm(request.POST, request.FILES)

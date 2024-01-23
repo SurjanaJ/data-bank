@@ -1,5 +1,5 @@
 from django.urls import include, path
-from .views import view,population_view,hotel_view,land_view,tourism_view,water_view,transport_view
+from .views import view,population_view,hotel_view,land_view,political_views,tourism_view,mining_views,water_view,housing_views,road_views,transport_view,public_unitillity_views,health_diseases_views,disaster_views
 from .views import export_views
 
 urlpatterns = [
@@ -71,5 +71,34 @@ urlpatterns = [
     path('transport_meta',  transport_view.display_transport_meta, name='transport_meta'),
     path('upload_transport_meta_excel', view.upload_meta_excel, name="upload_transport_meta_excel"),
 
+
+
+    path('public_unitillity_table', public_unitillity_views.display_public_unitillity_table, name='public_unitillity_table'),    
+    path('delete_selected_public_unitillity/', public_unitillity_views.delete_selected_public_unitillity, name='delete_selected_public_unitillity'),
+    path('delete_public_unitillity_record/<int:item_id>/', public_unitillity_views.delete_public_unitillity_record, name='delete_public_unitillity_record'),
+    path('update_public_unitillity_record/<int:pk>/',public_unitillity_views.update_public_unitillity_record,name='update_public_unitillity_record'),
+    path('export_public_unitillity_table_to_excel/', export_views.export_public_unitillity_table_to_excel, name='export_public_unitillity_table_to_excel'),
+    path('upload_public_unitillity_excel', public_unitillity_views.upload_public_unitillity_excel, name='upload_public_unitillity_excel'),
+
+
+    path('health_diseases_table',health_diseases_views.display_health_disease_table, name='health_disease_table'),
+
+
+    path('disaster_table',disaster_views.display_disaster_table, name='disaster_table'),
+
+    
+    path('road_table',road_views.display_road_table, name='road_table'),    
+
+    path('housing_table',housing_views.display_housing_table, name='housing_table'),
+
+    path('mining_table',mining_views.display_mining_table, name='mining_table'),
+
+
+    path('political_table',political_views.display_political_table, name='political_table'),    
+    
+    
+
+    
+    
 
 ]
