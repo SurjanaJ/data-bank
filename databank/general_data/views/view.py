@@ -8,8 +8,8 @@ from django.db.models import Q
 import pandas as pd
 
 from trade_data import views
-from ..models import Crime, Crime_Meta, Education, Education_Degree_Meta, Education_Level_Meta, ForestData, Country_meta, Land_Code_Meta, Occupation, Occupation_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
-from ..forms import UpdateCrime, UpdateEducation, UpdateOccupation, UpdateServices, UploadCrimeMetaForm, UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadOccupationMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
+from ..models import Crime, Crime_Meta, Education, Education_Degree_Meta, Education_Level_Meta, ForestData, Country_meta, Land_Code_Meta, Occupation, Occupation_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta,Disaster_Data,Disaster_Data_Meta
+from ..forms import UpdateCrime, UpdateEducation, UpdateOccupation, UpdateServices, UploadCrimeMetaForm, UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadOccupationMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm,UpdateDisaster
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -435,6 +435,7 @@ def update_record(request,pk):
         'update_crime_record': Crime,
         'update_education_record': Education,
         'update_occupation_record': Occupation,
+        'update_disaster_record':Disaster_Data
     }
 
     form_mapping = {
@@ -442,6 +443,7 @@ def update_record(request,pk):
         Crime: UpdateCrime,
         Education: UpdateEducation,
         Occupation: UpdateOccupation,
+        Disaster_Data:UpdateDisaster
     }
 
     view_mapping = {
@@ -449,13 +451,14 @@ def update_record(request,pk):
         Crime: 'crime_table',
         Education: 'education_table',
         Occupation:'occupation_table',
+        Disaster_Data:'disaster_table',
     }
 
     model_class = model_mapping.get(view_name)
     model_form = form_mapping.get(model_class)
     model_view = view_mapping.get(model_class)
 
-    record = model_class.objects.get(id= pk)
+    record = model_class.objects.get(id=pk)
     form = model_form(instance=record)
 
     if request.method == 'POST':
@@ -465,7 +468,7 @@ def update_record(request,pk):
             return redirect(model_view)
 
     context = {'form': form, 'meta_tables': views.meta_tables}
-    return render(request, 'general_data/update_forest_record.html', context)
+    return render(request, 'general_data/update_record.html', context)
    
 def delete_record(request,pk):
     resolved =  resolve(request.path_info)
@@ -475,6 +478,7 @@ def delete_record(request,pk):
         'delete_crime_record': Crime,
         'delete_education_record': Education,
         'delete_occupation_record': Occupation,
+        'delete_disaster_record':Disaster_Data
     }
 
     view_mapping = {
@@ -482,6 +486,7 @@ def delete_record(request,pk):
         Crime: 'crime_table',
         Education: 'education_table',
         Occupation: 'occupation_table',
+        Disaster_Data:'disaster_table',
     }
 
     model_class = model_mapping.get(view_name)
@@ -503,6 +508,7 @@ def delete_selected(request):
         'delete_selected_crime': Crime,
         'delete_selected_education': Education,
         'delete_selected_occupation': Occupation,
+        'delete_selected_disaster':Disaster_Data,
     }
 
     view_mapping = {
@@ -510,6 +516,7 @@ def delete_selected(request):
         Crime: 'crime_table',
         Education: 'education_table',
         Occupation:'occupation_table',
+        Disaster_Data:'disaster_table',
     }
     model_class = model_mapping.get(view_name)
     model_view = view_mapping.get(model_class)

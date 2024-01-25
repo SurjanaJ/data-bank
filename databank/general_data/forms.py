@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Crime, Education, ForestData,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land,Public_Unitillity
+from .models import Crime, Education, ForestData,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land,Public_Unitillity,Disaster_Data
 
 class UploadForestDataForm(forms.Form):
     forest_data_file = forms.FileField()
@@ -188,3 +188,11 @@ class UpdateOccupation(ModelForm):
             'Code': forms.Select(attrs={'class': 'form-control  '}),
             'Number': forms.NumberInput(attrs={'class': 'form-control  '}),
         }
+
+
+#disaster data
+
+class UpdateDisaster(ModelForm):
+    class Meta:
+        model = Disaster_Data
+        fields='__all__'

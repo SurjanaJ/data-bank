@@ -87,9 +87,13 @@ urlpatterns = [
 
 
     path('disaster_table',disaster_views.display_disaster_table, name='disaster_table'),
+    path('update_disaster_record/<int:pk>/', view.update_record, name = 'update_disaster_record'),
+    path('delete_disaster_record/<int:pk>/', view.delete_record, name ='delete_disaster_record' ),
+    path('delete_selected_disaster/', view.delete_selected, name='delete_selected_disaster'),
 
     
-    path('road_table',road_views.display_road_table, name='road_table'),    
+    path('road_table',road_views.display_road_table, name='road_table'),
+
 
     path('housing_table',housing_views.display_housing_table, name='housing_table'),
 

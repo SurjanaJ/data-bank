@@ -136,7 +136,7 @@ class Water(models.Model):
 
 class Public_Unitillity(models.Model):
     id = models.AutoField(primary_key=True)
-    Year=models.IntegerField()
+    Year=models.DateField(null=True , blank = True)
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
     Type_Of_Public_Utility = models.CharField(max_length = 100,null= True,blank = True)
     Number = models.IntegerField(default=0,null=True,blank=True)
@@ -158,7 +158,7 @@ class Mining(models.Model):
     )
 
     id = models.AutoField(primary_key=True)
-    Year=models.IntegerField()
+    Year=models.DateField(null = True , blank =True)
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
     Name_Of_Mine=models.ForeignKey(Mine_Meta,on_delete=models.CASCADE)
     Unit = models.CharField(max_length = 10, choices=Unit_Options , null=True, blank=True)
@@ -200,7 +200,6 @@ class Road_Meta(models.Model):
     def __str__(self):
         return self.Code
 
-
 class Road(models.Model):
 
     Length_Unit = (
@@ -208,13 +207,14 @@ class Road(models.Model):
     )
 
     id = models.AutoField(primary_key=True)
-    Year=models.IntegerField()
+    Year = models.IntegerField()
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
     Highway_No = models.CharField(max_length = 50 , null = True , blank = True)
     Name_Of_The_Road = models.CharField(max_length = 50 , null = True , blank = True)
     Code_Type_Of_Road = models.ForeignKey(Road_Meta, on_delete = models.CASCADE)
     Length_Unit_Options = models.CharField(max_length=20, choices = Length_Unit, blank = True ,null = True)
     Length = models.IntegerField(default = 0 , null = True , blank = True)
+
 
 
 
@@ -228,7 +228,7 @@ class Housing_Meta(models.Model):
 class Housing(models.Model):
 
     id = models.AutoField(primary_key=True)
-    Year=models.IntegerField()
+    Year = models.DateField(null=True, blank=True)
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
     House_Code = models.ForeignKey(Housing_Meta,on_delete = models.CASCADE)
     City = models.CharField(null=True,blank=True)
@@ -248,7 +248,7 @@ class Health_disease(models.Model):
     )
 
     id = models.AutoField(primary_key=True)
-    Year=models.IntegerField()
+    Year = models.DateField(null=True, blank=True)
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
     Disease_Code = models.ForeignKey( Health_disease_Meta, on_delete = models.CASCADE )
     Unit = models.CharField(max_length = 20 , choices = Unit_Options , blank = True , null= True)
@@ -265,10 +265,10 @@ class Budgetary_Data(models.Model):
 
 class Political_Data(models.Model):
     id = models.AutoField(primary_key=True)
-    Year=models.IntegerField()
+    Year=models.DateField(null=True, blank=True)
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
     Political_Party_Name = models.CharField(max_length = 30,null = True , blank = True)
-    Number_Of_Member = models.IntegerField()
+    Number_Of_Member = models.IntegerField(default = 0,null=True, blank=True)
     Province =  models.CharField(max_length = 30,null = True , blank = True)
     District =  models.CharField(max_length = 30,null = True , blank = True)
     Municipality = models.CharField(max_length = 30 ,null = True ,blank = True)
@@ -283,14 +283,106 @@ class Disaster_Data_Meta(models.Model):
 
 class Disaster_Data(models.Model):
     id = models.AutoField(primary_key=True)
-    Year=models.IntegerField()
+    Year=models.DateField(null=True, blank=True)
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
     Disaster_Code = models.ForeignKey(Disaster_Data_Meta,on_delete= models.CASCADE)
     Human_Loss = models.IntegerField(default = 0 ,null = True ,blank = True)
     Animal_Loss = models.IntegerField(default = 0 ,null = True ,blank = True)
     Physical_Properties_Loss_In_USD = models.IntegerField(default = 0 ,null = True ,blank = True)
 
+class Services_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    Code = models.CharField(max_length=100)
+    Services_Type = models.TextField(null=True,blank=True)
 
+    def __str__(self):
+        return self.Code
+
+class Services(models.Model):
+    DIRECTION_OPTIONS = (
+        ('Import', 'Import'),
+        ('Export', 'Export')
+    )
+    id = models.AutoField(primary_key=True)
+    Country = models.ForeignKey(Country_meta, on_delete=models.CASCADE, related_name='services_country')
+    Year = models.DateField(null=True, blank=True)
+    Direction = models.CharField(max_length= 10, choices = DIRECTION_OPTIONS, null=True, blank=True )
+    Code = models.ForeignKey(Services_Meta, on_delete = models.CASCADE)
+    Value = models.FloatField(max_length=100,null=True, blank=True)
+    Origin_Destination = models.ForeignKey(Country_meta, on_delete=models.CASCADE, related_name='services_origin_destination')
+
+
+class Crime_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    Code = models.CharField(max_length= 100)
+    Name = models.TextField(blank= True, null = True)
+    
+    def __str__(self):
+        return self.Code
+    
+class Crime(models.Model):
+    GENDER_OPTIONS = (
+        ('Male', 'Male'),
+        ('Female', 'Female')
+    )
+    id = models.AutoField(primary_key=True)
+    Country = models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    Year = models.DateField(null=True, blank=True)
+    Code = models.ForeignKey(Crime_Meta, on_delete= models.CASCADE)
+    Gender = models.CharField(max_length= 10, choices = GENDER_OPTIONS, null=True, blank=True )
+    Age = models.IntegerField(null=True, blank=True)
+    District = models.CharField(max_length= 50, null=True, blank=True )
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
+
+
+class Education_Level_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    Code = models.CharField(max_length= 20)
+    Level = models.TextField(blank= True, null= True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.Code
+
+class Education_Degree_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    Code = models.CharField(max_length= 20)
+    Degree = models.TextField(null=True, blank= True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.Code
+
+class Education(models.Model):
+    id = models.AutoField(primary_key=True)
+    Level_Code = models.ForeignKey(Education_Level_Meta, on_delete= models.CASCADE)
+    Degree_Code = models.ForeignKey(Education_Degree_Meta, on_delete = models.CASCADE)
+    Male = models.BigIntegerField(default = 0)
+    Female = models.BigIntegerField(default = 0)
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
+
+class Occupation_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    SOC_Code = models.CharField(max_length= 100)
+    SOC_Group = models.TextField(blank= True, null = True)
+    SOC_Title = models.TextField(blank= True, null = True)
+    
+    def __str__(self):
+        return self.SOC_Code
+    
+class Occupation(models.Model):
+    id = models.AutoField(primary_key=True)
+    Country = models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    Year = models.IntegerField()
+    Code = models.ForeignKey(Occupation_Meta, on_delete= models.CASCADE)
+    Number = models.IntegerField()
+
+    def __str__(self):
+        return self.Code
 
 
 
