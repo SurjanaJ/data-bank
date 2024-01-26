@@ -378,3 +378,16 @@ class Occupation(models.Model):
 
     def __str__(self):
         return self.Code
+    
+
+class Climate_Place_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    Country = models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    Place_Code = models.CharField(max_length=20)
+    Place_Name = models.TextField()
+    created_date = models.DateTimeField(auto_now=True)
+    modified_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.Place_Code
+

@@ -179,3 +179,7 @@ class UpdateOccupation(ModelForm):
             'Code': forms.Select(attrs={'class': 'form-control  '}),
             'Number': forms.NumberInput(attrs={'class': 'form-control  '}),
         }
+
+# CLIMATE DATA
+class UploadClimatePlaceMeta(forms.Form):
+    meta_file = forms.FileField()
