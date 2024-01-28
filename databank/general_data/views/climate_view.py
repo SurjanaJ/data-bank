@@ -145,7 +145,7 @@ def upload_climate_excel(request):
 
                     climate_type = row['Climate']
                     if climate_type not in ['Rain', 'Snow','Storm']:
-                        raise ValueError(f"Invalid Trade_Type at row {index}: {climate_type}")
+                        raise ValueError(f"Invalid Climate at row {index}: {climate_type}")
                     
                     climate_data = {
                         'Country': Country,
@@ -168,7 +168,7 @@ def upload_climate_excel(request):
                     Q(Country = Country)
                     & Q(Date = Date)
                     & Q(Place = Place)
-                )
+                ).first()
 
                 if existing_record:
                     existing_dict = model_to_dict(existing_record)
@@ -232,3 +232,13 @@ def upload_climate_excel(request):
         form = UploadClimateForm()
     
     return render(request,'general_data/transport_templates/upload_transport_form.html',{'form':form})
+
+def display_climate_table(request):
+    data = Climate_Data.objects.all()
+
+    paginator = Paginator(data, 40)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+
+    context ={'data_len':len(data),'page':page, 'query_len':len(page), 'tables': tables, 'meta_tables': views.meta_tables}
+    return render(request, 'general_data/climate_templates/climate_table.html', context)
