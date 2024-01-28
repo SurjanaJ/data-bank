@@ -1,7 +1,6 @@
 from django.urls import include, path
 
-
-from .views import occupation_view,education_view, view,population_view,hotel_view,land_view,tourism_view,water_view,transport_view,services_view, crime_view
+from .views import climate_view,occupation_view,education_view, view,population_view,hotel_view,land_view,tourism_view,water_view,transport_view,services_view, crime_view
 from .views import export_views
 
 urlpatterns = [
@@ -112,5 +111,7 @@ urlpatterns = [
     path('update_occupation_record/<int:pk>/', view.update_record, name = 'update_occupation_record'),
     path('export_occupation_excel', occupation_view.export_occupation_excel, name='export_occupation_excel'),
 
+    path('upload_climate_place_meta_excel', climate_view.upload_climate_place_meta_excel, name='upload_climate_place_meta_excel'),
+    path('place_meta',  climate_view.display_climate_place_meta, name='place_meta'),
 
 ]   
