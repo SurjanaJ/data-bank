@@ -167,7 +167,7 @@
 </div>
 {% else %}
 <div>
-  <form method="post" action="{% url 'delete_selected_forest' %}" id="delete-form-forest">
+  <form method="post" action="{% url 'delete_selected_mining' %}" id="delete-form-mining">
     {% csrf_token %}
     <div class="table-responsive mt-4 bg-light">
       <div class="d-flex align-items-center justify-content-between px-2">
@@ -257,7 +257,7 @@
               <div class="btn">
                 <a
                   class=""
-                  href="{% url 'update_forest_record' record.id %}"
+                  href="{% url 'update_mining_record' record.id %}"
 
                   ><i class="fa-regular fa-pen-to-square" style="color: rgb(3, 10, 86)"></i></a>
               </div>
@@ -270,7 +270,27 @@
     </div>
     </div>
   </form>
-</div> 
+</div><script>
+  function confirmDelete(itemId) {
+    var result = confirm("Are you sure you want to delete this record?");
+    if (result) {
+        window.location.href = 'delete_mining_record/' + itemId + '/';
+    } else {
+        alert("Delete canceled!");
+    }
+}
+
+function confirmDeleteAll() {
+      var confirmDelete = confirm(
+        "Are you sure you want to delete all selected items?"
+      );
+      if (confirmDelete) {
+        document.getElementById("delete-form-mining").submit();
+      }
+    }
+</script>
+
+
 
 {% endif %}
 

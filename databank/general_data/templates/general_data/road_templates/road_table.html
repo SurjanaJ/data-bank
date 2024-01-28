@@ -127,7 +127,7 @@
 {% else %}
 
 <div>
-  <form method="post" action="{% url 'delete_selected_public_unitillity' %}" id="delete-form-public_unitillity">
+  <form method="post" action="{% url 'delete_selected_road' %}" id="delete-form-road">
     {% csrf_token %}
     <div class="table-responsive mt-4 bg-light">
       <div class="d-flex align-items-center justify-content-between px-2">
@@ -207,7 +207,7 @@
               <div class="btn">
                 <a
                   class=""
-                  id="delete_tourism"
+                  id="delete_road"
                   onclick="confirmDelete('{{record.id}}')"
                   ><i class="fa-regular fa-trash-can" style="color: #ff0000"></i></a>
               </div>
@@ -215,7 +215,7 @@
               <div class="btn ">
                 <a
                   class=""
-                  href="{% url 'update_public_unitillity_record' record.id %}"
+                  href="{% url 'update_road_record' record.id %}"
 
                   ><i class="fa-regular fa-pen-to-square" style="color: rgb(3, 10, 86)"></i></a>
               </div>
@@ -229,6 +229,26 @@
     </div>
   </form>
 </div>
+
+<script>
+  function confirmDelete(itemId) {
+    var result = confirm("Are you sure you want to delete this record?");
+    if (result) {
+        window.location.href = 'delete_road_record/' + itemId + '/';
+    } else {
+        alert("Delete canceled!");
+    }
+}
+
+function confirmDeleteAll() {
+      var confirmDelete = confirm(
+        "Are you sure you want to delete all selected items?"
+      );
+      if (confirmDelete) {
+        document.getElementById("delete-form-road").submit();
+      }
+    }
+</script>
 
 {% endif %}
 

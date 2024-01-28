@@ -228,11 +228,13 @@ class Housing_Meta(models.Model):
 class Housing(models.Model):
 
     id = models.AutoField(primary_key=True)
-    Year = models.DateField(null=True, blank=True)
+    Year = models.IntegerField()
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
     House_Code = models.ForeignKey(Housing_Meta,on_delete = models.CASCADE)
     City = models.CharField(null=True,blank=True)
     Number = models.IntegerField(default = 0 , null = True , blank = True)
+    modified_date = models.DateTimeField(auto_now=True)
+    created_date = models.DateTimeField(auto_now=True)
 
 
 class Health_disease_Meta(models.Model):

@@ -8,8 +8,8 @@ from django.db.models import Q
 import pandas as pd
 
 from trade_data import views
-from ..models import Crime, Crime_Meta, Education, Education_Degree_Meta, Education_Level_Meta, ForestData, Country_meta, Land_Code_Meta, Occupation, Occupation_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta,Disaster_Data,Disaster_Data_Meta
-from ..forms import UpdateCrime, UpdateEducation, UpdateOccupation, UpdateServices, UploadCrimeMetaForm, UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadOccupationMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm,UpdateDisaster
+from ..models import Crime, Crime_Meta,Road,Mining,Housing,Political_Data, Education,Health_disease, Education_Degree_Meta, Education_Level_Meta, ForestData, Country_meta, Land_Code_Meta, Occupation, Occupation_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta,Disaster_Data,Disaster_Data_Meta
+from ..forms import UpdateCrime,UpdateHousing,UpdateMining,UpdatePolitical,UpdateRoad, UpdateEducation,UpdateHealthDisease, UpdateOccupation, UpdateServices, UploadCrimeMetaForm, UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadOccupationMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm,UpdateDisaster
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -435,7 +435,12 @@ def update_record(request,pk):
         'update_crime_record': Crime,
         'update_education_record': Education,
         'update_occupation_record': Occupation,
-        'update_disaster_record':Disaster_Data
+        'update_disaster_record':Disaster_Data,
+        'update_health_disease_record':Health_disease,
+        'update_road_record':Road,
+        'update_housing_record':Housing,
+        'update_political_record':Political_Data,
+        'update_mining_record':Mining,
     }
 
     form_mapping = {
@@ -443,7 +448,12 @@ def update_record(request,pk):
         Crime: UpdateCrime,
         Education: UpdateEducation,
         Occupation: UpdateOccupation,
-        Disaster_Data:UpdateDisaster
+        Disaster_Data:UpdateDisaster,
+        Health_disease:UpdateHealthDisease,
+        Road:UpdateRoad,
+        Housing:UpdateHousing,
+        Political_Data:UpdatePolitical,
+        Mining:UpdateMining,
     }
 
     view_mapping = {
@@ -452,6 +462,12 @@ def update_record(request,pk):
         Education: 'education_table',
         Occupation:'occupation_table',
         Disaster_Data:'disaster_table',
+        Health_disease:'health_disease_table',
+        Mining:'mining_table',
+        Housing:'housing_table',
+        Political_Data:'political_table',
+        Road:'road_table',
+
     }
 
     model_class = model_mapping.get(view_name)
@@ -478,7 +494,13 @@ def delete_record(request,pk):
         'delete_crime_record': Crime,
         'delete_education_record': Education,
         'delete_occupation_record': Occupation,
-        'delete_disaster_record':Disaster_Data
+        'delete_disaster_record':Disaster_Data,
+        'delete_health_disease_record':Health_disease,
+        'delete_road_record':Road,
+        'delete_mining_record':Mining,
+        'delete_housing_record':Housing,
+        'delete_political_record':Political_Data,
+
     }
 
     view_mapping = {
@@ -487,6 +509,11 @@ def delete_record(request,pk):
         Education: 'education_table',
         Occupation: 'occupation_table',
         Disaster_Data:'disaster_table',
+        Health_disease:'health_disease_table',
+        Road:'road_table',
+        Mining:'mining_table',
+        Housing:'housing_table',
+        Political_Data:'political_table'
     }
 
     model_class = model_mapping.get(view_name)
@@ -509,6 +536,12 @@ def delete_selected(request):
         'delete_selected_education': Education,
         'delete_selected_occupation': Occupation,
         'delete_selected_disaster':Disaster_Data,
+        'delete_selected_health_disease':Health_disease,
+        'delete_selected_mining':Mining,
+        'delete_selected_housing':Housing,
+        'delete_selected_road':Road,
+        'delete_selected_political':Political_Data
+
     }
 
     view_mapping = {
@@ -517,6 +550,11 @@ def delete_selected(request):
         Education: 'education_table',
         Occupation:'occupation_table',
         Disaster_Data:'disaster_table',
+        Health_disease:'health_disease_table',
+        Road:'road_table',
+        Mining:'mining_table',
+        Housing:'housing_table',
+        Political_Data:'political_table'
     }
     model_class = model_mapping.get(view_name)
     model_view = view_mapping.get(model_class)

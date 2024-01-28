@@ -84,6 +84,9 @@ urlpatterns = [
 
 
     path('health_diseases_table',health_diseases_views.display_health_disease_table, name='health_disease_table'),
+    path('update_health_disease_record/<int:pk>/', view.update_record, name = 'update_health_disease_record'),
+    path('delete_health_disease_record/<int:pk>/', view.delete_record, name ='delete_health_disease_record' ),
+    path('delete_selected_health_disease/', view.delete_selected, name='delete_selected_health_disease'),
 
 
     path('disaster_table',disaster_views.display_disaster_table, name='disaster_table'),
@@ -93,18 +96,28 @@ urlpatterns = [
 
     
     path('road_table',road_views.display_road_table, name='road_table'),
+    path('update_road_record/<int:pk>/', view.update_record, name = 'update_road_record'),
+    path('delete_road_record/<int:pk>/', view.delete_record, name ='delete_road_record' ),
+    path('delete_road_disease/', view.delete_selected, name='delete_selected_road'),
+
+
 
 
     path('housing_table',housing_views.display_housing_table, name='housing_table'),
+    path('update_housing_record/<int:pk>/', view.update_record, name = 'update_housing_record'),
+    path('delete_housing_record/<int:pk>/', view.delete_record, name ='delete_housing_record' ),
+    path('delete_selected_housing/', view.delete_selected, name='delete_selected_housing'),
 
     path('mining_table',mining_views.display_mining_table, name='mining_table'),
+    path('update_mining_record/<int:pk>/', view.update_record, name = 'update_mining_record'),
+    path('delete_mining_record/<int:pk>/', view.delete_record, name ='delete_mining_record'),
+    path('delete_selected_mining/', view.delete_selected, name='delete_selected_mining'),
 
 
-    path('political_table',political_views.display_political_table, name='political_table'),    
-    
-    
-
-    
+    path('political_table',political_views.display_political_table, name='political_table'),
+    path('update_political_record/<int:pk>/', view.update_record, name = 'update_political_record'),
+    path('delete_political_record/<int:pk>/', view.delete_record, name ='delete_political_record' ),
+    path('delete_selected_political/', view.delete_selected, name='delete_selected_political'),    
     
     
     path('upload_services_meta_excel', view.upload_meta_excel, name="upload_services_meta_excel"),

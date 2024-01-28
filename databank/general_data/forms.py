@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Crime, Education, ForestData,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land,Public_Unitillity,Disaster_Data
+from .models import Crime, Education,Road,Mining,Housing,Political_Data, ForestData,Hotel, Occupation,Health_disease, Services,Tourism,Transport,PopulationData,Water,Land,Public_Unitillity,Disaster_Data
 
 class UploadForestDataForm(forms.Form):
     forest_data_file = forms.FileField()
@@ -195,4 +195,29 @@ class UpdateOccupation(ModelForm):
 class UpdateDisaster(ModelForm):
     class Meta:
         model = Disaster_Data
+        fields='__all__'
+
+class UpdateHealthDisease(ModelForm):
+    class Meta:
+        model = Health_disease
+        fields='__all__'
+
+class UpdateMining(ModelForm):
+    class Meta:
+        model = Mining
+        fields='__all__'
+
+class UpdateHousing(ModelForm):
+    class Meta:
+        model = Housing
+        fields='__all__'
+
+class UpdatePolitical(ModelForm):
+    class Meta:
+        model = Political_Data
+        fields='__all__'
+
+class UpdateRoad(ModelForm):
+    class Meta:
+        model = Road
         fields='__all__'
