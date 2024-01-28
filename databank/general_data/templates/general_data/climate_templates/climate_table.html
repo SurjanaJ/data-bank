@@ -6,6 +6,93 @@
     Filters
 </button>
 
+<div class="bg-light mt-3">
+    <div class="collapse shadow rounded-2" id="collapseFilter">
+        <div class="px-2 py-2">
+            <form action="climate_table" class="row g-3" method="GET">
+
+                <div class="col-md-3">
+                    <label for="date_minimum">Date Minimum</label>
+                    <input type="date" class="form-control" id="date_minimum" name="date_minimum" />
+                </div>
+
+                <div class="col-md-3">
+                    <label for="date_maximum">Date Maximum</label>
+                    <input type="date" class="form-control" id="date_maximum" name="date_maximum" />
+                </div>
+
+                <div class="form-group col-md-3">
+                    <label for="country_category">Country</label>
+                    <select id="country_category" class="form-control" name="country_category">
+                        <option selected>--</option>
+                        {% for country_category in country_categories %}
+                        <option value="{{country_category.id}}">{{country_category}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group col-md-3">
+                    <label for="place_categories">Place</label>
+                    <select id="place_categories" class="form-control" name="place_categories">
+                        <option selected>--</option>
+                        {% for place in place_categories %}
+                        <option value="{{place.id }}">
+                            {{place.Place_Code}} - {{place.Place_Name}}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group col-md-3">
+                    <label for="temperature_unit">Temperature Unit</label>
+                    <select id="temperature_unit" class="form-control" name="temperature_unit">
+                        <option selected>--</option>
+                        {% for unit_category in unit_categories %}
+                        <option value="{{unit_category.id }}">{{unit_category}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label for="maximum_temperature">Maximum Temperature</label>
+                    <input type="number" min="0" class="form-control" id="maximum_temperature"
+                        name="maximum_temperature" />
+                </div>
+
+                <div class="col-md-3">
+                    <label for="minimum_temperature">Minimum Temperature</label>
+                    <input type="number" min="0" class="form-control" id="minimum_temperature"
+                        name="minimum_temperature" />
+                </div>
+
+                <div class="form-group col-md-3">
+                    <label for="climate_type">Climate Type</label>
+                    <select id="climate_type" class="form-control" name="climate_type">
+                        <option selected>--</option>
+                        {% for climate_type in climate_type_categories %}
+                        <option value="{{climate_type}}">{{climate_type}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group col-md-3">
+                    <label for="climate_unit">Climate Unit</label>
+                    <select id="climate_unit" class="form-control" name="climate_unit">
+                        <option selected>--</option>
+                        {% for unit_category in unit_categories %}
+                        <option value="{{unit_category.id }}">{{unit_category}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+
+
+
+            </form>
+        </div>
+    </div>
+</div>
+
 <div class="d-flex justify-content-center">
     <a class="fs-4 fw-bold mt-4 link-secondary  link-offset-2 link-underline-opacity-0 link-underline-opacity-25-hover"
         href="{% url 'climate_table' %}">Climate Data</a>

@@ -236,9 +236,22 @@ def upload_climate_excel(request):
 def display_climate_table(request):
     data = Climate_Data.objects.all()
 
+    country_categories = Country_meta.objects.all()
+    unit_categories = Unit_meta.objects.all()
+    place_categories = Climate_Place_Meta.objects.all()
+    climate_type_categories = [choice[1] for choice in Climate_Data.CLIMATE_OPTIONS]
+
     paginator = Paginator(data, 40)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
 
-    context ={'data_len':len(data),'page':page, 'query_len':len(page), 'tables': tables, 'meta_tables': views.meta_tables}
+    context ={'data_len':len(data),
+              'page':page, 
+              'query_len':len(page), 
+              'tables': tables, 
+              'meta_tables': views.meta_tables,'country_categories':country_categories,
+              'unit_categories':unit_categories,
+              'place_categories':place_categories,
+              'climate_type_categories':climate_type_categories
+                      }
     return render(request, 'general_data/climate_templates/climate_table.html', context)
