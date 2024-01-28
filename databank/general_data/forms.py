@@ -183,3 +183,6 @@ class UpdateOccupation(ModelForm):
 # CLIMATE DATA
 class UploadClimatePlaceMeta(forms.Form):
     meta_file = forms.FileField()
+
+class UploadClimateForm(forms.Form):
+    file = forms.FileField()

@@ -63,6 +63,11 @@ tables =[
         "name": "Occupation Data",
         "url": "occupation_table"
     }
+    ,
+    {
+        "name": "Climate Data",
+        "url": "climate_table"
+    }
     ]
 
 

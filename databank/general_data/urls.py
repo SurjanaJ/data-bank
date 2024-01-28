@@ -113,5 +113,7 @@ urlpatterns = [
 
     path('upload_climate_place_meta_excel', climate_view.upload_climate_place_meta_excel, name='upload_climate_place_meta_excel'),
     path('place_meta',  climate_view.display_climate_place_meta, name='place_meta'),
+    path('upload_climate_excel', climate_view.upload_climate_excel, name = 'upload_climate_excel'),
+    path('climate_table', climate_view.display_climate_table, name='climate_table'),    
 
 ]   
