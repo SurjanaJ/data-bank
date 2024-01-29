@@ -241,6 +241,35 @@ def display_climate_table(request):
     place_categories = Climate_Place_Meta.objects.all()
     climate_type_categories = [choice[1] for choice in Climate_Data.CLIMATE_OPTIONS]
 
+    date_minimum = request.GET.get('date_minimum')
+    date_maximum = request.GET.get('date_maximum')
+    country = request.GET.get('country')
+    place = request.GET.get('place')
+    temperature_unit = request.GET.get('temperature_unit')
+    climate_type = request.GET.get('climate_type')
+    climate_unit = request.GET.get('climate_unit')
+
+    if is_valid_queryparam(date_minimum):
+        data = data.filter(Date__gte = date_minimum)
+
+    if is_valid_queryparam(date_maximum):
+        data = data.filter(Date__lt = date_maximum)
+
+    if is_valid_queryparam(country) and country != '--':
+        data = data.filter(Country_id=country)
+    
+    if is_valid_queryparam(place) and place != '--':
+        data = data.filter(Place_id=place)
+
+    if is_valid_queryparam(temperature_unit) and temperature_unit !='--':
+        data = data.filter(Temperature_Unit_id = temperature_unit)
+
+    if is_valid_queryparam(climate_type) and climate_type != '--':
+        data = data.filter(Climate=climate_type) 
+
+    if is_valid_queryparam(climate_unit) and climate_unit !='--':
+        data = data.filter(Climate_Unit_id = climate_unit)
+
     paginator = Paginator(data, 40)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
