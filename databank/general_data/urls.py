@@ -116,5 +116,7 @@ urlpatterns = [
     path('upload_climate_excel', climate_view.upload_climate_excel, name = 'upload_climate_excel'),
     path('climate_table', climate_view.display_climate_table, name='climate_table'),    
     path('update_climate_record/<int:pk>/', view.update_record, name = 'update_climate_record'),
+    path('delete_climate_record/<int:pk>/', view.delete_record, name ='delete_climate_record' ),
+    path('delete_selected_climate/', view.delete_selected, name='delete_selected_climate'),
 
 ]   

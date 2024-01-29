@@ -478,6 +478,7 @@ def delete_record(request,pk):
         'delete_crime_record': Crime,
         'delete_education_record': Education,
         'delete_occupation_record': Occupation,
+        'delete_climate_record': Climate_Data,
     }
 
     view_mapping = {
@@ -485,6 +486,7 @@ def delete_record(request,pk):
         Crime: 'crime_table',
         Education: 'education_table',
         Occupation: 'occupation_table',
+        Climate_Data:'climate_table',
     }
 
     model_class = model_mapping.get(view_name)
@@ -506,6 +508,7 @@ def delete_selected(request):
         'delete_selected_crime': Crime,
         'delete_selected_education': Education,
         'delete_selected_occupation': Occupation,
+        'delete_selected_climate':Climate_Data,
     }
 
     view_mapping = {
@@ -513,6 +516,7 @@ def delete_selected(request):
         Crime: 'crime_table',
         Education: 'education_table',
         Occupation:'occupation_table',
+        Climate_Data: 'climate_table',
     }
     model_class = model_mapping.get(view_name)
     model_view = view_mapping.get(model_class)

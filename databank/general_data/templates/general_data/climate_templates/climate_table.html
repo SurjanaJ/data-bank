@@ -96,7 +96,7 @@
 </div>
 {% else %}
 <div>
-    <form action="" method="post" id="delete-form">
+    <form action="{% url 'delete_selected_climate' %}" method="post" id="delete-form">
         {% csrf_token %}
         <div class="table-responsive mt-4 bg-light p-3">
             <div class="d-flex align-items-center justify-content-between px-2">
@@ -304,7 +304,7 @@
       if (result) {
           // User clicked "OK"
           // Redirect to the Django view for deleting the item
-          window.location.href = 'delete_trade_record/' + itemId + '/';
+          window.location.href = 'delete_climate_record/' + itemId + '/';
       } else {
           // User clicked "Cancel" or closed the dialog
           alert("Delete canceled!");
@@ -316,7 +316,7 @@
           "Are you sure you want to delete all selected items?"
         );
         if (confirmDelete) {
-          document.getElementById("delete-form-trade").submit();
+          document.getElementById("delete-form").submit();
         }
       }
 </script>
