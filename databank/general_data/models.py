@@ -411,3 +411,9 @@ class Climate_Data(models.Model):
 
     def __str__(self):
         return (str(self.id))
+
+
+class Currency_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    Currency_Name = models.TextField()
+    Currency_Code = models.CharField(max_length = 40)

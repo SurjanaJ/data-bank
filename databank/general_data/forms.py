@@ -203,3 +203,7 @@ class UpdateClimate(ModelForm):
             'Climate_Unit': forms.Select(attrs={'class': 'form-control '}),
             'Amount': forms.NumberInput(attrs={'class': 'form-control  '})
         }
+
+# EXCHANGE DATA
+class UploadCurrencyMeta(forms.Form):
+    meta_file = forms.FileField()       
