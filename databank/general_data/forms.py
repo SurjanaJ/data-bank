@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Crime, Education, ForestData,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land
+from .models import Climate_Data, Crime, Education, ForestData,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land
 
 class UploadForestDataForm(forms.Form):
     forest_data_file = forms.FileField()
@@ -186,3 +186,20 @@ class UploadClimatePlaceMeta(forms.Form):
 
 class UploadClimateForm(forms.Form):
     file = forms.FileField()
+
+class UpdateClimate(ModelForm):
+    class Meta:
+        model = Climate_Data
+        fields='__all__'
+
+        widgets={
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Date': forms.DateInput(attrs={'class': 'form-control '}),
+            'Place': forms.Select(attrs={'class': 'form-control '}),
+            'Temperature_Unit': forms.Select(attrs={'class': 'form-control '}),
+            'Max_Temperature': forms.NumberInput(attrs={'class': 'form-control  '}),
+            'Min_Temperature': forms.NumberInput(attrs={'class': 'form-control  '}),
+            'Climate': forms.Select(attrs={'class': 'form-control '}),
+            'Climate_Unit': forms.Select(attrs={'class': 'form-control '}),
+            'Amount': forms.NumberInput(attrs={'class': 'form-control  '})
+        }

@@ -8,8 +8,8 @@ from django.db.models import Q
 import pandas as pd
 
 from trade_data import views
-from ..models import Crime, Crime_Meta, Education, Education_Degree_Meta, Education_Level_Meta, ForestData, Country_meta, Land_Code_Meta, Occupation, Occupation_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
-from ..forms import UpdateCrime, UpdateEducation, UpdateOccupation, UpdateServices, UploadCrimeMetaForm, UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadOccupationMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
+from ..models import Climate_Data, Crime, Crime_Meta, Education, Education_Degree_Meta, Education_Level_Meta, ForestData, Country_meta, Land_Code_Meta, Occupation, Occupation_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
+from ..forms import UpdateClimate, UpdateCrime, UpdateEducation, UpdateOccupation, UpdateServices, UploadCrimeMetaForm, UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadOccupationMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -435,6 +435,7 @@ def update_record(request,pk):
         'update_crime_record': Crime,
         'update_education_record': Education,
         'update_occupation_record': Occupation,
+        'update_climate_record': Climate_Data,
     }
 
     form_mapping = {
@@ -442,6 +443,7 @@ def update_record(request,pk):
         Crime: UpdateCrime,
         Education: UpdateEducation,
         Occupation: UpdateOccupation,
+        Climate_Data: UpdateClimate,
     }
 
     view_mapping = {
@@ -449,6 +451,7 @@ def update_record(request,pk):
         Crime: 'crime_table',
         Education: 'education_table',
         Occupation:'occupation_table',
+        Climate_Data:'climate_table'
     }
 
     model_class = model_mapping.get(view_name)
