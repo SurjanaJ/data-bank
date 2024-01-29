@@ -1,6 +1,6 @@
-from ..models import ForestData,Land,Hotel,Transport,Tourism,Water,PopulationData
+from ..models import ForestData,Land,Hotel,Transport,Tourism,Water,PopulationData,Mining,Political_Data,Road,Housing,Health_disease,Disaster_Data,Public_Unitillity
 from io import BytesIO
-from ..views import view,population_view,tourism_view,transport_view,hotel_view,water_view
+from ..views import view,population_view,tourism_view,transport_view,hotel_view,water_view,political_views,road_views,mining_views,health_diseases_views,housing_views,disaster_views
 import xlsxwriter
 from django.db.models import Q
 from django.db.models import F
@@ -466,6 +466,268 @@ def export_transport_table_to_excel(request):
     response['content-Disposition'] = 'attachment; filename=transport_data.xlsx'
     return response
 
+def filter_public_unitillity(request):
+    data = Public_Unitillity.objects.all()
+
+
+    return data
 
 def export_public_unitillity_table_to_excel(request):
-    pass
+    data = filter_public_unitillity(request)
+
+    df=None
+    output=BytesIO()
+    writer=pd.ExcelWriter(output,engine='xlsxwriter')
+    df.to_excel(writer,sheet_name='sheet1',index=False)
+
+    writer.close()
+    output.seek(0)
+
+    response=HttpResponse(
+        output,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['content-Disposition'] = 'attachment; filename=public_unitillity_data.xlsx'
+    return response
+
+
+
+def filter_road(request):
+    data = Road.objects.all()
+
+
+    return data
+def export_road_table_to_excel(request):
+    data = filter_road(request)
+
+    df=None
+    output=BytesIO()
+    writer=pd.ExcelWriter(output,engine='xlsxwriter')
+    df.to_excel(writer,sheet_name='sheet1',index=False)
+
+    writer.close()
+    output.seek(0)
+
+    response=HttpResponse(
+        output,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['content-Disposition'] = 'attachment; filename=road_data.xlsx'
+    return response
+
+
+def filter_political(request):
+    data = Political_Data.objects.all()
+
+
+    return data
+
+def export_political_table_to_excel(request):
+    data = filter_political(request)
+
+    df=None
+    output=BytesIO()
+    writer=pd.ExcelWriter(output,engine='xlsxwriter')
+    df.to_excel(writer,sheet_name='sheet1',index=False)
+
+    writer.close()
+    output.seek(0)
+
+    response=HttpResponse(
+        output,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['content-Disposition'] = 'attachment; filename=political_data.xlsx'
+    return response
+
+
+def filter_health_diseases(request):
+    data = Health_disease.objects.all()
+
+    date_min = request.GET.get('date_min')
+    date_max = request.GET.get('date_max')
+    country_category = request.GET.get('country_category')
+    unit=request.GET.get('unit')
+    disease_code = request.GET.get('health_disease_code')
+    minimum_number = request.GET.get('minimum_number')
+    maximum_number = request.GET.get('maximum_number')
+
+    if health_diseases_views.is_valid_queryparam(date_min):
+        data=data.filter(Year__gte=date_min)
+
+    if health_diseases_views.is_valid_queryparam(date_max):
+        data=data.filter(Year__lt=date_max)
+
+    if health_diseases_views.is_valid_queryparam(country_category) and country_category != '--':
+        data = data.filter(Country_id=country_category)
+
+    if health_diseases_views.is_valid_queryparam(unit)  and unit != '--':
+        data=data.filter(Unit=unit)
+
+    if health_diseases_views.is_valid_queryparam(minimum_number):
+        data=data.filter(Number_Of_Case__gte=minimum_number)
+
+    if health_diseases_views.is_valid_queryparam(maximum_number):
+        data=data.filter(Number_Of_Case__lt=maximum_number)
+
+    return data
+
+def export_health_diseases_table_to_excel(request):
+    data = filter_health_diseases(request)
+
+    df=None
+    output=BytesIO()
+    writer=pd.ExcelWriter(output,engine='xlsxwriter')
+    df.to_excel(writer,sheet_name='sheet1',index=False)
+
+    writer.close()
+    output.seek(0)
+
+    response=HttpResponse(
+        output,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['content-Disposition'] = 'attachment; filename=health_diseases_data.xlsx'
+    return response
+
+
+def filter_housing(request):
+    data = Housing.objects.all()
+
+    date_min = request.GET.get('date_min')
+    date_max = request.GET.get('date_max')
+    country_category = request.GET.get('country_category')
+    house_Code = request.GET.get('house_code')
+    min_number = request.GET.get('minimum_number')  
+    max_number = request.GET.get('maximum_number')
+    name_of_the_city = request.GET.get('name_of_the_city')
+
+  
+
+    if housing_views.is_valid_queryparam(date_min):
+        data=data.filter(Year__gte=date_min)
+
+    if housing_views.is_valid_queryparam(date_max):
+        data=data.filter(Year__lt=date_max)
+
+    if housing_views.is_valid_queryparam(country_category) and country_category != '--':
+        data = data.filter(Country_id=country_category)
+
+    if housing_views.is_valid_queryparam(house_Code) and house_Code != '--':
+        data=data.filter(House_Code = house_Code)
+
+    if housing_views.is_valid_queryparam(name_of_the_city):
+        data=data.filter(Q(City__icontains=name_of_the_city)).distinct()
+
+    if housing_views.is_valid_queryparam(max_number):
+        data = data.filter(Number__lt=max_number)   
+
+    if housing_views.is_valid_queryparam(min_number):
+        data = data.filter(Number__gte=min_number)
+
+
+    return data
+
+def export_housing_table_to_excel(request):
+    data = filter_housing(request)
+
+    df=None
+    output=BytesIO()
+    writer=pd.ExcelWriter(output,engine='xlsxwriter')
+    df.to_excel(writer,sheet_name='sheet1',index=False)
+
+    writer.close()
+    output.seek(0)
+
+    response=HttpResponse(
+        output,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['content-Disposition'] = 'attachment; filename=housing_data.xlsx'
+    return response
+
+
+def filter_mining(request):
+    data = Mining.objects.all()
+
+
+    return data
+
+def export_mining_table_to_excel(request):
+    data = filter_mining(request)
+
+    df=None
+    output=BytesIO()
+    writer=pd.ExcelWriter(output,engine='xlsxwriter')
+    df.to_excel(writer,sheet_name='sheet1',index=False)
+
+    writer.close()
+    output.seek(0)
+
+    response=HttpResponse(
+        output,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['content-Disposition'] = 'attachment; filename=mining_data.xlsx'
+    return response
+
+
+def filter_disaster(request):
+    data = Disaster_Data.objects.all()
+
+    date_min = request.GET.get('date_min')
+    date_max = request.GET.get('date_max')
+    country_category = request.GET.get('country_category')
+    disaster_Code = request.GET.get('disaster_code')
+    min_human_loss = request.GET.get('minimum_human_loss')
+    max_human_loss = request.GET.get('maximum_human_loss')
+    min_animal_loss = request.GET.get('minimum_animal_loss')
+    max_animal_loss = request.GET.get('maximum_animal_loss')
+    min_property_loss = request.GET.get('minimum_property_loss')
+    max_property_loss = request.GET.get('maximum_property_loss')
+
+
+    if disaster_views.is_valid_queryparam(date_min):
+        data=data.filter(Year__gte=date_min)
+
+    if disaster_views.is_valid_queryparam(date_max):
+        data=data.filter(Year__lt=date_max)
+
+    if disaster_views.is_valid_queryparam(disaster_Code) and disaster_Code != '--':
+        data=data.filter(Disaster_Code = disaster_Code)
+     
+
+    if disaster_views.is_valid_queryparam(country_category) and country_category != '--':
+        data = data.filter(Country_id=country_category)
+
+    if disaster_views.is_valid_queryparam(min_human_loss):
+        data = data.filter(Human_Loss__gte=min_human_loss)
+
+    if disaster_views.is_valid_queryparam(max_human_loss):
+        data = data.filter(Human_Loss__lt=max_human_loss)
+
+    if disaster_views.is_valid_queryparam(min_animal_loss):
+        data = data.filter(Animal_Loss__gte=min_animal_loss)
+
+    if disaster_views.is_valid_queryparam(max_animal_loss):
+        data = data.filter(Animal_Loss__lt=max_animal_loss)
+
+    if disaster_views.is_valid_queryparam(min_property_loss):
+        data = data.filter(Physical_Properties_Loss_In_USD__gte=min_property_loss)
+
+    if disaster_views.is_valid_queryparam(max_property_loss):
+        data = data.filter(Physical_Properties_Loss_In_USD__lt=max_property_loss)
+
+    return data
+
+def export_disaster_table_to_excel(request):
+    data = filter_disaster(request)
+
+    df=None
+    output=BytesIO()
+    writer=pd.ExcelWriter(output,engine='xlsxwriter')
+    df.to_excel(writer,sheet_name='sheet1',index=False)
+
+    writer.close()
+    output.seek(0)
+
+    response=HttpResponse(
+        output,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['content-Disposition'] = 'attachment; filename=disaster_data.xlsx'
+    return response
+

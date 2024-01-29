@@ -22,6 +22,7 @@ def is_valid_queryparam(param):
 def display_disaster_table(request):
 
     data = Disaster_Data.objects.all()
+
     disaster_codes=Disaster_Data_Meta.objects.all()
 
     country_categories = Country_meta.objects.all()
@@ -34,10 +35,9 @@ def display_disaster_table(request):
     max_human_loss = request.GET.get('maximum_human_loss')
     min_animal_loss = request.GET.get('minimum_animal_loss')
     max_animal_loss = request.GET.get('maximum_animal_loss')
-    min_property_loss = request.GET.get('minimum_physical_property_loss_in_usd')
-    max_property_loss = request.GET.get('maximum_physical_property_loss_in_usd')
+    min_property_loss = request.GET.get('minimum_property_loss')
+    max_property_loss = request.GET.get('maximum_property_loss')
 
-  
 
     if is_valid_queryparam(date_min):
         data=data.filter(Year__gte=date_min)
@@ -47,7 +47,6 @@ def display_disaster_table(request):
 
     if is_valid_queryparam(disaster_Code) and disaster_Code != '--':
         data=data.filter(Disaster_Code = disaster_Code)
-     
 
     if is_valid_queryparam(country_category) and country_category != '--':
         data = data.filter(Country_id=country_category)

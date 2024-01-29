@@ -51,8 +51,8 @@
         <div class="form-group col-md-3">
           <label for="country_category">Country</label>
           <select
-            id="country_category"
-            class="form-control"
+          id="country_category"
+          class="form-control"
             name="country_category"
           >
             <option selected>--</option>
@@ -61,7 +61,28 @@
             {% endfor %}
           </select>
         </div>
-
+        <div class="form-group col-md-3">
+          <label for="disaster_code">Disaster Code</label>
+          <select id="disaster_code" class="form-control" name="disaster_code">
+            <option selected>--</option>
+            {% for disaster_code in disaster_codes %}
+            <option value="{{disaster_code.id }}">
+              {{disaster_code.Code}} - {{disaster_code.Disaster_Type}}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label for="minimum_human_loss">Minimum Human Loss</label>
+          <input
+            type="number"
+            min="0"
+            class="form-control"
+            id="minimum_human_loss"
+            placeholder="10"
+            name="minimum_human_loss"
+          />
+        </div>
         <div class="col-md-3">
           <label for="maximum_population">Maximum Human Loss</label>
           <input
@@ -74,29 +95,7 @@
             />
         </div>
 
-        <div class="col-md-3">
-          <label for="minimum_human_loss">Minimum Human Loss</label>
-          <input
-            type="number"
-            min="0"
-            class="form-control"
-            id="minimum_human_loss"
-            placeholder="1000"
-            name="minimum_human_loss"
-          />
-        </div>
 
-        <div class="col-md-3">
-          <label for="maximum_animal_loss">Maximum Animal Loss</label>
-          <input
-            type="number"
-            min="0"
-            class="form-control"
-            id="maximum_animal_loss"
-            placeholder="1000"
-            name="maximum_animal_loss"
-            />
-        </div>
         <div class="col-md-3">
           <label for="minimum_animal_loss">Minimum Animal Loss</label>
           <input
@@ -109,6 +108,28 @@
           />
         </div>
         <div class="col-md-3">
+          <label for="maximum_animal_loss">Maximum Animal Loss</label>
+          <input
+            type="number"
+            min="0"
+            class="form-control"
+            id="maximum_animal_loss"
+            placeholder="1000"
+            name="maximum_animal_loss"
+            />
+        </div>
+        <div class="col-md-3">
+          <label for="minimum_property_loss">Minimum Physical_Properties_Loss</label>
+          <input
+            type="number"
+            min="0"
+            class="form-control"
+            id="minimum_property_loss"
+            placeholder="1000"
+            name="minimum_property_loss"
+          />
+        </div>        
+        <div class="col-md-3">
           <label for="maximum_property_loss">Maximum Physical_Properties_Loss</label>
           <input
             type="number"
@@ -120,17 +141,6 @@
             />
         </div>
 
-        <div class="col-md-3">
-          <label for="minimum_property_loss">Minimum Physical_Properties_Loss</label>
-          <input
-            type="number"
-            min="0"
-            class="form-control"
-            id="minimum_property_loss"
-            placeholder="1000"
-            name="minimum_property_loss"
-          />
-        </div>
         <div class="col-md-3 d-flex align-items-end">
           <button type="submit" class=" btn btn-primary">
             Search

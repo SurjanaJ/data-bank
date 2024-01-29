@@ -62,22 +62,22 @@
             </select>
           </div>
           <div class="form-group col-md-3">
-            <label for="land_code">House Code</label>
-            <select id="land_code" class="form-control" name="land_code">
+            <label for="house_code">Mine Code-Name of the mine </label>
+            <select id="house_code" class="form-control" name="house_code">
               <option selected>--</option>
               {% for house_code in house_codes %}
-              <option value="{{house_code.id}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           d_code.id }}">
+              <option value="{{house_code.id}}">
                 {{house_code.Code}} - {{house_code.House_Type}}
               </option>
               {% endfor %}
             </select>
           </div>
           <div class="col-md-3">
-            <label for="ViewNameOfPlant">Name of the City </label>
+            <label for="ViewNameOfCity">Name of the City </label>
             <input
               type="text"
               class="form-control"
-              id="view_city_Name"
+              id="view_Name_Of_The_City"
               placeholder="e.g. Kathmandu"
               name="name_of_the_city"
             />
@@ -135,7 +135,7 @@
               <span class="fw-normal">Delete Selected</span>
           </button>
             <a
-              href="{% url 'export_forest_table_to_excel' %}?{{ request.GET.urlencode }}"
+              href="{% url 'export_housing_table_to_excel' %}?{{ request.GET.urlencode }}"
               class="border p-2 styled-link"
             >
             <i class="fa-solid fa-table"></i>

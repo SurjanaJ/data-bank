@@ -61,6 +61,18 @@
               {% endfor %}
             </select>
           </div>
+          
+          <div class="form-group col-md-3">
+            <label for="health_disease_code">Health Disease Code</label>
+            <select id="health_disease_code" class="form-control" name="health_disease_code">
+              <option selected>--</option>
+              {% for code in health_disease_codes %}
+              <option value="{{code.id }}">
+                {{code.Code}} - {{code.Disease_Type}}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
           <div class="col-md-3">
             <label for="viewUnit">Unit</label>
             <select id="unit" name="unit" class="form-control">
@@ -70,40 +82,27 @@
               {% endfor %}
             </select>
           </div>
-
-          <div class="form-group col-md-3">
-            <label for="health_disease_code">Health Disease Code</label>
-            <select id="land_code" class="form-control" name="health_disease_code">
-              <option selected>--</option>
-              {% for code in health_disease_codes %}
-              <option value="{{code.id }}">
-                {{code.Code}} - {{code.Disease_Type}}
-              </option>
-              {% endfor %}
-            </select>
-          </div>
-
-        <div class="col-md-3">
-          <label for="minimum_population">Minimum Population</label>
-          <input
+          <div class="col-md-3">
+            <label for="minimum_number_of_case">Minimum Number_Of_Case</label>
+            <input
             type="number"
             min="0"
             class="form-control"
-            id="minimum_population"
+            id="minimum_number"
             placeholder="1000"
-            name="minimum_population"
+            name="minimum_number"
           />
         </div>
 
         <div class="col-md-3">
-          <label for="maximum_population">Maximum Population</label>
+          <label for="maximum_number_of_case">Maximum Number_Of_Case</label>
           <input
             type="number"
             min="0"
             class="form-control"
-            id="maximum_population"
+            id="maximum_number"
             placeholder="1000"
-            name="maximum_population"
+            name="maximum_number"
             />
         </div>
 
@@ -138,7 +137,7 @@
               <span class="fw-normal">Delete Selected</span>
           </button>
             <a
-              href="{% url 'export_forest_table_to_excel' %}?{{ request.GET.urlencode }}"
+              href="{% url 'export_health_diseases_table_to_excel' %}?{{ request.GET.urlencode }}"
               class="border p-2 styled-link"
             >
             <i class="fa-solid fa-table"></i>

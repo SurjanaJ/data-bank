@@ -27,13 +27,13 @@ def display_political_table(request):
     date_min = request.GET.get('date_min')
     date_max = request.GET.get('date_max')
     country_category = request.GET.get('country_category')
-    disaster_Code = request.GET.get('disaster_code')
-    min_human_loss = request.GET.get('minimum_human_loss')  
-    max_human_loss = request.GET.get('maximum_human_loss')
-    min_animal_loss = request.GET.get('minimum_animal_loss')
-    max_animal_loss = request.GET.get('maximum_animal_loss')
-    min_property_loss = request.GET.get('minimum_physical_property_loss_in_usd')
-    max_property_loss = request.GET.get('maximum_physical_property_loss_in_usd')
+    political_party_name = request.GET.get('political_party_name')    
+    min_no_of_members = request.GET.get('minimum_no_of_members')
+    max_no_of_members = request.GET.get('maximum_no_of_members')
+    province = request.GET.get('view_province')
+    district = request.GET.get('district')
+    municipality = request.GET.get('municipality')
+    ward = request.GET.get('ward')  
 
   
 
@@ -43,30 +43,29 @@ def display_political_table(request):
     if is_valid_queryparam(date_max):
         data=data.filter(Year__lt=date_max)
 
-    if is_valid_queryparam(disaster_Code) and disaster_Code != '--':
-        data=data.filter(Disaster_Code = disaster_Code)
-     
-
     if is_valid_queryparam(country_category) and country_category != '--':
         data = data.filter(Country_id=country_category)
 
-    if is_valid_queryparam(min_human_loss):
-        data = data.filter(Human_Loss__gte=min_human_loss)
+    if is_valid_queryparam(political_party_name):
+        data=data.filter(Q(Political_Party_Name__icontains=political_party_name)).distinct()
 
-    if is_valid_queryparam(max_human_loss):
-        data = data.filter(Human_Loss__lt=max_human_loss)
+    if is_valid_queryparam(min_no_of_members):
+        data = data.filter(Number_Of_Member__gte=min_no_of_members)
 
-    if is_valid_queryparam(min_animal_loss):
-        data = data.filter(Animal_Loss__gte=min_animal_loss)
+    if is_valid_queryparam(max_no_of_members):
+        data = data.filter(Number_Of_Member__lt=max_no_of_members)
 
-    if is_valid_queryparam(max_animal_loss):
-        data = data.filter(Animal_Loss__lt=max_animal_loss)
+    if is_valid_queryparam(province):
+        data=data.filter(Q(Province__icontains=province)).distinct()
 
-    if is_valid_queryparam(min_property_loss):
-        data = data.filter(Physical_Properties_Loss_In_USD__gte=min_property_loss)
+    if is_valid_queryparam(district):
+        data=data.filter(Q(District__icontains=district)).distinct()
 
-    if is_valid_queryparam(max_property_loss):
-        data = data.filter(Physical_Properties_Loss_In_USD__lt=max_property_loss)
+    if is_valid_queryparam(municipality):
+        data=data.filter(Q(Municipality__icontains=municipality)).distinct()
+
+    if is_valid_queryparam(ward):
+        data=data.filter(Q(Wards__icontains=ward)).distinct()
 
     paginator = Paginator(data, 10)
     page_number = request.GET.get('page')

@@ -29,9 +29,11 @@ def display_health_disease_table(request):
 
     date_min = request.GET.get('date_min')
     date_max = request.GET.get('date_max')
-
     country_category = request.GET.get('country_category')
-    unit=request.GET.get('unit')  
+    unit=request.GET.get('unit')
+    disease_code = request.GET.get('health_disease_code')
+    minimum_number = request.GET.get('minimum_number')
+    maximum_number = request.GET.get('maximum_number')
 
     if is_valid_queryparam(date_min):
         data=data.filter(Year__gte=date_min)
@@ -44,6 +46,12 @@ def display_health_disease_table(request):
 
     if is_valid_queryparam(unit)  and unit != '--':
         data=data.filter(Unit=unit)
+
+    if is_valid_queryparam(minimum_number):
+        data=data.filter(Number_Of_Case__gte=minimum_number)
+
+    if is_valid_queryparam(maximum_number):
+        data=data.filter(Number_Of_Case__lt=maximum_number)
 
         
     

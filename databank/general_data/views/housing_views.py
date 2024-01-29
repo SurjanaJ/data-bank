@@ -29,13 +29,10 @@ def display_housing_table(request):
     date_min = request.GET.get('date_min')
     date_max = request.GET.get('date_max')
     country_category = request.GET.get('country_category')
-    disaster_Code = request.GET.get('disaster_code')
-    min_human_loss = request.GET.get('minimum_human_loss')  
-    max_human_loss = request.GET.get('maximum_human_loss')
-    min_animal_loss = request.GET.get('minimum_animal_loss')
-    max_animal_loss = request.GET.get('maximum_animal_loss')
-    min_property_loss = request.GET.get('minimum_physical_property_loss_in_usd')
-    max_property_loss = request.GET.get('maximum_physical_property_loss_in_usd')
+    house_Code = request.GET.get('house_code')
+    min_number = request.GET.get('minimum_number')  
+    max_number = request.GET.get('maximum_number')
+    name_of_the_city = request.GET.get('name_of_the_city')
 
   
 
@@ -45,30 +42,20 @@ def display_housing_table(request):
     if is_valid_queryparam(date_max):
         data=data.filter(Year__lt=date_max)
 
-    if is_valid_queryparam(disaster_Code) and disaster_Code != '--':
-        data=data.filter(Disaster_Code = disaster_Code)
-     
-
     if is_valid_queryparam(country_category) and country_category != '--':
         data = data.filter(Country_id=country_category)
 
-    if is_valid_queryparam(min_human_loss):
-        data = data.filter(Human_Loss__gte=min_human_loss)
+    if is_valid_queryparam(house_Code) and house_Code != '--':
+        data=data.filter(House_Code = house_Code)
 
-    if is_valid_queryparam(max_human_loss):
-        data = data.filter(Human_Loss__lt=max_human_loss)
+    if is_valid_queryparam(name_of_the_city):
+        data=data.filter(Q(City__icontains=name_of_the_city)).distinct()
 
-    if is_valid_queryparam(min_animal_loss):
-        data = data.filter(Animal_Loss__gte=min_animal_loss)
+    if is_valid_queryparam(max_number):
+        data = data.filter(Number__lt=max_number)   
 
-    if is_valid_queryparam(max_animal_loss):
-        data = data.filter(Animal_Loss__lt=max_animal_loss)
-
-    if is_valid_queryparam(min_property_loss):
-        data = data.filter(Physical_Properties_Loss_In_USD__gte=min_property_loss)
-
-    if is_valid_queryparam(max_property_loss):
-        data = data.filter(Physical_Properties_Loss_In_USD__lt=max_property_loss)
+    if is_valid_queryparam(min_number):
+        data = data.filter(Number__gte=min_number)
 
     paginator = Paginator(data, 10)
     page_number = request.GET.get('page')

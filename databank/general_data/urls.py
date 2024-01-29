@@ -6,7 +6,6 @@ from .views import export_views
 
 urlpatterns = [
 
-
     path('forest_table', view.display_forest_table, name='forest_table'),
     path('upload_forest_excel', view.upload_forest_excel, name='upload_forest_excel'),
     path('delete_selected_forest/', view.delete_selected_forest, name='delete_selected_forest'),
@@ -74,7 +73,6 @@ urlpatterns = [
     path('upload_transport_meta_excel', view.upload_meta_excel, name="upload_transport_meta_excel"),
 
 
-
     path('public_unitillity_table', public_unitillity_views.display_public_unitillity_table, name='public_unitillity_table'),    
     path('delete_selected_public_unitillity/', public_unitillity_views.delete_selected_public_unitillity, name='delete_selected_public_unitillity'),
     path('delete_public_unitillity_record/<int:item_id>/', public_unitillity_views.delete_public_unitillity_record, name='delete_public_unitillity_record'),
@@ -87,38 +85,43 @@ urlpatterns = [
     path('update_health_disease_record/<int:pk>/', view.update_record, name = 'update_health_disease_record'),
     path('delete_health_disease_record/<int:pk>/', view.delete_record, name ='delete_health_disease_record' ),
     path('delete_selected_health_disease/', view.delete_selected, name='delete_selected_health_disease'),
+    path('export_health_diseases_table_to_excel/', export_views.export_health_diseases_table_to_excel, name='export_health_diseases_table_to_excel'),
 
 
     path('disaster_table',disaster_views.display_disaster_table, name='disaster_table'),
     path('update_disaster_record/<int:pk>/', view.update_record, name = 'update_disaster_record'),
     path('delete_disaster_record/<int:pk>/', view.delete_record, name ='delete_disaster_record' ),
     path('delete_selected_disaster/', view.delete_selected, name='delete_selected_disaster'),
+    path('export_disaster_table_to_excel/', export_views.export_disaster_table_to_excel, name='export_disaster_table_to_excel'),
 
     
     path('road_table',road_views.display_road_table, name='road_table'),
     path('update_road_record/<int:pk>/', view.update_record, name = 'update_road_record'),
     path('delete_road_record/<int:pk>/', view.delete_record, name ='delete_road_record' ),
     path('delete_road_disease/', view.delete_selected, name='delete_selected_road'),
-
-
+    path('export_road_table_to_excel/', export_views.export_road_table_to_excel, name='export_road_table_to_excel'),
 
 
     path('housing_table',housing_views.display_housing_table, name='housing_table'),
     path('update_housing_record/<int:pk>/', view.update_record, name = 'update_housing_record'),
     path('delete_housing_record/<int:pk>/', view.delete_record, name ='delete_housing_record' ),
     path('delete_selected_housing/', view.delete_selected, name='delete_selected_housing'),
+    path('export_housing_table_to_excel/', export_views.export_housing_table_to_excel, name='export_housing_table_to_excel'),
+
 
     path('mining_table',mining_views.display_mining_table, name='mining_table'),
     path('update_mining_record/<int:pk>/', view.update_record, name = 'update_mining_record'),
     path('delete_mining_record/<int:pk>/', view.delete_record, name ='delete_mining_record'),
     path('delete_selected_mining/', view.delete_selected, name='delete_selected_mining'),
+    path('export_mining_table_to_excel/', export_views.export_mining_table_to_excel, name='export_mining_table_to_excel'),
 
 
     path('political_table',political_views.display_political_table, name='political_table'),
     path('update_political_record/<int:pk>/', view.update_record, name = 'update_political_record'),
     path('delete_political_record/<int:pk>/', view.delete_record, name ='delete_political_record' ),
     path('delete_selected_political/', view.delete_selected, name='delete_selected_political'),    
-    
+    path('export_political_table_to_excel/', export_views.export_political_table_to_excel, name='export_political_table_to_excel'),
+   
     
     path('upload_services_meta_excel', view.upload_meta_excel, name="upload_services_meta_excel"),
     path('services_meta',  services_view.display_services_meta, name='services_meta'),

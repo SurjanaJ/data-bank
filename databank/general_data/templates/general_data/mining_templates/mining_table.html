@@ -27,28 +27,28 @@
 
     <div class="collapse shadow rounded-2 " id="collapseFilter">
       <div class="px-2 py-2"> 
-        <form class="row" method="GET" action="./housing_table">
+        <form class="row" method="GET" action="./mining_table">
           
         <div class="col-md-3">
-            <label for="minimum_population">From Date</label>
+            <label for="minimum_date">Calender Date Minimum</label>
             <input
               type="number"
               min="0"
               class="form-control"
-              id="from_date"
+              id="date_min"
               placeholder="2080"
-              name="from_date"
+              name="date_min"
             />
           </div>
           <div class="col-md-3">
-            <label for="maximum_number">To Date</label>
+            <label for="maximum_date">Calender Date Minimum</label>
             <input
               type="number"
               min="0"
               class="form-control"
-              id="to_date"
+              id="date_max"
               placeholder="2082"
-              name="to_date"
+              name="date_max"
               />
           </div>
     
@@ -66,29 +66,19 @@
             </select>
           </div>
           <div class="form-group col-md-3">
-            <label for="land_code">House Code</label>
-            <select id="land_code" class="form-control" name="land_code">
+            <label for="mine_code">Mine Code-Name of the mine </label>
+            <select id="mine_code" class="form-control" name="mine_code">
               <option selected>--</option>
-              {% for house_code in house_codes %}
-              <option value="{{house_code.id}}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           d_code.id }}">
-                {{house_code.Code}} - {{house_code.House_Type}}
+              {% for mine_code in mine_codes %}
+              <option value="{{mine_code.id}}">
+                {{mine_code.Code}} - {{mine_code.Mine_Type}}
               </option>
               {% endfor %}
             </select>
           </div>
           <div class="col-md-3">
-            <label for="ViewNameOfPlant">Name of the Mine </label>
-            <input
-              type="text"
-              class="form-control"
-              id="view_mine_Name"
-              placeholder="e.g. Kathmandu"
-              name="name_of_the_mine"
-            />
-          </div>
-          <div class="col-md-3">
-            <label for="viewLandUnit">Unit</label>
-            <select id="land_unit" name="land_unit" class="form-control">
+            <label for="viewMineUnit">Unit</label>
+            <select id="mine_unit" name="mine_unit" class="form-control">
               <option selected>--</option>
               {% for unit in unit_options %}
               <option value="{{unit}}">{{ unit }}</option>
@@ -146,7 +136,7 @@
               type="text"
               class="form-control"
               id="view_mining_company_name"
-              placeholder="e.g. Kathmandu"
+              placeholder="e.g. company name"
               name="mining_company_name"
             />
           </div>
@@ -180,7 +170,7 @@
               <span class="fw-normal">Delete Selected</span>
           </button>
             <a
-              href="{% url 'export_forest_table_to_excel' %}?{{ request.GET.urlencode }}"
+              href="{% url 'export_mining_table_to_excel' %}?{{ request.GET.urlencode }}"
               class="border p-2 styled-link"
             >
             <i class="fa-solid fa-table"></i>
