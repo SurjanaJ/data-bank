@@ -118,5 +118,6 @@ urlpatterns = [
     path('update_climate_record/<int:pk>/', view.update_record, name = 'update_climate_record'),
     path('delete_climate_record/<int:pk>/', view.delete_record, name ='delete_climate_record' ),
     path('delete_selected_climate/', view.delete_selected, name='delete_selected_climate'),
+    path('export_climate_excel', climate_view.export_climate_excel, name='export_climate_excel'),
 
 ]   

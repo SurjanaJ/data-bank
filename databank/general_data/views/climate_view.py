@@ -284,3 +284,64 @@ def display_climate_table(request):
               'climate_type_categories':climate_type_categories
                       }
     return render(request, 'general_data/climate_templates/climate_table.html', context)
+
+
+def export_climate_excel(request):
+    date_minimum = request.GET.get('date_minimum')
+    date_maximum = request.GET.get('date_maximum')
+    country = request.GET.get('country')
+    place = request.GET.get('place')
+    temperature_unit = request.GET.get('temperature_unit')
+    climate_type = request.GET.get('climate_type')
+    climate_unit = request.GET.get('climate_unit')
+
+    filter_conditions = {}
+    if is_valid_queryparam(date_minimum):
+        filter_conditions['Date__gte'] = date_minimum
+
+    if is_valid_queryparam(date_maximum):
+        filter_conditions['Date__lt'] = date_maximum
+
+    if is_valid_queryparam(country) and country != '--':
+        filter_conditions['Country'] = country
+    
+    if is_valid_queryparam(place) and place != '--':
+        filter_conditions['Place'] = place
+
+    if is_valid_queryparam(temperature_unit) and temperature_unit !='--':
+        filter_conditions['Temperature_Unit'] = temperature_unit
+
+    if is_valid_queryparam(climate_type) and climate_type != '--':
+        filter_conditions['Climate'] = climate_type
+
+    if is_valid_queryparam(climate_unit) and climate_unit !='--':
+        filter_conditions['Climate_Unit'] = climate_unit
+
+    queryset = Climate_Data.objects.filter(**filter_conditions)
+    queryset = queryset.annotate(
+        country = F('Country__Country_Name'),
+        place = F('Place__Place_Name'),
+        temperature_unit = F('Temperature_Unit__Unit_Name'),
+        climate_unit = F('Climate_Unit__Unit_Name')
+    )
+
+    data = pd.DataFrame(list(queryset.values('country','Date', 'place','temperature_unit','Max_Temperature', 'Min_Temperature', 'Climate', 'climate_unit','Amount')))
+
+    data.rename(columns={'country':'Country','place': 'Place', 'temperature_unit':'Temperature_Unit', 'climate_unit':'Climate_Unit'}, inplace=True)
+
+    column_order = ['Country', 'Date', 'Place', 'Temperature_Unit', 'Max_Temperature', 'Min_Temperature','Climate','Climate_Unit','Amount']
+
+    data = data[column_order]
+        
+    output = BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')  
+    data.to_excel(writer, sheet_name='Sheet1', index=False)
+
+    writer.close()  
+    output.seek(0)
+
+    response = HttpResponse(
+        output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
+    return response
