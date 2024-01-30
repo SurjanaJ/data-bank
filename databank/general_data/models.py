@@ -282,6 +282,8 @@ class Disaster_Data_Meta(models.Model):
     Code = Code=models.CharField(max_length=100)
     Disaster_Type = models.TextField(null=True,blank=True)
     
+    def __str__(self):
+        return self.Code
 
 class Disaster_Data(models.Model):
     id = models.AutoField(primary_key=True)

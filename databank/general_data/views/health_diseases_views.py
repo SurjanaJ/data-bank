@@ -18,7 +18,6 @@ def is_valid_queryparam(param):
     return param !='' and param is not None
 
 
-
 def display_health_disease_table(request):
     data=Health_disease.objects.all()
     country_categories=Country_meta.objects.all()
@@ -53,10 +52,6 @@ def display_health_disease_table(request):
     if is_valid_queryparam(maximum_number):
         data=data.filter(Number_Of_Case__lt=maximum_number)
 
-        
-    
-
-
     #get form data for filteration
 
     paginator = Paginator(data, 10)
@@ -65,7 +60,7 @@ def display_health_disease_table(request):
     context={
         'data_len':len(data),
         'query_len': len(page),
-        'page':page,
+        'page':page,    
         'country_categories':country_categories,
         'unit_categories':unit_categories,
         'health_disease_codes':health_disease_codes,

@@ -1,6 +1,6 @@
 from ..models import ForestData,Land,Hotel,Transport,Tourism,Water,PopulationData,Mining,Political_Data,Road,Housing,Health_disease,Disaster_Data,Public_Unitillity
 from io import BytesIO
-from ..views import view,population_view,tourism_view,transport_view,hotel_view,water_view,political_views,road_views,mining_views,health_diseases_views,housing_views,disaster_views
+from ..views import view,population_view,tourism_view,transport_view,public_unitillity_views,hotel_view,water_view,political_views,road_views,mining_views,health_diseases_views,housing_views,disaster_views
 import xlsxwriter
 from django.db.models import Q
 from django.db.models import F
@@ -469,13 +469,43 @@ def export_transport_table_to_excel(request):
 def filter_public_unitillity(request):
     data = Public_Unitillity.objects.all()
 
+    date_min = request.GET.get('date_min')
+    date_max = request.GET.get('date_max')
+    country_category = request.GET.get('country_category')
+    public_unitillity_type_category = request.GET.get('public_unitillity_type_category')
+    min_number  = request.GET.get('minimum_number')
+    max_number = request.GET.get('maximum_number')
+
+    if public_unitillity_views.is_valid_queryparam(date_min):
+        data=data.filter(Year__gte=date_min)
+
+    if public_unitillity_views.is_valid_queryparam(date_max):
+        data=data.filter(Year__lt=date_max)
+
+    if public_unitillity_views.is_valid_queryparam(country_category) and country_category != '--':
+        data = data.filter(Country_id=country_category)
+
+    if public_unitillity_views.is_valid_queryparam(public_unitillity_type_category):
+        data=data.filter(Q(Type_Of_Public_Utility__icontains=public_unitillity_type_category)).distinct()
+
+    if public_unitillity_views.is_valid_queryparam(min_number):
+        data = data.filter(Number__gte=min_number)
+
+    if public_unitillity_views.is_valid_queryparam(max_number):
+        data = data.filter(Number__lt=max_number)
+
 
     return data
 
 def export_public_unitillity_table_to_excel(request):
     data = filter_public_unitillity(request)
 
-    df=None
+    data = data.annotate(
+        country_name =F('Country__Country_Name'),
+    )
+    df=pd.DataFrame(data.values('Year','country_name','Type_Of_Public_Utility','Number'))
+    df.rename(columns={'country_name': 'Country'},inplace=True)
+    df = df[['Year','Country','Type_Of_Public_Utility','Number']]
     output=BytesIO()
     writer=pd.ExcelWriter(output,engine='xlsxwriter')
     df.to_excel(writer,sheet_name='sheet1',index=False)
@@ -494,12 +524,52 @@ def export_public_unitillity_table_to_excel(request):
 def filter_road(request):
     data = Road.objects.all()
 
+    date_min = request.GET.get('date_min')
+    date_max = request.GET.get('date_max')
+    country_category = request.GET.get('country_category')
+    road_code = request.GET.get('road_code')
+    min_length = request.GET.get('minimum_length')
+    max_length = request.GET.get('maximum_length')
+    unit = request.GET.get('road_unit')
+    Highway_No = request.GET.get('highway_no')
+ 
+
+    if road_views.is_valid_queryparam(date_min):
+        data=data.filter(Year__gte=date_min)
+
+    if road_views.is_valid_queryparam(date_max):
+        data=data.filter(Year__lt=date_max)
+
+    if road_views.is_valid_queryparam(country_category) and country_category != '--':
+        data = data.filter(Country_id=country_category)
+
+    if road_views.is_valid_queryparam(road_code) and road_code != '--':
+        data=data.filter(Code_Type_Of_Road = road_code)
+     
+    if road_views.is_valid_queryparam(min_length):
+        data = data.filter(Length__gte=min_length)
+
+    if road_views.is_valid_queryparam(max_length):
+        data = data.filter(Length__lt=max_length)
+
+    if road_views.is_valid_queryparam(unit)  and unit != '--':
+        data=data.filter(Length_Unit_Options=unit) 
+
 
     return data
 def export_road_table_to_excel(request):
     data = filter_road(request)
 
-    df=None
+    data = data.annotate(
+        country_name = F('Country__Country_Name'),
+        code_type_of_road = F('Code_Type_Of_Road__Code'),
+        Type_Of_The_Road = F('Code_Type_Of_Road__Road_Type')
+
+    )
+
+    df=pd.DataFrame(data.values('Year','country_name','Highway_No','code_type_of_road','Type_Of_The_Road','Length_Unit_Options','Length'))
+    df.rename(columns={'country_name':'Country','code_type_of_road':'Code_Type_Of_Road','Length_Unit_Options':'Length_Unit'},inplace=True)
+    df = df[['Year','Country','Highway_No','Code_Type_Of_Road','Type_Of_The_Road','Length_Unit','Length']]
     output=BytesIO()
     writer=pd.ExcelWriter(output,engine='xlsxwriter')
     df.to_excel(writer,sheet_name='sheet1',index=False)
@@ -517,13 +587,61 @@ def export_road_table_to_excel(request):
 def filter_political(request):
     data = Political_Data.objects.all()
 
+    date_min = request.GET.get('date_min')
+    date_max = request.GET.get('date_max')
+    country_category = request.GET.get('country_category')
+    political_party_name = request.GET.get('political_party_name')    
+    min_no_of_members = request.GET.get('minimum_no_of_members')
+    max_no_of_members = request.GET.get('maximum_no_of_members')
+    province = request.GET.get('view_province')
+    district = request.GET.get('district')
+    municipality = request.GET.get('municipality')
+    ward = request.GET.get('ward')  
+
+  
+    if political_views.is_valid_queryparam(date_min):
+        data=data.filter(Year__gte=date_min)
+
+    if political_views.is_valid_queryparam(date_max):
+        data=data.filter(Year__lt=date_max)
+
+    if political_views.is_valid_queryparam(country_category) and country_category != '--':
+        data = data.filter(Country_id=country_category)
+
+    if political_views.is_valid_queryparam(political_party_name):
+        data=data.filter(Q(Political_Party_Name__icontains=political_party_name)).distinct()
+
+    if political_views.is_valid_queryparam(min_no_of_members):
+        data = data.filter(Number_Of_Member__gte=min_no_of_members)
+
+    if political_views.is_valid_queryparam(max_no_of_members):
+        data = data.filter(Number_Of_Member__lt=max_no_of_members)
+
+    if political_views.is_valid_queryparam(province):
+        data=data.filter(Q(Province__icontains=province)).distinct()
+
+    if political_views.is_valid_queryparam(district):
+        data=data.filter(Q(District__icontains=district)).distinct()
+
+    if political_views.is_valid_queryparam(municipality):
+        data=data.filter(Q(Municipality__icontains=municipality)).distinct()
+
+    if political_views.is_valid_queryparam(ward):
+        data=data.filter(Q(Wards__icontains=ward)).distinct()
+
 
     return data
 
 def export_political_table_to_excel(request):
     data = filter_political(request)
 
-    df=None
+    data = data.annotate(
+        country_name = F('Country__Country_Name'),
+    )
+
+    df = pd.DataFrame(data.values('Year','country_name','Political_Party_Name','Number_Of_Member','Province','District','Municipality','Wards'))
+    df.rename(columns={'country_name':'Country','Number_Of_Member':'No_Of_Member'},inplace=True)
+    df = df[['Year','Country','Political_Party_Name','No_Of_Member','Province','District','Municipality','Wards']]
     output=BytesIO()
     writer=pd.ExcelWriter(output,engine='xlsxwriter')
     df.to_excel(writer,sheet_name='sheet1',index=False)
@@ -572,7 +690,14 @@ def filter_health_diseases(request):
 def export_health_diseases_table_to_excel(request):
     data = filter_health_diseases(request)
 
-    df=None
+    data = data.annotate(
+        country_name = F('Country__Country_Name'),
+        disease_code = F('Disease_Code__Code')
+    )
+    df = pd.DataFrame(data.values('Year','country_name','disease_code','Unit','Number_Of_Case'))
+    df.rename(columns={'country_name':'Country','disease_code':'Disease_Code'},inplace=True)
+
+    df=df[['Year','Country','Disease_Code','Unit','Number_Of_Case']]
     output=BytesIO()
     writer=pd.ExcelWriter(output,engine='xlsxwriter')
     df.to_excel(writer,sheet_name='sheet1',index=False)
@@ -627,7 +752,16 @@ def filter_housing(request):
 def export_housing_table_to_excel(request):
     data = filter_housing(request)
 
-    df=None
+    data =data.annotate(
+        country_name=F('Country__Country_Name'),
+        house_code = F('House_Code__Code'),
+        house_type = F('House_Code__House_Type')
+
+    )
+
+    df = pd.DataFrame(data.values('Year','country_name','house_code','house_type','City','Number'))
+    df.rename(columns={'country_name':'Country','house_code':'House_Code','house_type':'House_Type'},inplace=True)
+    df = df[['Year','Country','House_Code','House_Type','City','Number']]
     output=BytesIO()
     writer=pd.ExcelWriter(output,engine='xlsxwriter')
     df.to_excel(writer,sheet_name='sheet1',index=False)
@@ -645,13 +779,62 @@ def export_housing_table_to_excel(request):
 def filter_mining(request):
     data = Mining.objects.all()
 
+    date_min = request.GET.get('date_min')
+    date_max = request.GET.get('date_max')
+    country_category = request.GET.get('country_category')
+    mine_code = request.GET.get('mine_code')
+    unit = request.GET.get('mine_unit')  
+    minimum_current_production = request.GET.get('minimum_current_production')
+    maximum_current_production = request.GET.get('maximum_current_production')
+    minimum_potential_stock = request.GET.get('minimum_potential_stock')
+    maximum_potential_stock = request.GET.get('maximum_potential_stock')
+    mining_company_name = request.GET.get('mining_company_name')
+
+  
+    if mining_views.is_valid_queryparam(date_min):
+        data=data.filter(Year__gte=date_min)
+
+    if mining_views.is_valid_queryparam(date_max):
+        data=data.filter(Year__lt=date_max)
+
+    if mining_views.is_valid_queryparam(country_category) and country_category != '--':
+        data = data.filter(Country_id=country_category)
+
+    if mining_views.is_valid_queryparam(mine_code) and mine_code != '--':
+        data=data.filter(Name_Of_Mine_id = mine_code)
+
+    if mining_views.is_valid_queryparam(unit)  and unit != '--':
+        data=data.filter(Unit=unit) 
+
+    if mining_views.is_valid_queryparam(minimum_current_production):
+        data = data.filter(Current_Production__gte=minimum_current_production)
+
+    if mining_views.is_valid_queryparam(maximum_current_production):
+        data = data.filter(Current_Production__lt=maximum_current_production)
+
+    if mining_views.is_valid_queryparam(minimum_potential_stock):
+        data = data.filter(Potential_Stock__gte=minimum_potential_stock)
+
+    if mining_views.is_valid_queryparam(maximum_potential_stock):
+        data = data.filter(Potential_Stock__lt=maximum_potential_stock)
+
+    if mining_views.is_valid_queryparam(mining_company_name):
+        data=data.filter(Q(Mining_Company_Name__icontains=mining_company_name)).distinct()
 
     return data
 
 def export_mining_table_to_excel(request):
     data = filter_mining(request)
 
-    df=None
+    data = data.annotate(
+        country_name = F('Country__Country_Name'),
+        name_of_mine = F('Name_Of_Mine__Mine_Type')
+
+    )
+
+    df=pd.DataFrame(data.values('Year','country_name','name_of_mine','Unit','Current_Production','Potential_Stock','Mining_Company_Name'))
+    df.rename(columns={'country_name':'Country','name_of_mine':'Name_Of_Mine'},inplace=True)
+    df = df[['Year','Country','Name_Of_Mine','Unit','Current_Production','Potential_Stock','Mining_Company_Name']]
     output=BytesIO()
     writer=pd.ExcelWriter(output,engine='xlsxwriter')
     df.to_excel(writer,sheet_name='sheet1',index=False)
@@ -717,7 +900,14 @@ def filter_disaster(request):
 def export_disaster_table_to_excel(request):
     data = filter_disaster(request)
 
-    df=None
+    data =data.annotate(
+        country_name = F('Country__Country_Name'),
+        disaster_code = F('Disaster_Code__Code')
+    )
+    df = pd.DataFrame(data.values('Year','country_name','disaster_code','Human_Loss','Animal_Loss','Physical_Properties_Loss_In_USD'))
+    df.rename(columns={'country_name':'Country','disaster_code':'Disaster_id'},inplace=True)
+
+    df=df[['Year','Country','Disaster_id','Human_Loss','Animal_Loss','Physical_Properties_Loss_In_USD']]
     output=BytesIO()
     writer=pd.ExcelWriter(output,engine='xlsxwriter')
     df.to_excel(writer,sheet_name='sheet1',index=False)
@@ -730,4 +920,6 @@ def export_disaster_table_to_excel(request):
     )
     response['content-Disposition'] = 'attachment; filename=disaster_data.xlsx'
     return response
+
+
 
