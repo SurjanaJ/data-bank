@@ -125,6 +125,7 @@ def upload_disaster_excel(request):
                         'Animal_Loss': row['Animal_Loss'],
                         'Physical_Properties_Loss_In_USD': row['Physical_Properties_Loss_In_USD']
                     }
+                    print(disaster_data)
                     errors.append({'row_index': index, 'data': disaster_data, 'reason': str(e)})
                     continue
 

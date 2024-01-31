@@ -386,7 +386,7 @@ class Occupation(models.Model):
     Number = models.IntegerField()
 
     def __str__(self):
-        return str(self.Code
+        return str(self.Code)
     
 
 class Climate_Place_Meta(models.Model):
@@ -419,7 +419,7 @@ class Climate_Data(models.Model):
     Amount =  models.FloatField(max_length=100)
 
     def __str__(self):
-        return (str(self.id)))
+        return (str(self.id))
 
 
 

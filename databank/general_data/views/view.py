@@ -517,7 +517,7 @@ def delete_record(request,pk):
         Road:'road_table',
         Mining:'mining_table',
         Housing:'housing_table',
-        Political_Data:'political_table'
+        Political_Data:'political_table',
         Climate_Data:'climate_table',
     }
 
@@ -545,7 +545,7 @@ def delete_selected(request):
         'delete_selected_mining':Mining,
         'delete_selected_housing':Housing,
         'delete_selected_road':Road,
-        'delete_selected_political':Political_Data
+        'delete_selected_political':Political_Data,
 
         'delete_selected_climate':Climate_Data,
     }
@@ -560,7 +560,7 @@ def delete_selected(request):
         Road:'road_table',
         Mining:'mining_table',
         Housing:'housing_table',
-        Political_Data:'political_table'
+        Political_Data:'political_table',
         Climate_Data: 'climate_table',
     }
     model_class = model_mapping.get(view_name)
