@@ -138,6 +138,11 @@ meta_tables =[
         "url": "place_meta",
         "upload_url":"upload_climate_place_meta_excel"
     },
+    {
+        "name":"Currency Meta",
+        "url": "currency_meta",
+        "upload_url":"upload_currency_excel"
+    },
     ]
 
 def is_valid_queryparam(param):

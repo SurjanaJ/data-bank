@@ -205,5 +205,5 @@ class UpdateClimate(ModelForm):
         }
 
 # EXCHANGE DATA
-class UploadCurrencyMeta(forms.Form):
+class UploadCurrencyForm(forms.Form):
     meta_file = forms.FileField()       

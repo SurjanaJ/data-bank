@@ -417,3 +417,7 @@ class Currency_Meta(models.Model):
     id = models.AutoField(primary_key=True)
     Currency_Name = models.TextField()
     Currency_Code = models.CharField(max_length = 40)
+    Country = models.ForeignKey(Country_meta, on_delete= models.CASCADE)
+
+    def __str__(self):
+        return (self.Currency_Name)
