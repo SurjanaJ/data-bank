@@ -93,6 +93,8 @@ urlpatterns = [
     path('delete_disaster_record/<int:pk>/', view.delete_record, name ='delete_disaster_record' ),
     path('delete_selected_disaster/', view.delete_selected, name='delete_selected_disaster'),
     path('export_disaster_table_to_excel/', export_views.export_disaster_table_to_excel, name='export_disaster_table_to_excel'),
+    path('upload_disaster_excel', disaster_views.upload_disaster_excel, name = 'upload_disaster_excel'),
+
 
     
     path('road_table',road_views.display_road_table, name='road_table'),

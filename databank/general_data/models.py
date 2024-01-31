@@ -386,7 +386,7 @@ class Occupation(models.Model):
     Number = models.IntegerField()
 
     def __str__(self):
-        return self.Code
+        return str(self.Code)
 
 
 

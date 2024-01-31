@@ -872,7 +872,6 @@ def filter_disaster(request):
 
     if disaster_views.is_valid_queryparam(disaster_Code) and disaster_Code != '--':
         data=data.filter(Disaster_Code = disaster_Code)
-     
 
     if disaster_views.is_valid_queryparam(country_category) and country_category != '--':
         data = data.filter(Country_id=country_category)
@@ -907,7 +906,7 @@ def export_disaster_table_to_excel(request):
     df = pd.DataFrame(data.values('Year','country_name','disaster_code','Human_Loss','Animal_Loss','Physical_Properties_Loss_In_USD'))
     df.rename(columns={'country_name':'Country','disaster_code':'Disaster_id'},inplace=True)
 
-    df=df[['Year','Country','Disaster_id','Human_Loss','Animal_Loss','Physical_Properties_Loss_In_USD']]
+    df=df[['Year','Country','Disaster_id','Human_Loss','Animal_Loss','Physical_Properties_Loss_In_USD']] 
     output=BytesIO()
     writer=pd.ExcelWriter(output,engine='xlsxwriter')
     df.to_excel(writer,sheet_name='sheet1',index=False)

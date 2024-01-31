@@ -197,27 +197,65 @@ class UpdateDisaster(ModelForm):
         model = Disaster_Data
         fields='__all__'
 
+class UploadDisasterForm(forms.Form):
+    file = forms.FileField()
+
+#health disease 
+
 class UpdateHealthDisease(ModelForm):
     class Meta:
         model = Health_disease
         fields='__all__'
 
+class UploadHealthDiseaseForm(forms.Form):
+    file = forms.FileField()
+
+#Mining 
 class UpdateMining(ModelForm):
     class Meta:
         model = Mining
         fields='__all__'
+
+class UploadMiningForm(forms.Form):
+    file = forms.FileField()
+
+#Housing
 
 class UpdateHousing(ModelForm):
     class Meta:
         model = Housing
         fields='__all__'
 
+class UploadHousingForm(forms.Form):
+    file = forms.FileField()
+
+#political 
+
 class UpdatePolitical(ModelForm):
     class Meta:
         model = Political_Data
         fields='__all__'
 
+class UploadPoliticalForm(forms.Form):
+    file = forms.FileField()
+
+
+#Road
+
 class UpdateRoad(ModelForm):
     class Meta:
         model = Road
+        fields='__all__'
+
+class UploadRoadForm(forms.Form):
+    file = forms.FileField()
+
+# public unitillity data
+class UploadPublicUnitillityDataForm(forms.Form):
+    Public_Unitillity_data_file = forms.FileField()
+
+
+class UploadPublicUnitillityData(ModelForm):
+    class Meta:
+        model = Public_Unitillity
         fields='__all__'

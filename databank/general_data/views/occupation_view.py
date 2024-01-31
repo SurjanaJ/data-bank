@@ -46,7 +46,7 @@ def upload_occupation_excel(request):
                 try:
                     Code = Occupation_Meta.objects.get(SOC_Code = row['Code'])
                     Country = Country_meta.objects.get(Country_Name = row['Country'])
-
+                   
                     occupation_data = {
                         'Country': Country,
                         'Year': row['Year'],
