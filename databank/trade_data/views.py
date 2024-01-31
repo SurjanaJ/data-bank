@@ -63,6 +63,11 @@ tables =[
         "name": "Occupation Data",
         "url": "occupation_table"
     }
+    ,
+    {
+        "name": "Climate Data",
+        "url": "climate_table"
+    }
     ]
 
 
@@ -127,8 +132,12 @@ meta_tables =[
         "name":"Occupation Meta",
         "url": "occupation_meta",
         "upload_url":"upload_occupation_meta_excel"
-    }
-  
+    },
+    {
+        "name":"Climate Places Meta",
+        "url": "place_meta",
+        "upload_url":"upload_climate_place_meta_excel"
+    },
     ]
 
 def is_valid_queryparam(param):

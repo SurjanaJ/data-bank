@@ -1,7 +1,6 @@
 from django.urls import include, path
 
-
-from .views import occupation_view,education_view, view,population_view,hotel_view,land_view,political_views,tourism_view,mining_views,water_view,housing_views,road_views,transport_view,services_view, crime_view,public_unitillity_views,health_diseases_views,disaster_views
+from .views import climate_view,occupation_view,education_view, view,population_view,hotel_view,land_view,political_views,tourism_view,mining_views,water_view,housing_views,road_views,transport_view,services_view, crime_view,public_unitillity_views,health_diseases_views,disaster_views
 from .views import export_views
 
 urlpatterns = [
@@ -163,5 +162,13 @@ urlpatterns = [
     path('update_occupation_record/<int:pk>/', view.update_record, name = 'update_occupation_record'),
     path('export_occupation_excel', occupation_view.export_occupation_excel, name='export_occupation_excel'),
 
+    path('upload_climate_place_meta_excel', climate_view.upload_climate_place_meta_excel, name='upload_climate_place_meta_excel'),
+    path('place_meta',  climate_view.display_climate_place_meta, name='place_meta'),
+    path('upload_climate_excel', climate_view.upload_climate_excel, name = 'upload_climate_excel'),
+    path('climate_table', climate_view.display_climate_table, name='climate_table'),    
+    path('update_climate_record/<int:pk>/', view.update_record, name = 'update_climate_record'),
+    path('delete_climate_record/<int:pk>/', view.delete_record, name ='delete_climate_record' ),
+    path('delete_selected_climate/', view.delete_selected, name='delete_selected_climate'),
+    path('export_climate_excel', climate_view.export_climate_excel, name='export_climate_excel'),
 
 ]   

@@ -1,5 +1,5 @@
 from django.db import models
-from trade_data.models import Country_meta
+from trade_data.models import Country_meta, Unit_meta
 
 # # Create your models here.
 class ForestData(models.Model):
@@ -386,7 +386,40 @@ class Occupation(models.Model):
     Number = models.IntegerField()
 
     def __str__(self):
-        return str(self.Code)
+        return str(self.Code
+    
+
+class Climate_Place_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    Country = models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    Place_Code = models.CharField(max_length=20)
+    Place_Name = models.TextField()
+    created_date = models.DateTimeField(auto_now=True)
+    modified_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.Place_Code
+
+class Climate_Data(models.Model):
+    CLIMATE_OPTIONS = (
+        ('Rain', 'Rain'),
+        ('Snow', 'Snow'),
+        ('Storm', 'Storm')
+    )
+   
+    id = models.AutoField(primary_key=True)
+    Country = models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    Date =models.DateField()
+    Place = models.ForeignKey(Climate_Place_Meta, on_delete=models.CASCADE)
+    Temperature_Unit = models.ForeignKey(Unit_meta, on_delete = models.CASCADE,related_name='generaldata_temperature_unit')
+    Max_Temperature = models.FloatField(max_length=100)
+    Min_Temperature = models.FloatField(max_length=100)
+    Climate=models.CharField(max_length=20,choices=CLIMATE_OPTIONS)
+    Climate_Unit = models.ForeignKey(Unit_meta, on_delete = models.CASCADE, related_name='generaldata_climate_unit')
+    Amount =  models.FloatField(max_length=100)
+
+    def __str__(self):
+        return (str(self.id)))
 
 
 
