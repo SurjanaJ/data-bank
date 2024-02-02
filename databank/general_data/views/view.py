@@ -8,8 +8,8 @@ from django.db.models import Q
 import pandas as pd
 
 from trade_data import views
-from ..models import Climate_Data, Crime, Crime_Meta,Road,Mining,Housing,Political_Data, Education,Health_disease, Education_Degree_Meta, Education_Level_Meta, ForestData, Country_meta, Land_Code_Meta, Occupation, Occupation_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta,Disaster_Data,Disaster_Data_Meta
-from ..forms import UpdateClimate, UpdateCrime,UpdateHousing,UpdateMining,UpdatePolitical,UpdateRoad, UpdateEducation,UpdateHealthDisease, UpdateOccupation, UpdateServices, UploadCrimeMetaForm, UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadOccupationMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm,UpdateDisaster
+from ..models import Climate_Data, Crime, Crime_Meta, Disaster_Data, Health_disease,Road,Mining,Housing,Political_Data, Education, Education_Degree_Meta, Education_Level_Meta, ForestData, Country_meta, Land_Code_Meta, Occupation, Occupation_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
+from ..forms import UpdateClimate, UpdateCrime, UpdateDisaster, UpdateHealthDisease,UpdateHousing,UpdateMining,UpdatePolitical,UpdateRoad, UpdateEducation, UpdateOccupation, UpdateServices, UploadCrimeMetaForm, UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadOccupationMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages

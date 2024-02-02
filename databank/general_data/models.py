@@ -242,6 +242,9 @@ class Health_disease_Meta(models.Model):
     Code = Code=models.CharField(max_length=100)
     Disease_Type = models.TextField(null=True,blank=True)
 
+    def __str__(self):
+        return self.Code
+
 
 class Health_disease(models.Model):
 
@@ -250,11 +253,12 @@ class Health_disease(models.Model):
     )
 
     id = models.AutoField(primary_key=True)
-    Year = models.DateField(null=True, blank=True)
+    Year = models.IntegerField()
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
     Disease_Code = models.ForeignKey( Health_disease_Meta, on_delete = models.CASCADE )
     Unit = models.CharField(max_length = 20 , choices = Unit_Options , blank = True , null= True)
     Number_Of_Case = models.IntegerField(default = 0 , null = True , blank = True)
+
 
 
 class Budgetary_Data(models.Model):
@@ -287,7 +291,7 @@ class Disaster_Data_Meta(models.Model):
 
 class Disaster_Data(models.Model):
     id = models.AutoField(primary_key=True)
-    Year=models.DateField(null=True, blank=True)
+    Year=models.IntegerField()
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
     Disaster_Code = models.ForeignKey(Disaster_Data_Meta,on_delete= models.CASCADE)
     Human_Loss = models.IntegerField(default = 0 ,null = True ,blank = True)

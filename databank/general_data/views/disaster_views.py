@@ -96,96 +96,87 @@ def upload_disaster_excel(request):
         form = UploadDisasterForm(request.POST,request.FILES)
         if form.is_valid():
             excel_data = request.FILES['file']
-            df = pd.read_excel(excel_data, dtype={'Disaster_id': str})
-            cols = df.columns.tolist()
-            df.fillna('', inplace=True)
-            df['Year'] = pd.to_datetime(df['Year']).dt.date
+            df = pd.read_excel(excel_data,dtype={'Disaster_id':str})
+            cols = df.columns.to_list()
+            df.fillna('',inplace=True)
 
-            for index, row in df.iterrows():
+
+            for index,row in df.iterrows():
                 disaster_data = {col: row[col] for col in cols}
-                try: 
-                    Year = row['Year']
-                    Country = Country_meta.objects.get(Country_Name = row['Country'])
-                    Disaster_id = Disaster_Data_Meta.objects.get(Code = row['Disaster_id'])
+                
+                try:
+                    Country_instance = Country_meta.objects.get(Country_Name = row['Country'])
+                    disaster_id = Disaster_Data_Meta.objects.get(Code = row['Disaster_id'])
                     disaster_data = {
-                        'Year':Year,
-                        'Country':Country,
-                        'Disaster_id':Disaster_id,
-                        'Human_Loss': row['Human_Loss'],
-                        'Animal_Loss': row['Animal_Loss'],
-                        'Physical_Properties_Loss_In_USD': row['Physical_Properties_Loss_In_USD']
+                        'Year':row['Year'],
+                        'Country':Country_instance,
+                        'Disaster_Code':disaster_id,
+                        'Human_Loss':row['Human_Loss'],
+                        'Animal_Loss':row['Animal_Loss'],
+                        'Physical_Properties_Loss_In_USD':row['Physical_Properties_Loss_In_USD']
+                        
                     }
-
+                    
                 except Exception as e:
-                    disaster_data = {
-                        'Country':Country,
-                        'Year':Year.isoformat(),
-                        'Disaster_id':Disaster_id,
-                        'Human_Loss': row['Human_Loss'],
-                        'Animal_Loss': row['Animal_Loss'],
-                        'Physical_Properties_Loss_In_USD': row['Physical_Properties_Loss_In_USD']
-                    }
-                    print(disaster_data)
-                    errors.append({'row_index': index, 'data': disaster_data, 'reason': str(e)})
+                    errors.append({'row_index':index, 'data':disaster_data , 'reason': str(e)})
                     continue
 
-                existing_record = Disaster_Data.objects.filter(
-                    Q(Country = Country ) & Q(Year = row['Year']) & Q(Disaster_Code = Disaster_id)
-                )
+                
+                existing_record = Disaster_Data.objects.filter(Q(Year = row['Year'] )& Q(Country = Country_instance) & Q(Disaster_Code = disaster_id)).first()
 
                 if existing_record:
                     existing_dict = model_to_dict(existing_record)
                     disaster_data_dict = model_to_dict(Disaster_Data(**disaster_data))
 
-                    if all(existing_dict[key] == disaster_data_dict[key] or (pd.isna(existing_dict[key]) and pd.isna(disaster_data_dict[key])) for key in disaster_data_dict if key !='id'):
+                    if all(existing_dict[key] == disaster_data_dict[key] or (pd.isna(existing_dict[key])and pd.isna(disaster_data_dict[key])) for key in disaster_data_dict if key != 'id' ):
                         disaster_data = {
-                            'Country':Country,
                             'Year':row['Year'],
-                            'disaster_id':Disaster_id,
-                            'Human_Loss': row['Human_Loss'],
-                            'Animal_Loss': row['Animal_Loss'],
-                            'Physical_Properties_Loss_In_USD': row['Physical_Properties_Loss_In_USD']
-
+                            'Country':Country_instance,
+                            'Disaster_Code':disaster_id.Code,
+                            'Human_Loss':row['Human_Loss'],
+                            'Animal_Loss':row['Animal_Loss'],
+                            'Physical_Properties_Loss_In_USD':row['Physical_Properties_Loss_In_USD']
                         }
                         duplicate_data.append({
-                             'row_index': index,
-                                'data': {key: str(value) for key, value in disaster_data.items()}
+                            'row_index':index,
+                            'data':{key:str(value)for key,value in disaster_data.items()}
                         })
+                    
                     else:
-                        for key, value in disaster_data.items():
-                                setattr(existing_record, key, value)
+                        for key ,value in disaster_data.items():
+                            setattr(existing_record,key ,  value)
                         try:
                             existing_record.save()
-                            updated_count += 1
-                        except IntegrityError as e:
-                                errors.append(f"Error updating row {index}: {e}")                    
-                try:
-                    disasterData = Disaster_Data(**disaster_data)
-                    disasterData.save()
-                    added_count +=1
-                        
-                except Exception as e:
-                    errors.append(f"Error inserting row {index}: {e}")
-                        
-            
+                            updated_count +=1
+
+                        except IntegrityError  as e:
+                            errors.append({'row_index': index, 'data': disaster_data, 'reason': str(e)})
+
+                else:
+                    try:
+                        DisasterData = Disaster_Data(**disaster_data)
+                        DisasterData.save()
+                        added_count +=1
+                    
+                    except Exception as e:
+                        errors.append({'row_index': index, 'data': disaster_data, 'reason': str(e)})
+
             if added_count > 0:
                 messages.success(request, str(added_count) + ' records added.')
-            
-            if updated_count > 0:
+
+            if updated_count >0:
                 messages.info(request, str(updated_count) + ' records updated.')
 
             if errors:
                 request.session['errors'] = errors
                 return render(request, 'trade_data/error_template.html', {'errors': errors})
-            
             elif duplicate_data:
                 request.session['duplicate_data'] = duplicate_data
                 return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data})
-                
             else:
-                return redirect('services_table')  
-            
+                return redirect('disaster_table')
     else:
         form = UploadDisasterForm()
-
     return render(request,'general_data/transport_templates/upload_transport_form.html',{'form':form})
+
+

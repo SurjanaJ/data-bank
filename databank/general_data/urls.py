@@ -1,6 +1,6 @@
 from django.urls import include, path
 
-from .views import climate_view,occupation_view,education_view, view,population_view,hotel_view,land_view,political_views,tourism_view,mining_views,water_view,housing_views,road_views,transport_view,services_view, crime_view,public_unitillity_views,health_diseases_views,disaster_views
+from .views import climate_view,occupation_view,health_diseases_views,education_view, view,population_view,hotel_view,land_view,political_views,tourism_view,mining_views,water_view,housing_views,road_views,transport_view,services_view, crime_view,public_unitillity_views,disaster_views
 from .views import export_views
 
 urlpatterns = [
@@ -85,6 +85,7 @@ urlpatterns = [
     path('delete_health_disease_record/<int:pk>/', view.delete_record, name ='delete_health_disease_record' ),
     path('delete_selected_health_disease/', view.delete_selected, name='delete_selected_health_disease'),
     path('export_health_diseases_table_to_excel/', export_views.export_health_diseases_table_to_excel, name='export_health_diseases_table_to_excel'),
+    path('upload_health_diseases_excel', health_diseases_views.upload_health_diseases_excel, name = 'upload_health_diseases_excel'),
 
 
     path('disaster_table',disaster_views.display_disaster_table, name='disaster_table'),

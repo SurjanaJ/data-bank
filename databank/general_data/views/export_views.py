@@ -1,6 +1,6 @@
-from ..models import ForestData,Land,Hotel,Transport,Tourism,Water,PopulationData,Mining,Political_Data,Road,Housing,Health_disease,Disaster_Data,Public_Unitillity
+from ..models import Disaster_Data, ForestData, Health_disease,Land,Hotel,Transport,Tourism,Water,PopulationData,Mining,Political_Data,Road,Housing,Public_Unitillity
 from io import BytesIO
-from ..views import view,population_view,tourism_view,transport_view,public_unitillity_views,hotel_view,water_view,political_views,road_views,mining_views,health_diseases_views,housing_views,disaster_views
+from ..views import view,population_view,health_diseases_views,tourism_view,transport_view,public_unitillity_views,hotel_view,water_view,political_views,road_views,mining_views,housing_views,disaster_views
 import xlsxwriter
 from django.db.models import Q
 from django.db.models import F
