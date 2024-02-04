@@ -77,6 +77,11 @@ tables =[
         "name": "Exchange Data",
         "url": "exchange_table"
     }
+    ,
+    {
+        "name": "Energy Data",
+        "url": "exchange_table"
+    }
     ]
 
 
@@ -156,7 +161,7 @@ meta_tables =[
         "name":"Energy Meta",
         "url":"energy_meta",
         "upload_url":"upload_energy_meta_excel"
-    }
+    },
     ]
 
 def is_valid_queryparam(param):
