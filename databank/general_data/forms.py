@@ -229,3 +229,11 @@ class UpdateExchange(ModelForm):
         # Set the label for 'Selling' field
         self.fields['Selling'].label = 'Selling Against USD'
         self.fields['Buying'].label = 'Buying Against USD'
+
+
+# ENERGY_DATA
+class UploadCurrencyForm(forms.Form):
+    meta_file = forms.FileField()  
+
+class UploadExchangeForm(forms.Form):
+    file = forms.FileField() 
