@@ -128,4 +128,6 @@ urlpatterns = [
     path('update_exchange_record/<int:pk>/', view.update_record, name = 'update_exchange_record'),
     path('delete_exchange_record/<int:pk>/', view.delete_record, name ='delete_exchange_record' ),
     path('delete_selected_exchange/', view.delete_selected, name='delete_selected_exchange'),
+    path('export_exchange_excel', exchange_view.export_exchange_excel, name='export_exchange_excel'),
+
 ]   
