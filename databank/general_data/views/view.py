@@ -9,7 +9,7 @@ import pandas as pd
 
 from trade_data import views
 from ..models import Climate_Data, Crime, Crime_Meta, Education, Education_Degree_Meta, Education_Level_Meta, Exchange, ForestData, Country_meta, Land_Code_Meta, Occupation, Occupation_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
-from ..forms import UpdateClimate, UpdateCrime, UpdateEducation, UpdateOccupation, UpdateServices, UploadCrimeMetaForm,  UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadOccupationMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
+from ..forms import UpdateClimate, UpdateCrime, UpdateEducation, UpdateExchange, UpdateOccupation, UpdateServices, UploadCrimeMetaForm,  UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadOccupationMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -436,6 +436,7 @@ def update_record(request,pk):
         'update_education_record': Education,
         'update_occupation_record': Occupation,
         'update_climate_record': Climate_Data,
+        'update_exchange_record':Exchange,
     }
 
     form_mapping = {
@@ -444,6 +445,7 @@ def update_record(request,pk):
         Education: UpdateEducation,
         Occupation: UpdateOccupation,
         Climate_Data: UpdateClimate,
+        Exchange: UpdateExchange,
     }
 
     view_mapping = {
@@ -451,7 +453,8 @@ def update_record(request,pk):
         Crime: 'crime_table',
         Education: 'education_table',
         Occupation:'occupation_table',
-        Climate_Data:'climate_table'
+        Climate_Data:'climate_table',
+        Exchange: 'exchange_table'
     }
 
     model_class = model_mapping.get(view_name)
