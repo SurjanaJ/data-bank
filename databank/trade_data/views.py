@@ -68,6 +68,15 @@ tables =[
         "name": "Climate Data",
         "url": "climate_table"
     }
+    ,
+    {
+        "name": "Crime Data",
+        "url": "crime_table"
+    },
+    {
+        "name": "Exchange Data",
+        "url": "exchange_table"
+    }
     ]
 
 

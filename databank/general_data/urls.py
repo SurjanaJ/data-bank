@@ -123,5 +123,9 @@ urlpatterns = [
 
     path('upload_currency_excel', exchange_view.upload_currency_meta_excel, name='upload_currency_excel'),
     path('currency_meta',  exchange_view.display_currency_meta, name='currency_meta'),
-
+    path('upload_exchange_excel', exchange_view.upload_exchange_excel, name = 'upload_exchange_excel'),
+    path('exchange_table', exchange_view.display_exchange_table, name='exchange_table'),    
+    path('update_exchange_record/<int:pk>/', view.update_record, name = 'update_exchange_record'),
+    path('delete_exchange_record/<int:pk>/', view.delete_record, name ='delete_exchange_record' ),
+    path('delete_selected_exchange/', view.delete_selected, name='delete_selected_exchange'),
 ]   
