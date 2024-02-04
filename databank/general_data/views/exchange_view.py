@@ -189,12 +189,12 @@ def upload_exchange_excel(request):
                 else:
                     for key, value in exchange_data.items():
                             setattr(existing_record, key, value)
-                            try:
-                                existing_record.save()
-                                updated_count += 1
+                    try:
+                        existing_record.save()
+                        updated_count += 1
                             
-                            except IntegrityError as e:
-                                errors.append(f"Error updating row {index}: {e}")
+                    except IntegrityError as e:
+                        errors.append(f"Error updating row {index}: {e}")
                        
             else:
                 try:
