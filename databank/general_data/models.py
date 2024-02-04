@@ -165,31 +165,7 @@ class Mining(models.Model):
     Potential_Stock = models.IntegerField(default=0,null=True,blank=True)
     Mining_Company_Name = models.CharField(max_length=100,null=True,blank=True)
 
-class Energy_Meta(models.Model):
-    id = models.AutoField(primary_key=True)
-    Code = Code=models.CharField(max_length=100)
-    Energy_Type = models.TextField(null=True,blank=True)
 
-
-class Energy(models.Model):
-
-    Potential_Unit_Options = (
-        ('Mt','Mt'),
-    )
-
-    Unit_Production_Options = (
-        ('Megawat','Megawat'),
-    )
-
-    id = models.AutoField(primary_key=True)
-    Year=models.DateField(null=True,blank=True)
-    Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
-    Power_Category_Code = models.ForeignKey(Energy_Meta,on_delete = models.CASCADE)
-    Potential_Unit = models.CharField(max_length = 10, choices = Potential_Unit_Options, null = True , blank = True)
-    Potential_Capacity_MW = models.IntegerField(default = 0 , blank=True , null = True)
-    Unit_Production = models.CharField(max_length = 20, choices = Unit_Production_Options , blank = True , null = True)
-    Current_Production_In_MW = models.IntegerField(default = 0 , null = True , blank = True)
-    Name_Of_The_Generating_Company = models.CharField(max_length = 100 , null = True , blank = True)
 
 class Road_Meta(models.Model):
     id = models.AutoField(primary_key=True)
@@ -434,3 +410,31 @@ class Exchange(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+
+class Energy_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    Code = Code=models.CharField(max_length=100)
+    Energy_Type = models.TextField()
+    created_date = models.DateTimeField(auto_now=True)
+    modified_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return (self.Energy_Type)
+
+
+class Energy(models.Model):
+    id = models.AutoField(primary_key=True)
+    Year=models.IntegerField()
+    Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    Power_Code = models.ForeignKey(Energy_Meta,on_delete = models.CASCADE)
+    Potential_Unit = models.ForeignKey(Unit_meta, on_delete = models.CASCADE, related_name='Potential_Unit')
+    Potential_Capacity_MW = models.FloatField(default = 0.0)
+    Unit_Production = models.ForeignKey(Unit_meta, on_delete = models.CASCADE, related_name='Unit_Production')
+    Current_Production_In_MW = models.FloatField(default = 0.0)
+    Generating_Company = models.CharField(max_length = 300 , null = True , blank = True)
+    created_date = models.DateTimeField(auto_now=True)
+    modified_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return (str(self.id))
