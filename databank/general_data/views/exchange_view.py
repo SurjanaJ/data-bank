@@ -156,8 +156,8 @@ def upload_exchange_excel(request):
                 if Country.id != Currency.Country.id:
                     exchange_data = {
                         'Country': row['Country'],
-                        'Selling' : row['Selling against USD'],
-                        'Buying' : row ['Buying against USD'],
+                        'Selling Against USD' : row['Selling against USD'],
+                        'Buying Against USD' : row ['Buying against USD'],
                         'Currency' : row['Currency'],
             }
                     raise ValueError(f"Country value and Currency Value Mismatch")
@@ -175,10 +175,10 @@ def upload_exchange_excel(request):
 
                 if all(existing_dict[key] == exchange_data_dict[key] or (pd.isna(existing_dict[key]) and pd.isna(exchange_data_dict[key])) for key in exchange_data_dict if key != 'id'):
                     exchange_data = {
-                    'Country': Country,
-                    'Selling' : row['Selling against USD'],
-                    'Buying' : row ['Buying against USD'],
-                    'Currency': Currency,
+                    'Country': row['Country'],
+                    'Selling Against USD' : row['Selling against USD'],
+                    'Buying Against USD' : row ['Buying against USD'],
+                    'Currency': row['Currency'],
             }
                     duplicate_data.append({
                             'row_index': index,
@@ -212,11 +212,11 @@ def upload_exchange_excel(request):
 
         if errors:
             request.session['errors'] = errors
-            return render(request, 'trade_data/error_template.html', {'errors': errors})
+            return render(request, 'trade_data/error_template.html', {'errors': errors, 'tables':tables, 'meta_tables':views.meta_tables,})
             
         elif duplicate_data:
             request.session['duplicate_data'] = duplicate_data
-            return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data})
+            return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data, 'tables':tables, 'meta_tables':views.meta_tables,})
                 
         else:
             return redirect('exchange_table') 
