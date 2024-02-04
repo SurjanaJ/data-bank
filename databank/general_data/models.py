@@ -411,3 +411,26 @@ class Climate_Data(models.Model):
 
     def __str__(self):
         return (str(self.id))
+
+
+class Currency_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    Currency_Name = models.TextField()
+    Currency_Code = models.CharField(max_length = 40)
+    Country = models.ForeignKey(Country_meta, on_delete= models.CASCADE)
+
+    def __str__(self):
+        return (self.Currency_Name)
+
+
+class Exchange(models.Model):
+    id = models.AutoField(primary_key=True)
+    Country = models.ForeignKey(Country_meta, on_delete= models.CASCADE)
+    Currency = models.ForeignKey(Currency_Meta, on_delete = models.CASCADE)
+    Selling = models.FloatField()
+    Buying = models.FloatField()
+    created_date = models.DateTimeField(auto_now=True)
+    modified_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.id)

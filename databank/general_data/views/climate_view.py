@@ -135,7 +135,7 @@ def upload_climate_excel(request):
             df['Date'] = pd.to_datetime(df['Date']).dt.date
 
             for index, row in df.iterrows():
-                climate_view = {col: row[col] for col in cols}
+                climate_data = {col: row[col] for col in cols}
                 try:
                     Date = row['Date']
                     Country = Country_meta.objects.get(Country_Name = row['Country'])

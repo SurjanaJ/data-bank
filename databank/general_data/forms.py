@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Climate_Data, Crime, Education, ForestData,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land
+from .models import Climate_Data, Crime, Education, Exchange, ForestData,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land
 
 class UploadForestDataForm(forms.Form):
     forest_data_file = forms.FileField()
@@ -203,3 +203,29 @@ class UpdateClimate(ModelForm):
             'Climate_Unit': forms.Select(attrs={'class': 'form-control '}),
             'Amount': forms.NumberInput(attrs={'class': 'form-control  '})
         }
+
+# EXCHANGE DATA
+class UploadCurrencyForm(forms.Form):
+    meta_file = forms.FileField()  
+
+class UploadExchangeForm(forms.Form):
+    file = forms.FileField()     
+
+class UpdateExchange(ModelForm):
+    class Meta:
+        model = Exchange
+        fields='__all__'
+
+        widgets={
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Currency': forms.Select(attrs={'class': 'form-control '}),
+            'Selling': forms.NumberInput(attrs={'class': 'form-control '}),
+            'Buying': forms.NumberInput(attrs={'class': 'form-control '}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateExchange, self).__init__(*args, **kwargs)
+
+        # Set the label for 'Selling' field
+        self.fields['Selling'].label = 'Selling Against USD'
+        self.fields['Buying'].label = 'Buying Against USD'

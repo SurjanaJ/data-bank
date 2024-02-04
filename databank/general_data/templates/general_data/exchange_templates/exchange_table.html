@@ -1,0 +1,213 @@
+{% extends 'main.html' %} {% block content %}
+{% load custom_filters %}
+
+<button class="btn btn-sm px-4" data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="false"
+    aria-controls="collapseFilter" style="background-color: #419197;font-size:14px;font-weight: 500; color: white;">
+    Filters
+</button>
+
+
+<div class="bg-light mt-3">
+    <div class="collapse shadow rounded-2" id="collapseFilter">
+        <div class="px-2 py-2">
+            <form action="" class="row g-3" method="GET" action="exchange_table">
+                <div class="form-group col-md-3">
+                    <label for="country">Country</label>
+                    <select id="country" class="form-control" name="country">
+                        <option selected>--</option>
+                        {% for country_category in country_categories %}
+                        <option value="{{country_category.id}}">{{country_category}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label for="min_buying_amt">Minimum Buying Amount</label>
+                    <input type="number" min="0" class="form-control" id="min_buying_amt" placeholder="0"
+                        name="min_buying_amt" />
+                </div>
+                <div class="col-md-3">
+                    <label for="max_buying_amt">Maximum Buying Amount</label>
+                    <input type="number" min="0" class="form-control" id="max_buying_amt" placeholder="0"
+                        name="max_buying_amt" />
+                </div>
+
+                <div class="col-md-3">
+                    <label for="min_selling_amt">Minimum Selling Amount</label>
+                    <input type="number" min="0" class="form-control" id="min_selling_amt" placeholder="0"
+                        name="min_selling_amt" />
+                </div>
+                <div class="col-md-3">
+                    <label for="max_selling_amt">Maximum Selling Amount</label>
+                    <input type="number" min="0" class="form-control" id="max_selling_amt" placeholder="0"
+                        name="max_selling_amt" />
+                </div>
+
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary">
+                        Search
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-center">
+    <a class="fs-4 fw-bold mt-4 link-secondary  link-offset-2 link-underline-opacity-0 link-underline-opacity-25-hover"
+        href="{% url 'exchange_table' %}">Exchange Data</a>
+</div>
+
+{% if query_len == 0 %}
+<div class="bg-light p-4 text-center fw-normal mt-4 text-danger">
+    No Records
+</div>
+{% else %}
+<div>
+    <form method="post" action="{% url 'delete_selected_exchange' %}" id="delete-form">
+        {% csrf_token %}
+        <div class="table-responsive mt-4 bg-light p-3">
+            <div class="d-flex align-items-center justify-content-between px-2">
+                <span class="text-danger fs-6 fw-lighter mb-1">
+                    * {{data_len}} records found.
+                </span>
+
+                <div class="d-flex align-items-center py-2">
+                    <button type="button" class="btn border p-2 styled-link mx-3 hover-shadow"
+                        onclick="confirmDeleteAll()">
+                        <i class="fa-regular fa-trash-can" style="color: #ff0000"></i>
+                        <span>Delete Selected</span>
+                    </button>
+                    <a  href="{% url 'export_exchange_excel' %}?{{ request.GET.urlencode }}""
+                        class="border p-2 styled-link">
+                        <i class="fa-solid fa-table"></i>
+                        <span class="fw-normal">Export to Excel</span>
+                    </a>
+                </div>
+            </div>
+
+            <div>
+                <table class="table table-striped table-bordered table-sm w-100">
+                    <thead>
+                        <tr>
+                            <th class="text-white fw-semibold fs-6" scope="col" style="background: #12486B;">
+                                <input type="checkbox" name="" id="select-all" onclick="toggleSelectAll()">
+                            </th>
+                            <th class="text-white fst-normal  " scope="col"
+                                style="font-size:14px; font-weight: 500; background: #12486B;" scope="col">
+                                Country
+                            </th>
+                            <th class="text-white fst-normal  " scope="col"
+                                style="font-size:14px; font-weight: 500; background: #12486B;" scope="col">
+                                Currency
+                            </th>
+                            <th class="text-white fst-normal  " scope="col"
+                                style="font-size:14px; font-weight: 500; background: #12486B;" scope="col">
+                                Selling Against USD
+                            </th>
+                            <th class="text-white fst-normal  " scope="col"
+                                style="font-size:14px; font-weight: 500; background: #12486B;" scope="col">
+                                Buying Against USD
+                            </th>
+                            <th class="text-white fst-normal " scope="col"
+                                style="font-size:14px; font-weight: 500; background: #12486B;" scope=" col">
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-hover">
+                        {% for record in page %}
+                        <tr>
+                            <td class="text-white fw-semibold fs-6" scope="col">
+                                <input type="checkbox" name="selected_items" class="item-checkbox"
+                                    value="{{record.id}}" />
+                            </td>
+                            <td> {{record.Country.Country_Name}} </td>
+                            <td> {{record.Currency.Currency_Name}} </td>
+                            <td> {{record.Selling}} </td>
+                            <td> {{record.Buying}} </td>
+                            <td class="d-flex">
+                                <div class="btn">
+                                    <a class="" id="delete_record" onclick="confirmDelete('{{record.id}}')">
+                                        <i class="fa-regular fa-trash-can" style="color: #ff0000"></i></a>
+                                </div>
+                                <div class="btn ">
+                                    <a class="" href="{% url 'update_exchange_record' record.id %}"><i
+                                            class="fa-regular fa-pen-to-square" style="color: rgb(3, 10, 86)"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="pagination m-3 d-flex justify-content-center">
+            <span class="step-links bg-light rounded-1 d-flex justify-content-center gap-3 p-3">
+                {% if page.has_previous %}
+                <a href="?page=1{% if request.GET.country %}&country={{ request.GET.country }}{% endif %}
+                {% if request.GET.min_buying_amt %}&min_buying_amt={{ request.GET.min_buying_amt }}{% endif %}
+                {% if request.GET.max_buying_amt %}&max_buying_amt={{ request.GET.max_buying_amt }}{% endif %}
+                {% if request.GET.min_selling_amt %}&min_selling_amt={{ request.GET.min_selling_amt }}{% endif %}
+                {% if request.GET.max_selling_amt %}&max_selling_amt={{ request.GET.max_selling_amt }}{% endif %}
+                ">
+                    &laquo; First
+                </a>
+                <a href="?page={{ page.previous_page_number }}{% if request.GET.country %}&country={{ request.GET.country }}{% endif %}
+                {% if request.GET.min_buying_amt %}&min_buying_amt={{ request.GET.min_buying_amt }}{% endif %}
+                {% if request.GET.max_buying_amt %}&max_buying_amt={{ request.GET.max_buying_amt }}{% endif %}
+                {% if request.GET.min_selling_amt %}&min_selling_amt={{ request.GET.min_selling_amt }}{% endif %}
+                {% if request.GET.max_selling_amt %}&max_selling_amt={{ request.GET.max_selling_amt }}{% endif %}">
+                    Previous
+                </a>
+                {% endif %}
+
+                <span class="current-page">
+                    Page {{ page.number }} of {{ page.paginator.num_pages }}.
+                </span>
+
+                {% if page.has_next %}
+                <a href="?page={{ page.next_page_number }}{% if request.GET.country %}&country={{ request.GET.country }}{% endif %}
+                {% if request.GET.min_buying_amt %}&min_buying_amt={{ request.GET.min_buying_amt }}{% endif %}
+                {% if request.GET.max_buying_amt %}&max_buying_amt={{ request.GET.max_buying_amt }}{% endif %}
+                {% if request.GET.min_selling_amt %}&min_selling_amt={{ request.GET.min_selling_amt }}{% endif %}
+                {% if request.GET.max_selling_amt %}&max_selling_amt={{ request.GET.max_selling_amt }}{% endif %}">
+                    Next
+                </a>
+                <a href="?page={{ page.paginator.num_pages }}{% if request.GET.country %}&country={{ request.GET.country }}{% endif %}
+                {% if request.GET.min_buying_amt %}&min_buying_amt={{ request.GET.min_buying_amt }}{% endif %}
+                {% if request.GET.max_buying_amt %}&max_buying_amt={{ request.GET.max_buying_amt }}{% endif %}
+                {% if request.GET.min_selling_amt %}&min_selling_amt={{ request.GET.min_selling_amt }}{% endif %}
+                {% if request.GET.max_selling_amt %}&max_selling_amt={{ request.GET.max_selling_amt }}{% endif %}">
+                    Last &raquo;
+                </a>
+                {% endif %}
+            </span>
+        </div>
+    </form>
+</div>
+<script>
+    function confirmDelete(itemId) {
+        var result = confirm("Are you sure you want to delete this record?");
+        if (result) {
+            // User clicked "OK"
+            // Redirect to the Django view for deleting the item
+            window.location.href = 'delete_exchange_record/' + itemId + '/';
+        } else {
+            // User clicked "Cancel" or closed the dialog
+            alert("Delete canceled!");
+        }
+    }
+
+    function confirmDeleteAll() {
+        var confirmDelete = confirm(
+            "Are you sure you want to delete all selected items?"
+        );
+        if (confirmDelete) {
+            document.getElementById("delete-form").submit();
+        }
+    }
+</script>
+{% endif %}
+{% endblock content %}
