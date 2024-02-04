@@ -1,7 +1,6 @@
 from django.urls import include, path
 
-
-from .views import exchange_view,climate_view,occupation_view,education_view, view,population_view,hotel_view,land_view,tourism_view,water_view,transport_view,services_view, crime_view
+from .views import energy_view,exchange_view,climate_view,occupation_view,education_view, view,population_view,hotel_view,land_view,tourism_view,water_view,transport_view,services_view, crime_view
 from .views import export_views
 
 urlpatterns = [
@@ -129,5 +128,9 @@ urlpatterns = [
     path('delete_exchange_record/<int:pk>/', view.delete_record, name ='delete_exchange_record' ),
     path('delete_selected_exchange/', view.delete_selected, name='delete_selected_exchange'),
     path('export_exchange_excel', exchange_view.export_exchange_excel, name='export_exchange_excel'),
+
+    path('upload_energy_meta_excel', view.upload_meta_excel, name='upload_energy_meta_excel'),
+    path('energy_meta',  energy_view.display_energy_meta, name='energy_meta'),
+
 
 ]   

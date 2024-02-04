@@ -152,6 +152,11 @@ meta_tables =[
         "url": "currency_meta",
         "upload_url":"upload_currency_excel"
     },
+    {
+        "name":"Energy Meta",
+        "url":"energy_meta",
+        "upload_url":"upload_energy_meta_excel"
+    }
     ]
 
 def is_valid_queryparam(param):

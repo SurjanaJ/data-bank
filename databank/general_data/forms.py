@@ -232,8 +232,8 @@ class UpdateExchange(ModelForm):
 
 
 # ENERGY_DATA
-class UploadCurrencyForm(forms.Form):
+class UploadEnergyMetaForm(forms.Form):
     meta_file = forms.FileField()  
 
-class UploadExchangeForm(forms.Form):
+class UploadEnergyForm(forms.Form):
     file = forms.FileField() 

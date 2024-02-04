@@ -8,8 +8,8 @@ from django.db.models import Q
 import pandas as pd
 
 from trade_data import views
-from ..models import Climate_Data, Crime, Crime_Meta, Education, Education_Degree_Meta, Education_Level_Meta, Exchange, ForestData, Country_meta, Land_Code_Meta, Occupation, Occupation_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
-from ..forms import UpdateClimate, UpdateCrime, UpdateEducation, UpdateExchange, UpdateOccupation, UpdateServices, UploadCrimeMetaForm,  UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadOccupationMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
+from ..models import Climate_Data, Crime, Crime_Meta, Education, Education_Degree_Meta, Education_Level_Meta, Energy_Meta, Exchange, ForestData, Country_meta, Land_Code_Meta, Occupation, Occupation_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
+from ..forms import UpdateClimate, UpdateCrime, UpdateEducation, UpdateExchange, UpdateOccupation, UpdateServices, UploadCrimeMetaForm,  UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadEnergyMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadOccupationMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -337,6 +337,7 @@ def upload_meta_excel(request):
         '/others/upload_education_level_meta_excel':UploadEducationLevelMetaForm,
         '/others/upload_education_degree_meta_excel': UploadEducationDegreeMetaForm,   
         '/others/upload_occupation_meta_excel': UploadOccupationMetaForm,
+        '/others/upload_energy_meta_excel' : UploadEnergyMetaForm,
     }
 
     form_class = form_mapping.get(request.path)
@@ -351,6 +352,7 @@ def upload_meta_excel(request):
         UploadEducationLevelMetaForm : Education_Level_Meta,
         UploadEducationDegreeMetaForm : Education_Degree_Meta,
         UploadOccupationMetaForm :Occupation_Meta,
+        UploadEnergyMetaForm : Energy_Meta,
     }
     model_class = model_mapping.get(form_class)
 
@@ -363,7 +365,8 @@ def upload_meta_excel(request):
     Crime_Meta: 'crime_meta',
     Education_Level_Meta : 'education_level_meta',
     Education_Degree_Meta : 'education_degree_meta',
-    Occupation_Meta : 'occupation_meta'
+    Occupation_Meta : 'occupation_meta',
+    Energy_Meta: 'energy_meta',
 }
     model_view = view_mapping.get(model_class)            
 
@@ -415,17 +418,17 @@ def upload_meta_excel(request):
 
             if errors:
                 # If there are errors, return them as a response
-                return render(request, 'trade_data/error_template.html', {'errors': errors})
+                return render(request, 'trade_data/error_template.html', {'errors': errors,'tables':tables, 'meta_tables':views.meta_tables,})
             
             elif duplicate_data:
                 request.session['duplicate_data'] = duplicate_data
-                return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data})
+                return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data,'tables':tables, 'meta_tables':views.meta_tables,})
             else:
                 return redirect(f'{model_view}')
 
     else:
         form = form_class()
-    return render(request, 'general_data/upload_form.html',  {'form': form, 'tables': tables})
+    return render(request, 'general_data/upload_form.html',  {'form': form, 'tables': tables, 'meta_tables':views.meta_tables,})
 
 def update_record(request,pk):
     resolved =  resolve(request.path_info)
@@ -506,7 +509,6 @@ def delete_record(request,pk):
         return HttpResponse(f"An error occurred: {str(e)}")
     
 def delete_selected(request):
-    print('REACHED HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1')
     resolved =  resolve(request.path_info)
     view_name = resolved.url_name
     model_mapping = {
