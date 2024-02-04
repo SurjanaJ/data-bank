@@ -224,7 +224,7 @@ def upload_exchange_excel(request):
     else:
         form = UploadExchangeForm()
 
-    return render(request, 'general_data/transport_templates/upload_transport_form.html',{'form': form})
+    return render(request, 'general_data/transport_templates/upload_transport_form.html',{'form': form, 'meta_tables':views.meta_tables, 'tables':tables,})
 
 
 def display_exchange_table(request):
