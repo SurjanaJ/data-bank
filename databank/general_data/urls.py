@@ -132,6 +132,7 @@ urlpatterns = [
     path('upload_energy_meta_excel', view.upload_meta_excel, name='upload_energy_meta_excel'),
     path('energy_meta',  energy_view.display_energy_meta, name='energy_meta'),
     path('upload_energy_excel', energy_view.upload_energy_excel, name = 'upload_energy_excel'),
+    path('energy_table', energy_view.display_energy_table, name='energy_table'), 
 
 
 ]   

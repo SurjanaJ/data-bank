@@ -130,10 +130,26 @@ def upload_energy_excel(request):
                 return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data, 'tables': tables, 'meta_tables': views.meta_tables,})
             
             else:
-                return redirect('occupation_table')
+                return redirect('energy_table')
     else:
         form = UploadEnergyForm()    
 
     return render(request,'general_data/transport_templates/upload_transport_form.html',{'form':form, 'tables': tables, 'meta_tables': views.meta_tables,})
     
                     
+def display_energy_table(request):
+    data = Energy.objects.all()
+
+    paginator = Paginator(data, 40)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+
+    context ={'data_len':len(data),
+              'page':page, 
+              'query_len':len(page), 
+              'tables': tables, 
+              'meta_tables': views.meta_tables,
+                      }
+    return render(request, 'general_data/energy_templates/energy_table.html', context)
+
+

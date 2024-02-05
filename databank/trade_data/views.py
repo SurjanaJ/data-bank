@@ -80,7 +80,7 @@ tables =[
     ,
     {
         "name": "Energy Data",
-        "url": "exchange_table"
+        "url": "energy_table"
     }
     ]
 
