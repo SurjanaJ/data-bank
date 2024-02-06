@@ -8,8 +8,8 @@ from django.db.models import Q
 import pandas as pd
 
 from trade_data import views
-from ..models import Climate_Data, Crime, Crime_Meta, Disaster_Data, Health_disease,Road,Mining,Housing,Political_Data, Education, Education_Degree_Meta, Education_Level_Meta, ForestData, Country_meta, Land_Code_Meta, Occupation, Occupation_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
-from ..forms import UpdateClimate, UpdateCrime, UpdateDisaster, UpdateHealthDisease,UpdateHousing,UpdateMining,UpdatePolitical,UpdateRoad, UpdateEducation, UpdateOccupation, UpdateServices, UploadCrimeMetaForm, UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadOccupationMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
+from ..models import Climate_Data, Crime, Crime_Meta, Disaster_Data, Health_disease,Road,Mining,Housing,Political_Data, Education, Education_Degree_Meta, Education_Level_Meta, Exchange, ForestData, Country_meta, Land_Code_Meta, Occupation, Occupation_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
+from ..forms import UpdateClimate, UpdateCrime, UpdateDisaster, UpdateHealthDisease,UpdateHousing,UpdateMining,UpdatePolitical,UpdateRoad, UpdateEducation, UpdateExchange, UpdateOccupation, UpdateServices, UploadCrimeMetaForm,  UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadOccupationMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -452,6 +452,7 @@ def update_record(request,pk):
         'update_political_record':Political_Data,
         'update_mining_record':Mining,
         'update_climate_record': Climate_Data,
+        'update_exchange_record':Exchange,
     }
 
     form_mapping = {
@@ -466,6 +467,7 @@ def update_record(request,pk):
         Political_Data:UpdatePolitical,
         Mining:UpdateMining,
         Climate_Data: UpdateClimate,
+        Exchange: UpdateExchange,
     }
 
     view_mapping = {
@@ -480,7 +482,8 @@ def update_record(request,pk):
         Political_Data:'political_table',
         Road:'road_table',
 
-        Climate_Data:'climate_table'
+        Climate_Data:'climate_table',
+        Exchange: 'exchange_table'
     }
 
     model_class = model_mapping.get(view_name)
@@ -515,6 +518,7 @@ def delete_record(request,pk):
         'delete_political_record':Political_Data,
 
         'delete_climate_record': Climate_Data,
+        'delete_exchange_record': Exchange,
     }
 
     view_mapping = {
@@ -529,6 +533,7 @@ def delete_record(request,pk):
         Housing:'housing_table',
         Political_Data:'political_table',
         Climate_Data:'climate_table',
+        Exchange: 'exchange_table',
     }
 
     model_class = model_mapping.get(view_name)
@@ -543,6 +548,7 @@ def delete_record(request,pk):
         return HttpResponse(f"An error occurred: {str(e)}")
     
 def delete_selected(request):
+    print('REACHED HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1')
     resolved =  resolve(request.path_info)
     view_name = resolved.url_name
     model_mapping = {
@@ -558,6 +564,7 @@ def delete_selected(request):
         'delete_selected_political':Political_Data,
 
         'delete_selected_climate':Climate_Data,
+        'delete_selected_exchange':Exchange,
     }
 
     view_mapping = {
@@ -572,6 +579,7 @@ def delete_selected(request):
         Housing:'housing_table',
         Political_Data:'political_table',
         Climate_Data: 'climate_table',
+        Exchange:'exchange_table'
     }
     model_class = model_mapping.get(view_name)
     model_view = view_mapping.get(model_class)

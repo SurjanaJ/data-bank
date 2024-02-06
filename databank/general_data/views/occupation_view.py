@@ -147,7 +147,6 @@ def display_occupation_table(request):
     context ={'data_len':len(data),'code_categories':code_categories, 'country_categories':country_categories, 'page':page, 'query_len':len(page), 'tables': tables, 'meta_tables': views.meta_tables, 'year_categories':year_categories}
     return render(request, 'general_data/occupation_templates/occupation_table.html', context)
 
-
 def export_occupation_excel(request):
     country = request.GET.get('country')
     code = request.GET.get('code')

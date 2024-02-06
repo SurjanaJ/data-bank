@@ -1,6 +1,8 @@
 from django.urls import include, path
 
 from .views import climate_view,occupation_view,health_diseases_views,education_view, view,population_view,hotel_view,land_view,political_views,tourism_view,mining_views,water_view,housing_views,road_views,transport_view,services_view, crime_view,public_unitillity_views,disaster_views
+
+from .views import exchange_view,climate_view,occupation_view,education_view, view,population_view,hotel_view,land_view,tourism_view,water_view,transport_view,services_view, crime_view
 from .views import export_views
 
 urlpatterns = [
@@ -172,5 +174,14 @@ urlpatterns = [
     path('delete_climate_record/<int:pk>/', view.delete_record, name ='delete_climate_record' ),
     path('delete_selected_climate/', view.delete_selected, name='delete_selected_climate'),
     path('export_climate_excel', climate_view.export_climate_excel, name='export_climate_excel'),
+
+    path('upload_currency_excel', exchange_view.upload_currency_meta_excel, name='upload_currency_excel'),
+    path('currency_meta',  exchange_view.display_currency_meta, name='currency_meta'),
+    path('upload_exchange_excel', exchange_view.upload_exchange_excel, name = 'upload_exchange_excel'),
+    path('exchange_table', exchange_view.display_exchange_table, name='exchange_table'),    
+    path('update_exchange_record/<int:pk>/', view.update_record, name = 'update_exchange_record'),
+    path('delete_exchange_record/<int:pk>/', view.delete_record, name ='delete_exchange_record' ),
+    path('delete_selected_exchange/', view.delete_selected, name='delete_selected_exchange'),
+    path('export_exchange_excel', exchange_view.export_exchange_excel, name='export_exchange_excel'),
 
 ]   
