@@ -109,6 +109,7 @@ urlpatterns = [
     path('delete_housing_record/<int:pk>/', view.delete_record, name ='delete_housing_record' ),
     path('delete_selected_housing/', view.delete_selected, name='delete_selected_housing'),
     path('export_housing_table_to_excel/', export_views.export_housing_table_to_excel, name='export_housing_table_to_excel'),
+    path('upload_housing_excel', housing_views.upload_housing_excel, name = 'upload_housing_excel'),
 
 
     path('mining_table',mining_views.display_mining_table, name='mining_table'),

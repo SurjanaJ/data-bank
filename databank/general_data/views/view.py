@@ -32,46 +32,58 @@ def upload_forest_excel(request):
             excel_data = request.FILES['forest_data_file']
             df = pd.read_excel(excel_data)
 
-
+            Stock_unit_options = [option[0] for option in ForestData.Stock_Unit_Options]
+            Area_unit_options = [option[0] for option in ForestData.Area_Unit_Options]
             if 'id' in df.columns or 'ID' in df.columns:
-                for index,row in df.iterows():
-                    id_value = row['ID']
-
+                cols = df.columns.tolist()
+                for index, row in df.iterrows():
+                    id_value = row.get('id')
                     try:
-                        forest_instance = ForestData.objects.get(id = id_value)
-                    except:
-                        forest_instance = ForestData()
+                        forest_instance = ForestData.objects.get(id=id_value)
+                    except Exception as e:
+                        data = {col: row[col] for col in cols}
+                        data['Year'] = data['Year'].isoformat()
+                        errors.append({
+                                    'row_index': index,
+                                    'data': data,
+                                    'reason': f'Error inserting row {index}: {e}'
+                                })
+                        break
 
-                    Year = row['Year']
-                    Country = row['Country']
+                    forest_data = {
+                        'Year': row['Year'],
+                        'Country': row['Country'],
+                        'Name_of_the_plant': row['Name_Of_The_Plant'],
+                        'Scientific_Name': row['Scientific_Name'],
+                        'Local_Name': row['Local_Name'],
+                        'Stock_Unit': row['Stock_Unit'],
+                        'Stock_Available': row['Stock_Available'],
+                        'Area_Unit': row['Area_Unit'],
+                        'Area_Covered': row['Area_Covered']
+                    }
 
-                    try:
-                        calender_year = pd.to_datetime(Year).date()
-
-                    except ValueError as e:
-                        print(f'Error converting date in row {index}:{e}')
-                        print(f"Problematic row data:{row}")
-                        continue
-
-                    try:
-                        Year = calender_year
-                        Country = Country_meta.objects.get(Country_name = Country)
-
-                    except DataError as e:
-                        print(f"Error handling the row at {index}:{e}")
-
-                    forest_instance.Year = Year
-                    forest_instance.Country = Country
-                    forest_instance.Name_Of_The_Plant=row['Name_Of_The_Plant']
-                    forest_instance.Scientific_Name = row['Scientific_Name']
-                    forest_instance.Local_Name = row['Local_Name']
-                    forest_instance.Stock_Unit = row['Stock_Unit']
-                    forest_instance.Stock_Available = row['Stock_Available']
-                    forest_instance.Area_Unit = row['Area_Unit']
-                    forest_instance.Area_Covered = row['Area_Covered']
-                    forest_instance.save()
-
-                    updated_count +=1
+                    if forest_data['Stock_Unit'] not in Stock_unit_options:
+                        errors.append({'row_index': index, 'reason': f'Error inserting row {index}: Invalid Stock unit value'})
+                    elif forest_data['Area_Unit'] not in Area_unit_options:
+                        errors.append({'row_index': index, 'reason': f'Error inserting row {index}: Invalid Area unit value'})
+                    else:    
+                        Year = pd.to_datetime(row['Year']).date()
+                        # Retrieve Country_meta instance or None if not found
+                        country_instance = Country_meta.objects.filter(Country_Name=row['Country']).first()
+                        if country_instance is None:
+                            raise ValueError(f"Country '{row['Country']}' not found")
+                        
+                        forest_instance.Year = Year
+                        forest_instance.Country = country_instance
+                        forest_instance.Name_Of_The_Plant = row['Name_Of_The_Plant']
+                        forest_instance.Scientific_Name = row['Scientific_Name']
+                        forest_instance.Local_Name = row['Local_Name']
+                        forest_instance.Stock_Unit = row['Stock_Unit']
+                        forest_instance.Stock_Available = row['Stock_Available']
+                        forest_instance.Area_Unit = row['Area_Unit']
+                        forest_instance.Area_Covered = row['Area_Covered']
+                        forest_instance.save()
+                        updated_count += 1
 
             else:
 
@@ -160,20 +172,18 @@ def upload_forest_excel(request):
                                     'reason': f"Error inserting row {index}: {e}"
                                 })
 
-                if added_count > 0:
-                    messages.success(request, f'{added_count} records added')
+            if added_count > 0:
+                messages.success(request, f'{added_count} records added')
 
-                if updated_count > 0:
-                    messages.success(request, f'{updated_count} records updated')
+            if updated_count > 0:
+                messages.success(request, f'{updated_count} records updated')
 
-                if errors:
-                    request.session['errors'] = errors
-                    return render(request, 'general_data/error_template.html', {'errors': errors})
+            if errors:
+                request.session['errors'] = errors
+                return render(request, 'general_data/error_template.html', {'errors': errors})
 
-                if duplicate_data:
-                    return render(request, 'general_data/duplicate_template.html', {'duplicate_data': duplicate_data})
-
-
+            if duplicate_data:
+                return render(request, 'general_data/duplicate_template.html', {'duplicate_data': duplicate_data})
 
     else:
         form = UploadForestDataForm()

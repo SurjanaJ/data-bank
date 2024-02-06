@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Climate_Data, Crime, Disaster_Data, Education, Health_disease,Road,Mining,Housing,Political_Data, ForestData,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land,Public_Unitillity
+from .models import Climate_Data, Crime,ForestData, Disaster_Data, Education, Health_disease,Road,Mining,Housing,Political_Data,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land,Public_Unitillity
 
 class UploadForestDataForm(forms.Form):
     forest_data_file = forms.FileField()
