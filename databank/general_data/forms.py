@@ -1,5 +1,6 @@
 from django import forms
 from django.forms import ModelForm
+from .models import Climate_Data, Crime,ForestData, Disaster_Data, Education, Health_disease,Road,Mining,Housing,Political_Data,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land,Public_Unitillity
 from .models import Climate_Data, Crime, Education, Exchange, ForestData,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land
 
 class UploadForestDataForm(forms.Form):
@@ -95,6 +96,15 @@ class UploadTransportData(ModelForm):
 class UploadTransportMetaForm(forms.Form):
     meta_file = forms.FileField()
 
+# public unitillity data
+class UploadPublicUnitillityDataForm(forms.Form):
+    Public_Unitillity_data_file = forms.FileField()
+
+
+class UploadPublicUnitillityData(ModelForm):
+    class Meta:
+        model = Public_Unitillity
+        fields='__all__'
 # SERVICE DATA
 class UploadServicesMetaForm(forms.Form):
     meta_file = forms.FileField()
@@ -179,6 +189,77 @@ class UpdateOccupation(ModelForm):
             'Code': forms.Select(attrs={'class': 'form-control  '}),
             'Number': forms.NumberInput(attrs={'class': 'form-control  '}),
         }
+
+
+#disaster data
+
+class UpdateDisaster(ModelForm):
+    class Meta:
+        model = Disaster_Data
+        fields='__all__'
+
+class UploadDisasterForm(forms.Form):
+    file = forms.FileField()
+
+#health disease 
+
+class UpdateHealthDisease(ModelForm):
+    class Meta:
+        model = Health_disease
+        fields='__all__'
+
+class UploadHealthDiseaseForm(forms.Form):
+    file = forms.FileField()
+
+#Mining 
+class UpdateMining(ModelForm):
+    class Meta:
+        model = Mining
+        fields='__all__'
+
+class UploadMiningForm(forms.Form):
+    file = forms.FileField()
+
+#Housing
+
+class UpdateHousing(ModelForm):
+    class Meta:
+        model = Housing
+        fields='__all__'
+
+class UploadHousingForm(forms.Form):
+    file = forms.FileField()
+
+#political 
+
+class UpdatePolitical(ModelForm):
+    class Meta:
+        model = Political_Data
+        fields='__all__'
+
+class UploadPoliticalForm(forms.Form):
+    file = forms.FileField()
+
+
+#Road
+
+class UpdateRoad(ModelForm):
+    class Meta:
+        model = Road
+        fields='__all__'
+
+class UploadRoadForm(forms.Form):
+    file = forms.FileField()
+
+# public unitillity data
+class UploadPublicUnitillityDataForm(forms.Form):
+    Public_Unitillity_data_file = forms.FileField()
+
+
+class UploadPublicUnitillityData(ModelForm):
+    class Meta:
+        model = Public_Unitillity
+        fields='__all__'
 
 # CLIMATE DATA
 class UploadClimatePlaceMeta(forms.Form):

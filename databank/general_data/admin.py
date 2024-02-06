@@ -1,5 +1,7 @@
 from django.contrib import admin
 
+from .models import Crime, Crime_Meta, Disaster_Data, Disaster_Data_Meta, Education, Education_Degree_Meta, Health_disease,Housing,Road,Road_Meta,Education_Level_Meta, ForestData, Occupation, Occupation_Meta,PopulationData,Land_Code_Meta,Land, Services, Services_Meta,Transport_Meta,Transport,Tourism,Tourism_Meta,Hotel,Water,Water_Meta,Public_Unitillity,Mine_Meta,Mining,Energy_Meta,Energy,Housing_Meta,Health_disease_Meta,Budgetary_Data,Political_Data
+from .models import Climate_Data, Climate_Place_Meta, Crime, Crime_Meta, Education, Education_Degree_Meta, Education_Level_Meta, ForestData, Occupation, Occupation_Meta,PopulationData,Land_Code_Meta,Land, Services, Services_Meta,Transport_Meta,Transport,Tourism,Tourism_Meta,Hotel,Water,Water_Meta,Public_Unitillity,Mine_Meta,Mining,Energy_Meta,Energy,Road_Meta,Road,Housing_Meta,Housing,Health_disease_Meta,Budgetary_Data,Political_Data
 from .models import Climate_Data, Climate_Place_Meta, Crime, Crime_Meta, Currency_Meta,  Education, Education_Degree_Meta, Education_Level_Meta, ForestData, Occupation, Occupation_Meta,PopulationData,Land_Code_Meta,Land, Services, Services_Meta,Transport_Meta,Transport,Tourism,Tourism_Meta,Hotel,Water,Water_Meta,Public_Unitillity,Mine_Meta,Mining,Energy_Meta,Energy,Road_Meta,Road,Housing_Meta,Housing,Health_disease_Meta,Health_disease,Budgetary_Data,Political_Data,Disaster_Data_Meta,Disaster_Data
 
 class LandCodeMeta_Admin(admin.ModelAdmin ):
@@ -92,6 +94,7 @@ admin.site.register(Energy)
 admin.site.register(Road_Meta)
 
 admin.site.register(Road)
+
 
 admin.site.register(Housing_Meta)
 

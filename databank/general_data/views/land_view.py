@@ -114,7 +114,7 @@ def update_land_record(request,pk):
             return redirect('land_table')
         
     context={'form':form,}
-    return render(request,'general_data/land_templates/update_land_record.html',context)
+    return render(request,'general_data/update_record.html',context)
 
 
 def upload_land_excel(request):
