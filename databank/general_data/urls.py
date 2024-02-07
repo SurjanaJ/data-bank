@@ -136,5 +136,6 @@ urlpatterns = [
     path('update_energy_record/<int:pk>/', view.update_record, name = 'update_energy_record'),
     path('delete_energy_record/<int:pk>/', view.delete_record, name ='delete_energy_record' ),
     path('delete_selected_energy/', view.delete_selected, name='delete_selected_energy'),
+    path('export_energy_excel', energy_view.export_energy_excel, name='export_energy_excel'),
 
 ]   
