@@ -269,7 +269,7 @@ def update_selected_energy(request):
         unit_production = F('Unit_Production__Unit_Code'),
     )
         
-        data = pd.DataFrame(list(queryset.values('Year','country','power_code', 'energy_type','potential_unit','Potential_Capacity_MW','unit_production','Current_Production_In_MW', 'Generating_Company')))
+        data = pd.DataFrame(list(queryset.values('id','Year','country','power_code', 'energy_type','potential_unit','Potential_Capacity_MW','unit_production','Current_Production_In_MW', 'Generating_Company')))
 
         data.rename(columns={
                          'country':'Country',
@@ -282,7 +282,7 @@ def update_selected_energy(request):
                          'Generating_Company':'Generating Company'
                          }, inplace=True)
 
-        column_order = ['Year','Country','Power Code','Energy Type',
+        column_order = ['id','Year','Country','Power Code','Energy Type',
                         'Potential Unit','Potential Capacity MW','Unit Production','Current Production In MW','Generating Company']
         data = data[column_order]
         output = BytesIO()
