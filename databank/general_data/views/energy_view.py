@@ -252,3 +252,49 @@ def export_energy_excel(request):
     )
     response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
     return response
+
+
+def update_selected_energy(request):
+    selected_ids = request.POST.getlist('selected_items')
+    if not selected_ids:
+        messages.error(request, 'No items selected.')
+        return redirect('energy_table')
+    else:
+        queryset = Energy.objects.filter(id__in=selected_ids)
+        queryset = queryset.annotate(
+        country = F('Country__Country_Name'),
+        power_code = F('Power_Code__Code'),
+        energy_type = F('Power_Code__Energy_Type'),
+        potential_unit = F('Potential_Unit__Unit_Code'),
+        unit_production = F('Unit_Production__Unit_Code'),
+    )
+        
+        data = pd.DataFrame(list(queryset.values('Year','country','power_code', 'energy_type','potential_unit','Potential_Capacity_MW','unit_production','Current_Production_In_MW', 'Generating_Company')))
+
+        data.rename(columns={
+                         'country':'Country',
+                         'power_code': 'Power Code',
+                         'energy_type':'Energy Type',
+                         'potential_unit':'Potential Unit',
+                         'Potential_Capacity_MW':'Potential Capacity MW',
+                         'unit_production' : 'Unit Production',
+                         'Current_Production_In_MW':'Current Production In MW',
+                         'Generating_Company':'Generating Company'
+                         }, inplace=True)
+
+        column_order = ['Year','Country','Power Code','Energy Type',
+                        'Potential Unit','Potential Capacity MW','Unit Production','Current Production In MW','Generating Company']
+        data = data[column_order]
+        output = BytesIO()
+        writer = pd.ExcelWriter(output, engine='xlsxwriter')  
+        data.to_excel(writer, sheet_name='Sheet1', index=False)
+
+        writer.close()  
+        output.seek(0)
+
+        response = HttpResponse(
+            output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
+        return response
+

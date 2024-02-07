@@ -77,6 +77,10 @@
             </span>
 
             <div class="d-flex align-items-center py-2">
+                <button type="button" class="btn border p-2 styled-link hover-shadow" onclick="updateSelected()">
+                    <i class="fa-solid fa-file-pen"></i>
+                    <span>Update Selected</span>
+                </button>
                 <button type="button" class="btn border p-2 styled-link mx-3 hover-shadow" onclick="confirmDeleteAll()">
                     <i class="fa-regular fa-trash-can" style="color: #ff0000"></i>
                     <span>Delete Selected</span>
@@ -94,7 +98,6 @@
                         <th class="text-white fw-semibold fs-6" scope="col" style="background: #12486B;">
                             <input type="checkbox" name="" id="select-all" onclick="toggleSelectAll()">
                         </th>
-
                         <th class="text-white fst-normal  " scope="col"
                             style="font-size:14px; font-weight: 500; background: #12486B;" scope="col">
                             Year
@@ -235,6 +238,11 @@
         } else {
             alert("Delete canceled!");
         }
+    }
+
+    function updateSelected(itemId) {
+        document.getElementById("delete-form").action = "{% url 'update_selected_energy' %}";
+        document.getElementById("delete-form").submit();
     }
 
     function confirmDeleteAll() {
