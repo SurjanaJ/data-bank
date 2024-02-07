@@ -140,6 +140,11 @@ def upload_energy_excel(request):
 def display_energy_table(request):
     data = Energy.objects.all()
 
+    country_categories = Country_meta.objects.all()
+    power_code_categories = Energy_Meta.objects.all()
+    unit_categories = Unit_meta.objects.all()
+
+
     paginator = Paginator(data, 40)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
@@ -149,6 +154,9 @@ def display_energy_table(request):
               'query_len':len(page), 
               'tables': tables, 
               'meta_tables': views.meta_tables,
+              'country_categories':country_categories,
+              'power_code_categories':power_code_categories,
+              'unit_categories':unit_categories,
                       }
     return render(request, 'general_data/energy_templates/energy_table.html', context)
 

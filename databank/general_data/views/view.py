@@ -8,8 +8,8 @@ from django.db.models import Q
 import pandas as pd
 
 from trade_data import views
-from ..models import Climate_Data, Crime, Crime_Meta, Education, Education_Degree_Meta, Education_Level_Meta, Energy_Meta, Exchange, ForestData, Country_meta, Land_Code_Meta, Occupation, Occupation_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
-from ..forms import UpdateClimate, UpdateCrime, UpdateEducation, UpdateExchange, UpdateOccupation, UpdateServices, UploadCrimeMetaForm,  UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadEnergyMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadOccupationMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
+from ..models import Climate_Data, Crime, Crime_Meta, Education, Education_Degree_Meta, Education_Level_Meta, Energy, Energy_Meta, Exchange, ForestData, Country_meta, Land_Code_Meta, Occupation, Occupation_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
+from ..forms import UpdateClimate, UpdateCrime, UpdateEducation, UpdateEnergy, UpdateExchange, UpdateOccupation, UpdateServices, UploadCrimeMetaForm,  UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadEnergyMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadOccupationMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -440,6 +440,7 @@ def update_record(request,pk):
         'update_occupation_record': Occupation,
         'update_climate_record': Climate_Data,
         'update_exchange_record':Exchange,
+        'update_energy_record':Energy,
     }
 
     form_mapping = {
@@ -449,6 +450,7 @@ def update_record(request,pk):
         Occupation: UpdateOccupation,
         Climate_Data: UpdateClimate,
         Exchange: UpdateExchange,
+        Energy: UpdateEnergy,
     }
 
     view_mapping = {
@@ -457,7 +459,8 @@ def update_record(request,pk):
         Education: 'education_table',
         Occupation:'occupation_table',
         Climate_Data:'climate_table',
-        Exchange: 'exchange_table'
+        Exchange: 'exchange_table',
+        Energy: 'energy_table'
     }
 
     model_class = model_mapping.get(view_name)
@@ -486,6 +489,7 @@ def delete_record(request,pk):
         'delete_occupation_record': Occupation,
         'delete_climate_record': Climate_Data,
         'delete_exchange_record': Exchange,
+        'delete_energy_record':Energy,
     }
 
     view_mapping = {
@@ -495,6 +499,7 @@ def delete_record(request,pk):
         Occupation: 'occupation_table',
         Climate_Data:'climate_table',
         Exchange: 'exchange_table',
+        Energy:'energy_table',
     }
 
     model_class = model_mapping.get(view_name)
@@ -518,6 +523,7 @@ def delete_selected(request):
         'delete_selected_occupation': Occupation,
         'delete_selected_climate':Climate_Data,
         'delete_selected_exchange':Exchange,
+        'delete_selected_energy':Energy,
     }
 
     view_mapping = {
@@ -526,7 +532,8 @@ def delete_selected(request):
         Education: 'education_table',
         Occupation:'occupation_table',
         Climate_Data: 'climate_table',
-        Exchange:'exchange_table'
+        Exchange:'exchange_table',
+        Energy:'energy_table',
     }
     model_class = model_mapping.get(view_name)
     model_view = view_mapping.get(model_class)

@@ -133,6 +133,8 @@ urlpatterns = [
     path('energy_meta',  energy_view.display_energy_meta, name='energy_meta'),
     path('upload_energy_excel', energy_view.upload_energy_excel, name = 'upload_energy_excel'),
     path('energy_table', energy_view.display_energy_table, name='energy_table'), 
-
+    path('update_energy_record/<int:pk>/', view.update_record, name = 'update_energy_record'),
+    path('delete_energy_record/<int:pk>/', view.delete_record, name ='delete_energy_record' ),
+    path('delete_selected_energy/', view.delete_selected, name='delete_selected_energy'),
 
 ]   

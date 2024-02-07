@@ -420,7 +420,7 @@ class Energy_Meta(models.Model):
     modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return (self.Energy_Type)
+        return (f'{self.Code} - {self.Energy_Type}')
 
 
 class Energy(models.Model):
