@@ -39,32 +39,51 @@ def upload_energy_excel(request):
         form = UploadEnergyForm(request.POST, request.FILES)
         if form.is_valid():
             excel_data = request.FILES['file']
-            df = pd.read_excel(excel_data, dtype={'Power_Code': str})
+            df = pd.read_excel(excel_data, dtype={'Power Code': str})
             df.fillna('', inplace=True)
             df = df.map(strip_spaces)
-            cols = df.columns.tolist()
             
             for index, row in df.iterrows():
-                energy_data = {col: row[col] for col in cols}
+                energy_data = {
+                            'Country': row['Country'],
+                            'Year': row['Year'],
+                            'Power_Code':row['Power Code'],
+                            'Potential_Unit': row['Potential Unit'],
+                            'Potential_Capacity_MW': row['Potential Capacity MW'],
+                            'Unit_Production':row['Unit Production'],
+                            'Current_Production_In_MW':row['Current Production In MW'],
+                            'Generating_Company':row['Generating Company']
+                        }
                 
                 try:
                     Country = Country_meta.objects.get(Country_Name = row['Country'])
-                    Power_Code = Energy_Meta.objects.get(Code = row['Power_Code'])
-                    Potential_Unit = Unit_meta.objects.get(Unit_Code = row['Potential_Unit'])
-                    Unit_Production= Unit_meta.objects.get(Unit_Code = row['Unit_Production'])
+                    Power_Code = Energy_Meta.objects.get(Code = row['Power Code'])
+                    Potential_Unit = Unit_meta.objects.get(Unit_Code = row['Potential Unit'])
+                    Unit_Production= Unit_meta.objects.get(Unit_Code = row['Unit Production'])
                     
                     energy_data = {
                             'Country': Country,
                             'Year': row['Year'],
                             'Power_Code': Power_Code,
                             'Potential_Unit': Potential_Unit,
-                            'Potential_Capacity_MW': row['Potential_Capacity_MW'],
+                            'Potential_Capacity_MW': row['Potential Capacity MW'],
                             'Unit_Production':Unit_Production,
-                            'Current_Production_In_MW':row['Current_Production_In_MW'],
-                            'Generating_Company':row['Generating_Company']
+                            'Current_Production_In_MW':row['Current Production In MW'],
+                            'Generating_Company':row['Generating Company']
                         }
                     
                 except Exception as e:
+                    energy_data  = {
+                            'Country': row['Country'],
+                            'Year': row['Year'],
+                            'Power_Code':row['Power Code'],
+                            'Energy Type': row['Energy Type'],
+                            'Potential_Unit': row['Potential Unit'],
+                            'Potential_Capacity_MW': row['Potential Capacity MW'],
+                            'Unit_Production':row['Unit Production'],
+                            'Current_Production_In_MW':row['Current Production In MW'],
+                            'Generating_Company':row['Generating Company']
+                        }
                     errors.append({'row_index': index, 'data': energy_data, 'reason': str(e)})
                     continue
 
@@ -74,7 +93,7 @@ def upload_energy_excel(request):
                     & Q(Power_Code = Power_Code) 
                     & Q(Potential_Unit = Potential_Unit)
                     & Q(Unit_Production = Unit_Production)
-                    & Q(Generating_Company = row['Generating_Company'])
+                    & Q(Generating_Company = row['Generating Company'])
                 ).first()
 
                 if existing_record:
@@ -85,12 +104,13 @@ def upload_energy_excel(request):
                         energy_data = {
                             'Country': row['Country'],
                             'Year': row['Year'],
-                            'Power_Code': row['Power_Code'],
-                            'Potential_Unit': row['Potential_Unit'],
-                            'Potential_Capacity_MW': row['Potential_Capacity_MW'],
-                            'Unit_Production':row['Unit_Production'],
-                            'Current_Production_In_MW':row['Current_Production_In_MW'],
-                            'Generating_Company':row['Generating_Company']
+                            'Power Code': row['Power Code'],
+                            'Energy Type': row['Energy Type'],
+                            'Potential Unit': row['Potential Unit'],
+                            'Potential Capacity MW': row['Potential Capacity MW'],
+                            'Unit Production':row['Unit Production'],
+                            'Current Production In MW':row['Current Production In MW'],
+                            'Generating Company':row['Generating Company']
                         }
 
                         duplicate_data.append({
