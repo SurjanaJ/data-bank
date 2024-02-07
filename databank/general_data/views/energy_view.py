@@ -144,6 +144,22 @@ def display_energy_table(request):
     power_code_categories = Energy_Meta.objects.all()
     unit_categories = Unit_meta.objects.all()
 
+    power_code = request.GET.get('power_code')
+    country = request.GET.get('country')
+    potential_unit = request.GET.get('potential_unit')
+    unit_production = request.GET.get('unit_production')
+
+    if is_valid_queryparam(country) and country != '--':
+        data = data.filter(Country_id=country)
+
+    if is_valid_queryparam(power_code) and power_code != '--':
+        data = data.filter(Power_Code_id=power_code)
+
+    if is_valid_queryparam(potential_unit) and potential_unit != '--':
+        data = data.filter(Potential_Unit_id=potential_unit)
+
+    if is_valid_queryparam(unit_production) and unit_production != '--':
+        data = data.filter(Unit_Production_id=unit_production)
 
     paginator = Paginator(data, 40)
     page_number = request.GET.get('page')
