@@ -433,7 +433,7 @@ class Energy(models.Model):
     Unit_Production = models.ForeignKey(Unit_meta, on_delete = models.CASCADE, related_name='Unit_Production')
     Current_Production_In_MW = models.FloatField(default = 0.0)
     Generating_Company = models.CharField(max_length = 300 , null = True , blank = True)
-    created_date = models.DateTimeField(auto_now=True)
+    created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
