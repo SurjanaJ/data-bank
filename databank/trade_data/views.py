@@ -77,6 +77,11 @@ tables =[
         "name": "Exchange Data",
         "url": "exchange_table"
     }
+    ,
+    {
+        "name": "Energy Data",
+        "url": "energy_table"
+    }
     ]
 
 
@@ -151,6 +156,11 @@ meta_tables =[
         "name":"Currency Meta",
         "url": "currency_meta",
         "upload_url":"upload_currency_excel"
+    },
+    {
+        "name":"Energy Meta",
+        "url":"energy_meta",
+        "upload_url":"upload_energy_meta_excel"
     },
     ]
 

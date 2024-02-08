@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ModelForm
 from .models import Climate_Data, Crime,ForestData, Disaster_Data, Education, Health_disease,Road,Mining,Housing,Political_Data,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land,Public_Unitillity
-from .models import Climate_Data, Crime, Education, Exchange, ForestData,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land
+from .models import Climate_Data, Crime, Education, Energy, Exchange, ForestData,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land
 
 class UploadForestDataForm(forms.Form):
     forest_data_file = forms.FileField()
@@ -310,3 +310,39 @@ class UpdateExchange(ModelForm):
         # Set the label for 'Selling' field
         self.fields['Selling'].label = 'Selling Against USD'
         self.fields['Buying'].label = 'Buying Against USD'
+
+
+# ENERGY_DATA
+class UploadEnergyMetaForm(forms.Form):
+    meta_file = forms.FileField()  
+
+class UploadEnergyForm(forms.Form):
+    file = forms.FileField() 
+
+class UpdateEnergy(ModelForm):
+    class Meta:
+        model = Energy
+        fields='__all__'
+
+        widgets={
+            'Year': forms.NumberInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Power_Code': forms.Select(attrs={'class': 'form-control '}),
+            'Potential_Unit': forms.Select(attrs={'class': 'form-control '}),
+            'Potential_Capacity_MW':forms.NumberInput(attrs={'class': 'form-control '}),
+            'Unit_Production': forms.Select(attrs={'class': 'form-control '}),
+            'Current_Production_In_MW':forms.NumberInput(attrs={'class': 'form-control '}),
+            'Generating_Company':forms.TextInput(attrs={'class': 'form-control '})
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateEnergy, self).__init__(*args, **kwargs)
+
+        # Set the label for 'Selling' field
+        self.fields['Power_Code'].label = 'Power Code'
+        self.fields['Potential_Unit'].label = 'Potential Unit'
+        self.fields['Unit_Production'].label = 'Unit Production'
+        self.fields['Potential_Capacity_MW'].label = 'Potential Capacity MW'
+        self.fields['Current_Production_In_MW'].label = 'Current Production In MW'
+        self.fields['Generating_Company'].label = 'Generating Company'
+
