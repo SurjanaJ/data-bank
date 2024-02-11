@@ -30,7 +30,6 @@ def display_currency_meta(request):
     
     return render(request, 'general_data/display_meta.html', context)
 
-
 def upload_currency_meta_excel(request):
     errors = []
     duplicate_data = []
@@ -136,75 +135,124 @@ def upload_exchange_excel(request):
             excel_data = request.FILES['file']
             df = pd.read_excel(excel_data)
             df.fillna('', inplace=True)
-            
-        for index, row in df.iterrows():
-            exchange_data = {
-                'Country': row['Country'],
-                'Selling' : row['Selling against USD'],
-                'Buying' : row ['Buying against USD'],
-                'Currency' : row['Currency'],
-            }
-            try:
-                Country  = Country_meta.objects.get(Country_Name = row['Country'])
-                Currency = Currency_Meta.objects.get(Currency_Name = row['Currency'] )
+            df = df.map(strip_spaces)
 
-                exchange_data = {
-                'Country': Country,
-                'Selling' : row['Selling against USD'],
-                'Buying' : row ['Buying against USD'],
-                'Currency' : Currency,
-            }
-                
-                if Country.id != Currency.Country.id:
-                    exchange_data = {
-                        'Country': row['Country'],
-                        'Selling Against USD' : row['Selling against USD'],
-                        'Buying Against USD' : row ['Buying against USD'],
-                        'Currency' : row['Currency'],
-            }
-                    raise ValueError(f"Country value and Currency Value Mismatch")
-
-            except Exception as e:
-                errors.append({'row_index': index, 'data': exchange_data, 'reason': str(e)})      
-                continue 
-
-            existing_record = Exchange.objects.filter(
-                    Q(Country = Country)).first()
-            
-            if existing_record:
-                existing_dict = model_to_dict(existing_record)
-                exchange_data_dict = model_to_dict(Exchange(**exchange_data))
-
-                if all(existing_dict[key] == exchange_data_dict[key] or (pd.isna(existing_dict[key]) and pd.isna(exchange_data_dict[key])) for key in exchange_data_dict if key != 'id'):
-                    exchange_data = {
-                    'Country': row['Country'],
-                    'Selling Against USD' : row['Selling against USD'],
-                    'Buying Against USD' : row ['Buying against USD'],
-                    'Currency': row['Currency'],
-            }
-                    duplicate_data.append({
-                            'row_index': index,
-                            'data': {key: str(exchange_data[key]) if isinstance(exchange_data[key], date) else exchange_data[key] for key in exchange_data}
-                        })
-                    
-
-                else:
-                    for key, value in exchange_data.items():
-                            setattr(existing_record, key, value)
+            # update the data
+            if 'id' in df.columns:
+                for index, row in df.iterrows():
+                    id = row.get('id')
                     try:
-                        existing_record.save()
-                        updated_count += 1
-                            
-                    except IntegrityError as e:
-                        errors.append(f"Error updating row {index}: {e}")
-                       
+                        # find instance 
+                        exchange_instance = Exchange.objects.get(id = id)
+                        exchange_data = {
+                            'Country': row['Country'],
+                            'Selling' : row['Selling Against USD'],
+                            'Buying' : row ['Buying Against USD'],
+                            'Currency' : row['Currency'],
+                        }
+                        # check if all the meta datas exist
+                        try:
+                            Country  = Country_meta.objects.get(Country_Name = row['Country'])
+                            Currency = Currency_Meta.objects.get(Currency_Name = row['Currency'] )
+
+                            # Updating the values
+                            exchange_instance.Country = Country
+                            exchange_instance.Selling = row['Selling Against USD']
+                            exchange_instance.Buying = row['Buying Against USD']
+                            exchange_instance.Currency = Currency
+
+                            exchange_instance.save()
+                            updated_count +=1
+                        
+                        # error : meta data does not exist
+                        except Exception as e:
+                            exchange_data = {
+                            'Country': row['Country'],
+                            'Selling' : row['Selling Against USD'],
+                            'Buying' : row ['Buying Against USD'],
+                            'Currency' : row['Currency'],
+                        }
+                            errors.append({'row_index': index, 'data': exchange_data, 'reason': str(e)})
+                            continue
+                    
+                    # instance does not exist
+                    except Exception as e:
+                        exchange_data = {
+                            'Country': row['Country'],
+                            'Selling' : row['Selling Against USD'],
+                            'Buying' : row ['Buying Against USD'],
+                            'Currency' : row['Currency'],
+                        }
+
+                        errors.append({
+                                    'row_index': index,
+                                    'data': exchange_data,
+                                    'reason': f'Error inserting row {index}: {e}'
+                                })
+                        continue
+            # Add new data
             else:
-                try:
-                    exchangeData = Exchange(**exchange_data)
-                    exchangeData.save()
-                    added_count += 1
-                except Exception as e:
-                    errors.append(f"Error inserting row {index}: {e}")
+                for index, row in df.iterrows():
+                    # Find if the meta data exists
+                    try:
+                        Country  = Country_meta.objects.get(Country_Name = row['Country'])
+                        Currency = Currency_Meta.objects.get(Currency_Name = row['Currency'] )
+
+                        exchange_data = {
+                            'Country': Country,
+                            'Selling' : row['Selling Against USD'],
+                            'Buying' : row ['Buying Against USD'],
+                            'Currency' : Currency,
+                        }
+
+                        if Country.id != Currency.Country.id:
+                            exchange_data = {
+                                'Country': row['Country'],
+                                'Selling Against USD' : row['Selling Against USD'],
+                                'Buying Against USD' : row ['Buying Against USD'],
+                                'Currency' : row['Currency'],
+                    }
+                            raise ValueError(f"Country value and Currency Value Mismatch")
+
+
+                        existing_record = Exchange.objects.filter(
+                            Q(Country = Country)
+                            & Q(Selling = row['Selling Against USD'])
+                            & Q(Buying = row['Buying Against USD'])
+                            & Q(Currency = Currency)
+                            ).first()
+                        
+                        if existing_record:
+                            exchange_data = {
+                                'Country': row['Country'],
+                                'Selling Against USD' : row['Selling Against USD'],
+                                'Buying Against USD' : row ['Buying Against USD'],
+                                'Currency' : row['Currency'],
+                            }       
+                            duplicate_data.append({
+                                'row_index': index,
+                                'data': {key: str(value) for key, value in exchange_data.items()}
+                            })
+                        else:
+                            try:
+                                exchangeData = Exchange(**exchange_data)
+                                exchangeData.save()
+                                added_count += 1
+                            except Exception as e:
+                                errors.append(f"Error inserting row {index}:{e}")
+                    
+                    # Meta data doesnt exist
+                    except Exception as e:
+                        exchange_data = {
+                                'Country': row['Country'],
+                                'Selling Against USD' : row['Selling Against USD'],
+                                'Buying Against USD' : row ['Buying Against USD'],
+                                'Currency' : row['Currency'],
+                            }  
+
+                        errors.append({'row_index': index, 'data': exchange_data, 'reason': str(e)})
+                        continue
+            
 
         if added_count > 0:
             messages.success(request, str(added_count) + ' records added.')
@@ -317,3 +365,39 @@ def export_exchange_excel(request):
     )
     response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
     return response
+
+def update_selected_exchange(request):
+    selected_ids = request.POST.getlist('selected_items')
+    if not selected_ids:
+        messages.error(request, 'No items selected.')
+        return redirect('exchange_table')
+    else:
+        queryset = Exchange.objects.filter(id__in=selected_ids)
+        queryset = queryset.annotate(
+        country = F('Country__Country_Name'),
+        currency = F('Currency__Currency_Name'),
+    )
+        
+        data = pd.DataFrame(list(queryset.values('id','country','currency','Buying','Selling')))
+
+        data.rename(columns={
+                         'country':'Country',
+                         'currency': 'Currency',
+                         'Buying':'Buying Against USD',
+                         'Selling':'Selling Against USD',
+                         }, inplace=True)
+
+        column_order = ['id','Country','Currency','Selling Against USD','Buying Against USD']
+        data = data[column_order]
+        output = BytesIO()
+        writer = pd.ExcelWriter(output, engine='xlsxwriter')  
+        data.to_excel(writer, sheet_name='Sheet1', index=False)
+
+        writer.close()  
+        output.seek(0)
+
+        response = HttpResponse(
+            output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
+        return response
