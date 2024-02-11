@@ -184,23 +184,22 @@ def upload_energy_excel(request):
                         errors.append({'row_index': index, 'data': energy_data, 'reason': str(e)})
                         continue
 
-           
-            if added_count > 0:
-                messages.success(request, str(added_count) + ' records added.')
+        if added_count > 0:
+            messages.success(request, str(added_count) + ' records added.')
             
-            if updated_count > 0:
-                messages.info(request, str(updated_count) + ' records updated.')
+        if updated_count > 0:
+            messages.info(request, str(updated_count) + ' records updated.')
 
-            if errors:
-                request.session['errors'] = errors
-                return render(request, 'trade_data/error_template.html', {'errors': errors, 'tables': tables, 'meta_tables': views.meta_tables, })
+        if errors:
+            request.session['errors'] = errors
+            return render(request, 'trade_data/error_template.html', {'errors': errors, 'tables': tables, 'meta_tables': views.meta_tables, })
             
-            elif duplicate_data:
-                request.session['duplicate_data'] = duplicate_data
-                return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data, 'tables': tables, 'meta_tables': views.meta_tables,})
+        elif duplicate_data:
+            request.session['duplicate_data'] = duplicate_data
+            return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data, 'tables': tables, 'meta_tables': views.meta_tables,})
             
-            else:
-                return redirect('energy_table')
+        else:
+            return redirect('energy_table')
     else:
         form = UploadEnergyForm()    
 
