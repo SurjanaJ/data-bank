@@ -198,3 +198,36 @@ def export_excel(request):
     response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
     return response
 
+def update_selected_crime(request):
+    selected_ids = request.POST.getlist('selected_items')
+    if not selected_ids:
+        messages.error(request, 'No items selected.')
+        return redirect('crime_table')
+    else:
+        queryset = Crime.objects.filter(id__in=selected_ids)
+        queryset = queryset.annotate(
+        country = F('Country__Country_Name'),
+        code = F('Code__Code'),
+        crime_type = F('Code__Name',)
+    )
+        data = pd.DataFrame(list(queryset.values('id','Year','country','code', 'crime_type','Gender','Age','District')))
+        data.rename(columns={
+                         'country':'Country',
+                         'code': 'Code',
+                         'crime_type':'Crime Type'
+                         }, inplace=True)
+        column_order = ['id','Year','Country','Code','Crime Type','Gender','Age','District']
+
+        data = data[column_order]
+        output = BytesIO()
+        writer = pd.ExcelWriter(output, engine='xlsxwriter')  
+        data.to_excel(writer, sheet_name='Sheet1', index=False)
+
+        writer.close()  
+        output.seek(0)
+
+        response = HttpResponse(
+            output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
+        return response
