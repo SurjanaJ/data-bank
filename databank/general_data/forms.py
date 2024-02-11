@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Climate_Data, Crime,ForestData, Disaster_Data, Education, Health_disease,Road,Mining,Housing,Political_Data,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land,Public_Unitillity
-from .models import Climate_Data, Crime, Education, Exchange, ForestData,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land
+from .models import Climate_Data, Crime, Exchange,ForestData, Disaster_Data, Education, Health_disease,Road,Mining,Housing,Political_Data,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land,Public_Unitillity
+from .models import Climate_Data, Crime, Education, ForestData,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land
 
 class UploadForestDataForm(forms.Form):
     forest_data_file = forms.FileField()
@@ -231,6 +231,7 @@ class UploadHousingForm(forms.Form):
     file = forms.FileField()
 
 #political 
+    
 
 class UpdatePolitical(ModelForm):
     class Meta:

@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.db.models import Q
 import pandas as pd
 from ..models import Political_Data, Country_meta
-from ..forms import UploadLandData,UploadLandDataForm, UploadLandMetaForm
+from ..forms import UploadPoliticalForm
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -80,3 +80,165 @@ def display_political_table(request):
         'country_categories':country_categories,
     }
     return render(request, 'general_data/political_templates/political_table.html',context)
+
+
+
+def upload_political_excel(request):
+    errors = []
+    duplicate_data = []
+    updated_count = 0
+    added_count = 0 
+    if request.method == 'POST':
+        form = UploadPoliticalForm(request.POST,request.FILES)
+        if form.is_valid():
+            excel_data = request.FILES['file']
+            df = pd.read_excel(excel_data)
+
+            if 'id' in df.columns or 'ID' in df.columns:
+                cols = df.columns.tolist()
+                for index,row in df.iterrows():
+                    id_value = row.get('id')
+                    try: 
+                        political_instance = Political_Data.objects.get(id = id_value)
+
+                    except Exception as e:
+                        data = {col:row[col] for col in cols}
+                        data['Year'] = data['Year'].isoformat()
+                        errors.append({
+                            'row_index': index,
+                            'data':data,
+                            'reason':f'Error'
+                            'inserting row {index}:{e}'
+                        })
+                        continue
+                    
+
+                    try:
+                        Country = Country_meta.objects.get(Country_Name=row['Country'])
+                        Year = pd.to_datetime(row['Year']).date()
+                        political_data ={
+                            'Year':Year,
+                            'Country':Country,
+                            'Political_Party_Name': row['Political_Party_Name'],
+                            'No_Of_Member':row['No_Of_Member'],
+                            'Province':row['Province'],
+                            'District':row['District'],
+                            'Municipality':row['Municipality'],
+                            'Wards':row['Wards'],
+                        }
+
+                    except Exception as e:
+                        Year = pd.to_datetime(row['Year']).date()
+                        political_data ={
+                            'Year':Year.isoformat(),
+                            'Country':row['Country'],
+                            'Political_Party_Name': row['Political_Party_Name'],
+                            'No_Of_Member':row['No_Of_Member'],
+                            'Province':row['Province'],
+                            'District':row['District'],
+                            'Municipality':row['Municipality'],
+                            'Wards':row['Wards'],
+                        }
+                        errors.append({'row_index': index, 'data': political_data, 'reason': str(e)})
+                        continue
+
+                    
+
+                    
+                        
+                    political_instance.Year = Year
+                    political_instance.Country = Country
+                    political_instance.Political_Party_Name = row['Political_Party_Name']
+                    political_instance.Number_Of_Member = row['No_Of_Member']
+                    political_instance.Province= row['Province']
+                    political_instance.District = row['District']
+                    political_instance.Municipality = row['Municipality']
+                    political_instance.Wards = row['Wards']
+                    political_instance.save()
+                    updated_count += 1
+
+            else:
+                for index,row in df.iterrows():
+                    political_data = {
+                    'Year':row['Year'],
+                    'Country':row['Country'],
+                    'Political_Party_Name': row['Political_Party_Name'],
+                    'No_Of_Member':row['No_Of_Member'],
+                    'Province':row['Province'],
+                    'District':row['District'],
+                    'Municipality':row['Municipality'],
+                    'Wards':row['Wards'], 
+                    }
+                    
+                    try:
+                        calender_date = datetime.strptime(str(row['Year'].date().strftime('%Y-%m-%d')), '%Y-%m-%d').date()
+                    except:
+                        calender_date = datetime.strptime(f'{str(row["Year"].date().strftime("%Y-%m-%d"))}-01-01', '%Y-%m-%d').date()
+                    Country = None
+
+                    try:
+                        Year = calender_date.strftime('%Y-%m-%d')
+                        Country = Country_meta.objects.get(Country_Name=row['Country'])
+                        political_data = {
+                            'Year':Year,
+                            'Country':Country,
+                            'Political_Party_Name': row['Political_Party_Name'],
+                            'No_Of_Member':row['No_Of_Member'],
+                            'Province':row['Province'],
+                            'District':row['District'],
+                            'Municipality':row['Municipality'],
+                            'Wards':row['Wards'], 
+                        }
+                    except Exception as e:
+                            political_data = {
+                                'Year':row['Year'],
+                                'Country':row['Country'],
+                                'Political_Party_Name': row['Political_Party_Name'],
+                                'No_Of_Member':row['No_Of_Member'],
+                                'Province':row['Province'],
+                                'District':row['District'],
+                                'Municipality':row['Municipality'],
+                                'Wards':row['Wards'], 
+                    }
+                            errors.append({
+                                'row_index': index,
+                                'data': political_data,
+                                'reason': f'Error inserting row {index}: {e}'
+                            })
+                            continue
+                    existing_record = Political_Data.objects.filter(Q(Year=Year) & Q(Country=Country) & Q(Political_Party_Name=political_data['Political_Party_Name']) & Q(Number_Of_Member = political_data['No_Of_Member']) & Q(Province = political_data['Province']) & Q(District = political_data['District']) & Q(Municipality = political_data['Municipality']) & Q(Wards = political_data['Wards']))
+
+                    if existing_record:
+                        duplicate_data.append({
+                            'row_index':index,
+                            'data': political_data,
+                            'reason': 'Duplicate data found'
+                        })
+                    else:
+                        try:
+                            Politicaldata =Political_Data(**political_data)
+                            Politicaldata.save()
+                            added_count += 1
+                        except Exception as e:
+                            errors.append({
+                                'row_index': index,
+                                'data': political_data,
+                                'reason': f"Error inserting row {index}: {e}"
+                            })
+
+        if added_count > 0:
+            messages.success(request, f'{added_count} records added')
+        if updated_count > 0:
+            messages.success(request, f'{updated_count} records updated')
+        if errors:
+            
+            request.session['errors'] = errors
+            return render(request, 'general_data/error_template.html', {'errors': errors})
+        if duplicate_data:
+            return render(request, 'general_data/duplicate_template.html', {'duplicate_data': duplicate_data})
+
+    else:
+        form = UploadPoliticalForm()
+
+    return render(request, 'general_data/upload_form.html', {'form': form, 'tables':tables})
+
