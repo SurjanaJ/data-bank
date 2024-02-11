@@ -1,6 +1,7 @@
 from django.urls import include, path
 
-from .views import climate_view,exchange_view,occupation_view,health_diseases_views,education_view, view,population_view,hotel_view,land_view,political_views,tourism_view,mining_views,water_view,housing_views,road_views,transport_view,services_view, crime_view,public_unitillity_views,disaster_views,tourism_view
+from .views import climate_view,occupation_view,health_diseases_views,education_view, view,population_view,hotel_view,land_view,political_views,tourism_view,mining_views,water_view,housing_views,road_views,transport_view,services_view, crime_view,public_unitillity_views,disaster_views
+from .views import energy_view,exchange_view,climate_view,occupation_view,education_view, view,population_view,hotel_view,land_view,tourism_view,water_view,transport_view,services_view, crime_view
 from .views import export_views
 
 urlpatterns = [
@@ -183,4 +184,13 @@ urlpatterns = [
     path('delete_selected_exchange/', view.delete_selected, name='delete_selected_exchange'),
     path('export_exchange_excel', exchange_view.export_exchange_excel, name='export_exchange_excel'),
 
+    path('upload_energy_meta_excel', view.upload_meta_excel, name='upload_energy_meta_excel'),
+    path('energy_meta',  energy_view.display_energy_meta, name='energy_meta'),
+    path('upload_energy_excel', energy_view.upload_energy_excel, name = 'upload_energy_excel'),
+    path('energy_table', energy_view.display_energy_table, name='energy_table'), 
+    path('update_energy_record/<int:pk>/', view.update_record, name = 'update_energy_record'),
+    path('delete_energy_record/<int:pk>/', view.delete_record, name ='delete_energy_record' ),
+    path('delete_selected_energy/', view.delete_selected, name='delete_selected_energy'),
+    path('export_energy_excel', energy_view.export_energy_excel, name='export_energy_excel'),
+    path('update_selected_energy/', energy_view.update_selected_energy, name='update_selected_energy')
 ]   

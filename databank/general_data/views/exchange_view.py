@@ -16,7 +16,9 @@ from ..models import Currency_Meta, Exchange
 from ..forms import UploadCurrencyForm, UploadExchangeForm
 
 def strip_spaces(value):
-    return value.lstrip()
+    if isinstance(value, str):
+        return value.strip()
+    return value
 
 def display_currency_meta(request):
     data = Currency_Meta.objects.all()
@@ -42,7 +44,7 @@ def upload_currency_meta_excel(request):
             excel_data = request.FILES['meta_file']
             df = pd.read_excel(excel_data)
             df.fillna('', inplace= True)
-            df = df.applymap(strip_spaces)
+            df = df.map(strip_spaces)
 
             for index, row in df.iterrows():
                 currency_data = {
