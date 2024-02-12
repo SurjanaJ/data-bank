@@ -174,6 +174,8 @@ urlpatterns = [
     path('delete_climate_record/<int:pk>/', view.delete_record, name ='delete_climate_record' ),
     path('delete_selected_climate/', view.delete_selected, name='delete_selected_climate'),
     path('export_climate_excel', climate_view.export_climate_excel, name='export_climate_excel'),
+    path('update_selected_climate/', climate_view.update_selected_climate, name='update_selected_climate'),
+
 
     path('upload_currency_excel', exchange_view.upload_currency_meta_excel, name='upload_currency_excel'),
     path('currency_meta',  exchange_view.display_currency_meta, name='currency_meta'),
@@ -194,5 +196,5 @@ urlpatterns = [
     path('delete_energy_record/<int:pk>/', view.delete_record, name ='delete_energy_record' ),
     path('delete_selected_energy/', view.delete_selected, name='delete_selected_energy'),
     path('export_energy_excel', energy_view.export_energy_excel, name='export_energy_excel'),
-    path('update_selected_energy/', energy_view.update_selected_energy, name='update_selected_energy')
+    path('update_selected_energy/', energy_view.update_selected_energy, name='update_selected_energy'),
 ]   

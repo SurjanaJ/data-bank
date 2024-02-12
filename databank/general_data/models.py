@@ -302,7 +302,7 @@ class Crime_Meta(models.Model):
     Name = models.TextField(blank= True, null = True)
     
     def __str__(self):
-        return self.Code
+        return (f'{self.Code} - {self.Name}')
     
 class Crime(models.Model):
     GENDER_OPTIONS = (
@@ -378,7 +378,7 @@ class Climate_Place_Meta(models.Model):
     modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.Place_Code
+        return (f'{self.Place_Code} - {self.Place_Name}')
 
 class Climate_Data(models.Model):
     CLIMATE_OPTIONS = (
