@@ -302,7 +302,7 @@ class Crime_Meta(models.Model):
     Name = models.TextField(blank= True, null = True)
     
     def __str__(self):
-        return self.Code
+        return (f'{self.Code} - {self.Name}')
     
 class Crime(models.Model):
     GENDER_OPTIONS = (
