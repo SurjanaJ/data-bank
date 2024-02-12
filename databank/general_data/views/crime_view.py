@@ -7,7 +7,7 @@ from django.core.paginator import Paginator
 from .energy_view import strip_spaces
 from trade_data.views import is_valid_queryparam, tables
 from django.http import HttpResponse
-from django.db.models import F
+from django.db.models import F, Q
 from trade_data import views
 
 from trade_data.models import Country_meta
@@ -47,60 +47,127 @@ def upload_crime_excel(request):
                     id = row.get('id')
                     try: 
                         crime_instance = Crime.objects.get(id = id)
+                        
+                        # Check for the existence of meta data
+                        try:
+                            Country = Country_meta.objects.get(Country_Name = row['Country'])
+                            Code = Crime_Meta.objects.get(Code = row['Code'])
+                            gender = row['Gender']
+                            
+                            if gender not in ['Male','Female']:
+                                raise ValueError(f"Invalid Trade_Type at row {index}: {gender}")
+                            
+                            crime_instance.Country = Country
+                            crime_instance.Year = row['Year']
+                            crime_instance.Code = Code
+                            crime_instance.Gender = gender
+                            crime_instance.Age = row['Age']
+                            crime_instance.District = row['District']
+                            
+                            crime_instance.save()
+                            updated_count += 1
+                        
+                        except Exception as e:
+                            crime_data = {
+                                'Country':row['Country'],
+                                'Year':row['Year'].isoformat(),
+                                'Code':row['Code'],
+                                'Crime Type' : row['Crime Type'],
+                                'Gender': row['Gender'],
+                                'Age': row['Age'],
+                                'District': row['District']
+                            }
+
+                            errors.append({'row_index': index, 'data': crime_data, 'reason': str(e)})
+                            continue
+
+                    except Exception as e:
                         crime_data = {
-                        'Country':row['Country'],
-                        'Year':row['Year'],
-                        'Code':row['Code'],
-                        'Gender': row['Gender'],
-                        'Age': row['Age'],
-                        'District': row['District']
-                    }
-                    except:
-                        pass
+                                'Country':row['Country'],
+                                'Year':row['Year'].isoformat(),
+                                'Code':row['Code'],
+                                'Crime Type' : row['Crime Type'],
+                                'Gender': row['Gender'],
+                                'Age': row['Age'],
+                                'District': row['District']
+                            }
+                        errors.append({
+                                    'row_index': index,
+                                    'data': crime_data,
+                                    'reason': f'Error inserting row {index}: {e}'
+                                })
+                        continue
             # Add new data
             else:
-                pass
-            
-            # for index, row in df.iterrows():
-            #     try: 
-            #         Year = row['Year']
-            #         Country = Country_meta.objects.get(Country_Name = row['Country'])
-            #         Code = Crime_Meta.objects.get(Code = row['Code'])
-            #         gender = row['Gender']
+                for index, row in df.iterrows():
+                    try:
+                        Country = Country_meta.objects.get(Country_Name = row['Country'])
+                        Code = Crime_Meta.objects.get(Code = row['Code'])
+                        gender = row['Gender']
 
-            #         if gender not in ['Male', 'Female']:
-            #             raise ValueError(
-            #                 f"Invalid Direction at row {index} : {gender}"
-            #             )
-            #         crime_data = {
-            #             'Country':Country,
-            #             'Year':Year,
-            #             'Code':Code,
-            #             'Gender': row['Gender'],
-            #             'Age': row['Age'],
-            #             'District': row['District']
-            #         }
+                        crime_data = {
+                                'Country':row['Country'],
+                                'Year':row['Year'],
+                                'Code':row['Code'],
+                                'Crime Type' : row['Crime Type'],
+                                'Gender': row['Gender'],
+                                'Age': row['Age'],
+                                'District': row['District']
+                            }
+                            
+                        if gender not in ['Male','Female']:
+                            raise ValueError(f"Invalid Trade_Type at row {index}: {gender}")
 
-            #     except Exception as e:
-            #         crime_data = {
-            #             'Country':Country,
-            #             'Year':Year.isoformat(),
-            #             'Code':Code,
-            #             'Gender': row['Gender'],
-            #             'Age': row['Age'],
-            #             'District': row['District']
-            #         }
-            #         errors.append({'row_index': index, 'data': crime_data, 'reason': str(e)})
-            #         continue
-                
-            #     try:
-            #         crimeData = Crime(**crime_data)
-            #         crimeData.save()
-            #         added_count +=1
+                        existing_record = Crime.objects.filter(
+                            Q(Country = Country)
+                            & Q(Year = row['Year'])
+                            & Q(Code = Code)
+                            & Q(Gender = gender)
+                            & Q(Age = row['Age'])
+                            & Q(District = row['District'])
+                        ).first()
+
+                        if existing_record: 
+                            crime_data = {
+                                'Country':row['Country'],
+                                'Year':row['Year'].isoformat(),
+                                'Code':row['Code'],
+                                'Crime Type' : row['Crime Type'],
+                                'Gender': row['Gender'],
+                                'Age': row['Age'],
+                                'District': row['District']
+                            }
+
+                            duplicate_data.append({
+                             'row_index': index,
+                                'data': {key: str(value) for key, value in crime_data.items()}
+                            })
+                            continue
+
+                        else:
+                            try:
+                                crimeData = Crime(**crime_data)
+                                crimeData.save()
+                                added_count +=1
+
+                            except:
+                                errors.append(f"Error inserting row {index}: {e}")
+                            
+                                
                         
-            #     except Exception as e:
-            #         errors.append(f"Error inserting row {index}: {e}")
+                    except Exception as e:
+                        crime_data = {
+                                'Country':row['Country'],
+                                'Year':row['Year'].isoformat(),
+                                'Code':row['Code'],
+                                'Crime Type' : row['Crime Type'],
+                                'Gender': row['Gender'],
+                                'Age': row['Age'],
+                                'District': row['District']
+                            }
                         
+                        errors.append({'row_index': index, 'data': crime_data, 'reason': str(e)})
+                        continue         
             
             if added_count > 0:
                 messages.success(request, str(added_count) + ' records added.')
