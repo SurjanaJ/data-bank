@@ -378,7 +378,7 @@ class Climate_Place_Meta(models.Model):
     modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.Place_Code
+        return (f'{self.Place_Code} - {self.Place_Name}')
 
 class Climate_Data(models.Model):
     CLIMATE_OPTIONS = (
