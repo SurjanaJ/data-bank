@@ -170,7 +170,6 @@ def display_crime_table(request):
     return render(request, 'general_data/crime_templates/crime_table.html', context)
 
 def export_excel(request):
-
     year_min = request.GET.get('year_min')
     year_max = request.GET.get('year_max')
     age_min = request.GET.get('age_min')
@@ -198,12 +197,15 @@ def export_excel(request):
     queryset = Crime.objects.filter(**filter_conditions)
     queryset = queryset.annotate(
         country_name = F('Country__Country_Name'),
-        code_name = F('Code__Code')
+        code_name = F('Code__Code'),
+        crime_type = F('Code__Name'),
     )
-    data = pd.DataFrame(list(queryset.values('country_name','Year','code_name', 'Gender','Age', 'District')))
+    data = pd.DataFrame(list(queryset.values('country_name','Year','code_name','crime_type', 'Gender','Age', 'District')))
     
-    data.rename(columns={'country_name': 'Country', 'code_name': 'Code'}, inplace=True)
+    data.rename(columns={'country_name': 'Country', 'code_name': 'Code', 'crime_type':'Crime Type'}, inplace=True)
 
+    column_order = ['Country','Year','Code','Crime Type','Gender', 'Age', 'District']
+    data = data[column_order]
 
     output = BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')  
@@ -228,7 +230,7 @@ def update_selected_crime(request):
         queryset = queryset.annotate(
         country = F('Country__Country_Name'),
         code = F('Code__Code'),
-        crime_type = F('Code__Name',)
+        crime_type = F('Code__Name')
     )
         data = pd.DataFrame(list(queryset.values('id','Year','country','code', 'crime_type','Gender','Age','District')))
         data.rename(columns={
