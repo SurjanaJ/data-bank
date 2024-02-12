@@ -142,7 +142,12 @@
                                 style="font-size:14px; font-weight: 500; background: #12486B;" scope="col">
                                 Place
                             </th>
-    
+                            
+                            <th class="text-white fst-normal  " scope="col"
+                                style="font-size:14px; font-weight: 500; background: #12486B;" scope="col">
+                                Place Name
+                            </th>
+
                             <th class="text-white fst-normal  " scope="col"
                                 style="font-size:14px; font-weight: 500; background: #12486B;" scope="col">
                                 Temperature_Unit
@@ -184,6 +189,7 @@
                             <td> {{record.Country.Country_Name}} </td>
                             <td> {{record.Date}} </td>
                             <td>{{record.Place}}</td>
+                            <td>{{record.Place.Place_Name}}</td>
                             <td>{{record.Temperature_Unit}}</td>
                             <td>{{record.Max_Temperature}}</td>
                             <td>{{record.Min_Temperature}}</td>
