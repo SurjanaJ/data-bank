@@ -4,6 +4,7 @@ from django.shortcuts import redirect, render
 import pandas as pd
 from django.contrib import messages
 from django.core.paginator import Paginator
+from .energy_view import strip_spaces
 from trade_data.views import is_valid_queryparam, tables
 from django.http import HttpResponse
 from django.db.models import F
@@ -20,7 +21,6 @@ def display_crime_meta(request):
     total_data = data.count()
 
     column_names = Crime_Meta._meta.fields
-
     context = {'data': data, 'total_data':total_data, 'meta_tables':views.meta_tables, 'tables':tables, 'column_names':column_names}
     
     return render(request, 'general_data/display_meta.html', context)
@@ -39,46 +39,67 @@ def upload_crime_excel(request):
             df = pd.read_excel(excel_data, dtype={'Code': str})
             df.fillna('', inplace=True)
             df['Year'] = pd.to_datetime(df['Year']).dt.date
+            df = df.map(strip_spaces)
 
-            for index, row in df.iterrows():
-                try: 
-                    Year = row['Year']
-                    Country = Country_meta.objects.get(Country_Name = row['Country'])
-                    Code = Crime_Meta.objects.get(Code = row['Code'])
-                    gender = row['Gender']
-
-                    if gender not in ['Male', 'Female']:
-                        raise ValueError(
-                            f"Invalid Direction at row {index} : {gender}"
-                        )
-                    crime_data = {
-                        'Country':Country,
-                        'Year':Year,
-                        'Code':Code,
+            # Update existing data
+            if 'id' in df.columns:
+                for index, row in df.iterrows():
+                    id = row.get('id')
+                    try: 
+                        crime_instance = Crime.objects.get(id = id)
+                        crime_data = {
+                        'Country':row['Country'],
+                        'Year':row['Year'],
+                        'Code':row['Code'],
                         'Gender': row['Gender'],
                         'Age': row['Age'],
                         'District': row['District']
                     }
+                    except:
+                        pass
+            # Add new data
+            else:
+                pass
+            
+            # for index, row in df.iterrows():
+            #     try: 
+            #         Year = row['Year']
+            #         Country = Country_meta.objects.get(Country_Name = row['Country'])
+            #         Code = Crime_Meta.objects.get(Code = row['Code'])
+            #         gender = row['Gender']
 
-                except Exception as e:
-                    crime_data = {
-                        'Country':Country,
-                        'Year':Year.isoformat(),
-                        'Code':Code,
-                        'Gender': row['Gender'],
-                        'Age': row['Age'],
-                        'District': row['District']
-                    }
-                    errors.append({'row_index': index, 'data': crime_data, 'reason': str(e)})
-                    continue
+            #         if gender not in ['Male', 'Female']:
+            #             raise ValueError(
+            #                 f"Invalid Direction at row {index} : {gender}"
+            #             )
+            #         crime_data = {
+            #             'Country':Country,
+            #             'Year':Year,
+            #             'Code':Code,
+            #             'Gender': row['Gender'],
+            #             'Age': row['Age'],
+            #             'District': row['District']
+            #         }
+
+            #     except Exception as e:
+            #         crime_data = {
+            #             'Country':Country,
+            #             'Year':Year.isoformat(),
+            #             'Code':Code,
+            #             'Gender': row['Gender'],
+            #             'Age': row['Age'],
+            #             'District': row['District']
+            #         }
+            #         errors.append({'row_index': index, 'data': crime_data, 'reason': str(e)})
+            #         continue
                 
-                try:
-                    crimeData = Crime(**crime_data)
-                    crimeData.save()
-                    added_count +=1
+            #     try:
+            #         crimeData = Crime(**crime_data)
+            #         crimeData.save()
+            #         added_count +=1
                         
-                except Exception as e:
-                    errors.append(f"Error inserting row {index}: {e}")
+            #     except Exception as e:
+            #         errors.append(f"Error inserting row {index}: {e}")
                         
             
             if added_count > 0:
@@ -106,7 +127,6 @@ def upload_crime_excel(request):
 
 def display_crime_table(request):
     data = Crime.objects.all()
-    column_names = Crime._meta.fields
 
     country_categories = Country_meta.objects.all()
     gender_categories = [choice[1] for choice in Crime.GENDER_OPTIONS]
@@ -145,7 +165,7 @@ def display_crime_table(request):
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
 
-    context = {'data_len': len(data), 'country_categories': country_categories, 'gender_categories': gender_categories, 'crime_code':crime_code ,'page':page, 'query_len': len(page), 'tables':tables, 'meta_tables':views.meta_tables, 'column_names':column_names}
+    context = {'data_len': len(data), 'country_categories': country_categories, 'gender_categories': gender_categories, 'crime_code':crime_code ,'page':page, 'query_len': len(page), 'tables':tables, 'meta_tables':views.meta_tables, }
 
     return render(request, 'general_data/crime_templates/crime_table.html', context)
 
