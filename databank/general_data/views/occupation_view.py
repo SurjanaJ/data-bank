@@ -252,18 +252,20 @@ def update_selected_occupation(request):
         queryset = queryset.annotate(
             country = F('Country__Country_Name'),
             code = F('Code__SOC_Code'),
-            title = F('Code__SOC_Title')
+            title = F('Code__SOC_Title'),
+            Group = F('Code__SOC_Group'),
         )
 
-        data = pd.DataFrame(list(queryset.values('id','Year','country','code', 'title','Number')))
+        data = pd.DataFrame(list(queryset.values('id','Year','country','code', 'title','Group','Number')))
 
         data.rename(columns= {
             'country': 'Country',
             'code':'Code',
-            'title': 'SOC Title'
+            'title': 'SOC Title',
+            'Group': 'SOC Group'
         }, inplace=True)
 
-        column_order = ['id','Country','Year','Code','SOC Title','Number']
+        column_order = ['id','Country','Year','Code','SOC Title','SOC Group','Number']
         
         data = data[column_order]
         output = BytesIO()
