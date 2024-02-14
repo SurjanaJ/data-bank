@@ -223,9 +223,9 @@ def export_occupation_excel(request):
 
     data = pd.DataFrame(list(queryset.values('country','code', 'Group','Title','Year', 'Number')))
 
-    data.rename(columns={'country':'Country','code': 'Code'}, inplace=True)
+    data.rename(columns={'country':'Country','code': 'Code','Title':'SOC Title','Group': 'SOC Group'}, inplace=True)
 
-    column_order = ['Country', 'Code', 'Group', 'Title', 'Year', 'Number']
+    column_order = ['Year','Country', 'Code', 'SOC Group', 'SOC Title', 'Number']
 
     data = data[column_order]
 
