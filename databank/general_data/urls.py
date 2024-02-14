@@ -165,6 +165,8 @@ urlpatterns = [
     path('delete_selected_occupation/', view.delete_selected, name='delete_selected_occupation'),
     path('update_occupation_record/<int:pk>/', view.update_record, name = 'update_occupation_record'),
     path('export_occupation_excel', occupation_view.export_occupation_excel, name='export_occupation_excel'),
+    path('update_selected_occupation/', occupation_view.update_selected_occupation, name='update_selected_occupation'),
+
 
     path('upload_climate_place_meta_excel', climate_view.upload_climate_place_meta_excel, name='upload_climate_place_meta_excel'),
     path('place_meta',  climate_view.display_climate_place_meta, name='place_meta'),
