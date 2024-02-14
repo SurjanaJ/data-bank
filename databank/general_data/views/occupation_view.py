@@ -5,6 +5,7 @@ from django.shortcuts import redirect, render
 import pandas as pd
 from django.contrib import messages
 from django.core.paginator import Paginator
+from .energy_view import strip_spaces
 from trade_data.models import Country_meta
 from trade_data.views import is_valid_queryparam, tables
 from django.http import HttpResponse
@@ -38,61 +39,107 @@ def upload_occupation_excel(request):
         if form.is_valid():
             excel_data = request.FILES['file']
             df = pd.read_excel(excel_data, dtype={'Code': str})
-            cols = df.columns.tolist()
             df.fillna('', inplace= True)
+            df = df.map(strip_spaces)
 
-            for index, row in df.iterrows():
-                occupation_data = {col: row[col] for col in cols}
-                try:
-                    Code = Occupation_Meta.objects.get(SOC_Code = row['Code'])
-                    Country = Country_meta.objects.get(Country_Name = row['Country'])
-                   
-                    occupation_data = {
-                        'Country': Country,
+            # update existing data
+            if 'id' in df.columns:
+                for index, row in df.iterrows():
+                    id = row.get('id')
+                    data = {
+                        'Country': row['Country'],
                         'Year': row['Year'],
-                        'Code': Code,
+                        'Code': row['Code'],
+                        'SOC Title': row['SOC Title'],
                         'Number': row['Number']
                     }
-                except Exception as e:
-                    errors.append({'row_index': index, 'data': occupation_data, 'reason': str(e)})
-                    continue
+                    # try to find the existing instance
+                    try:
+                        occupation_instance = Occupation.objects.get(id = id)
+                        occupation_data = data
 
-                existing_record = Occupation.objects.filter(
-                    Q(Country = Country) & Q(Year = row['Year']) & Q(Code = Code)
-                ).first()
+                        # check if the meta values exist
+                        try:
+                            Country = Country_meta.objects.get(Country_Name = row['Country'])
+                            Code = Occupation_Meta.objects.get(SOC_Code = row['Code'])
 
-                if existing_record:
-                    existing_dict = model_to_dict(existing_record)
-                    occupation_data_dict = model_to_dict(Occupation(**occupation_data))
+                            occupation_instance.Country = Country
+                            occupation_instance.Year = row['Year']
+                            occupation_instance.Code = Code
+                            occupation_instance.Number = row['Number']
 
-                    if all(existing_dict[key] == occupation_data_dict[key] or (pd.isna(existing_dict[key]) and pd.isna(occupation_data_dict[key])) for key in occupation_data_dict if key != 'id'):
+                            occupation_instance.save()
+                            updated_count += 1
+
+                        # meta values don't exist
+                        except Exception as e:
+                            occupation_data = data
+                            errors.append({'row_index': index, 'data': occupation_data, 'reason': str(e)})
+                            continue
+
+                    # instance not found
+                    except Exception as e:
+                        occupation_data = data
+                        errors.append({
+                                    'row_index': index,
+                                    'data': occupation_data,
+                                    'reason': f'Error inserting row {index}: {e}'
+                                })
+                        continue
+
+
+            # add new data
+            else:
+                for index, row in df.iterrows():
+                    data = {
+                        'Country': row['Country'],
+                        'Year': row['Year'],
+                        'Code': row['Code'],
+                        'SOC Title': row['SOC Title'],
+                        'Number': row['Number']
+                    }
+
+                    # check if the meta values exist
+                    try:
+                        Country = Country_meta.objects.get(Country_Name = row['Country'])
+                        Code = Occupation_Meta.objects.get(SOC_Code = row['Code'])
+                        
                         occupation_data = {
                             'Country': Country,
-                            'Year' : row['Year'],
+                            'Year': row['Year'],
                             'Code': Code,
-                            'Number':row['Number']
+                            'Number': row['Number']
                         }
-                        duplicate_data.append({
-                             'row_index': index,
-                                'data': {key: str(value) for key, value in occupation_data.items()}
-                        })
 
-                    else:
-                        for key, value in occupation_data.items():
-                                setattr(existing_record, key, value)
-                        try:
-                            existing_record.save()
-                            updated_count += 1
-                        except IntegrityError as e:
-                                errors.append(f"Error updating row {index}: {e}")
+                        existing_record = Occupation.objects.filter(
+                            Q(Country = Country)
+                            & Q(Year = row['Year']) 
+                            & Q(Code = Code) 
+                            & Q(Number = row['Number'])
+                        ).first()
 
-                else:
-                    try:
-                        occupationData = Occupation(**occupation_data)
-                        occupationData.save()
-                        added_count += 1
+                        # check the record already exists
+                        if existing_record:
+                            occupation_data = data
+                            duplicate_data.append({
+                                'row_index': index,
+                                    'data': {key: str(value) for key, value in occupation_data.items()}
+                            })
+
+                        # record already exist i.e duplicate
+                        else:
+                            try:
+                                occupationData = Occupation(**occupation_data)
+                                occupationData.save()
+                                added_count += 1
+                            except Exception as e:
+                                errors.append(f"Error inserting row {index}: {e}")
+                    
+                    # meta values don't exist
                     except Exception as e:
-                        errors.append(f"Error inserting row {index}: {e}")
+                        occupation_data = data
+                        errors.append({'row_index': index, 'data': occupation_data, 'reason': str(e)})
+                        continue
 
             if added_count > 0:
                 messages.success(request, str(added_count) + ' records added.')
