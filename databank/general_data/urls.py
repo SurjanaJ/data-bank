@@ -2,6 +2,8 @@ from django.urls import include, path
 from .views import climate_view, occupation_view, health_diseases_views, education_view, view, population_view, hotel_view, land_view, political_views, tourism_view, mining_views, water_view, housing_views, road_views, transport_view, services_view, crime_view, public_unitillity_views, disaster_views, energy_view, exchange_view, export_views
 
 
+from .views import climate_view,occupation_view,health_diseases_views,education_view, view,population_view,hotel_view,land_view,political_views,tourism_view,mining_views,water_view,housing_views,road_views,transport_view,services_view, crime_view,public_unitillity_views,disaster_views, energy_view,exchange_view,climate_view,occupation_view,education_view, view,population_view,hotel_view,land_view,tourism_view,water_view,transport_view,services_view, crime_view
+from .views import export_views
 
 urlpatterns = [
 
@@ -146,6 +148,8 @@ urlpatterns = [
     path('delete_crime_record/<int:pk>/', view.delete_record, name ='delete_crime_record' ),
     path('update_crime_record/<int:pk>/', view.update_record, name = 'update_crime_record'),
     path('export_excel', crime_view.export_excel, name='export_excel'),
+    path('update_selected_crime/', crime_view.update_selected_crime, name='update_selected_crime'),
+
     
     path('upload_education_level_meta_excel', view.upload_meta_excel, name = 'upload_education_level_meta_excel'),
     path('upload_education_degree_meta_excel', view.upload_meta_excel, name = 'upload_education_degree_meta_excel'),
@@ -166,6 +170,8 @@ urlpatterns = [
     path('delete_selected_occupation/', view.delete_selected, name='delete_selected_occupation'),
     path('update_occupation_record/<int:pk>/', view.update_record, name = 'update_occupation_record'),
     path('export_occupation_excel', occupation_view.export_occupation_excel, name='export_occupation_excel'),
+    path('update_selected_occupation/', occupation_view.update_selected_occupation, name='update_selected_occupation'),
+
 
     path('upload_climate_place_meta_excel', climate_view.upload_climate_place_meta_excel, name='upload_climate_place_meta_excel'),
     path('place_meta',  climate_view.display_climate_place_meta, name='place_meta'),
@@ -175,6 +181,8 @@ urlpatterns = [
     path('delete_climate_record/<int:pk>/', view.delete_record, name ='delete_climate_record' ),
     path('delete_selected_climate/', view.delete_selected, name='delete_selected_climate'),
     path('export_climate_excel', climate_view.export_climate_excel, name='export_climate_excel'),
+    path('update_selected_climate/', climate_view.update_selected_climate, name='update_selected_climate'),
+
 
     path('upload_currency_excel', exchange_view.upload_currency_meta_excel, name='upload_currency_excel'),
     path('currency_meta',  exchange_view.display_currency_meta, name='currency_meta'),
@@ -184,6 +192,8 @@ urlpatterns = [
     path('delete_exchange_record/<int:pk>/', view.delete_record, name ='delete_exchange_record' ),
     path('delete_selected_exchange/', view.delete_selected, name='delete_selected_exchange'),
     path('export_exchange_excel', exchange_view.export_exchange_excel, name='export_exchange_excel'),
+    path('update_selected_exchange/', exchange_view.update_selected_exchange, name='update_selected_exchange'),
+
 
     path('upload_energy_meta_excel', view.upload_meta_excel, name='upload_energy_meta_excel'),
     path('energy_meta',  energy_view.display_energy_meta, name='energy_meta'),
@@ -193,5 +203,5 @@ urlpatterns = [
     path('delete_energy_record/<int:pk>/', view.delete_record, name ='delete_energy_record' ),
     path('delete_selected_energy/', view.delete_selected, name='delete_selected_energy'),
     path('export_energy_excel', energy_view.export_energy_excel, name='export_energy_excel'),
-    path('update_selected_energy/', energy_view.update_selected_energy, name='update_selected_energy')
+    path('update_selected_energy/', energy_view.update_selected_energy, name='update_selected_energy'),
 ]   

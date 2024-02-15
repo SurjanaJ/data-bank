@@ -105,6 +105,10 @@
                 </span>
     
                 <div class="d-flex align-items-center py-2">
+                    <button type="button" class="btn border p-2 styled-link hover-shadow" onclick="updateSelected()">
+                        <i class="fa-solid fa-file-pen"></i>
+                        <span>Update Selected</span>
+                    </button>
                     <button type="button" class="btn border p-2 styled-link mx-3 hover-shadow" onclick="confirmDeleteAll()">
                         <i class="fa-regular fa-trash-can" style="color: #ff0000"></i>
                         <span>Delete Selected</span>
@@ -138,20 +142,25 @@
                                 style="font-size:14px; font-weight: 500; background: #12486B;" scope="col">
                                 Place
                             </th>
-    
+                            
                             <th class="text-white fst-normal  " scope="col"
                                 style="font-size:14px; font-weight: 500; background: #12486B;" scope="col">
-                                Temperature_Unit
+                                Place Name
+                            </th>
+
+                            <th class="text-white fst-normal  " scope="col"
+                                style="font-size:14px; font-weight: 500; background: #12486B;" scope="col">
+                                Temperature Unit
                             </th>
     
                             <th class="text-white fst-normal  " scope="col"
                                 style="font-size:14px; font-weight: 500; background: #12486B;" scope="col">
-                                Max_Temperature
+                                Max Temperature
                             </th>
     
                             <th class="text-white fst-normal  " scope="col"
                                 style="font-size:14px; font-weight: 500; background: #12486B;" scope="col">
-                                Min_Temperature
+                                Min Temperature
                             </th>
                             <th class="text-white fst-normal  " scope="col"
                                 style="font-size:14px; font-weight: 500; background: #12486B;" scope="col">
@@ -159,7 +168,7 @@
                             </th>
                             <th class="text-white fst-normal  " scope="col"
                                 style="font-size:14px; font-weight: 500; background: #12486B;" scope="col">
-                                Climate_Unit
+                                Climate Unit
                             </th>
                             <th class="text-white fst-normal  " scope="col"
                                 style="font-size:14px; font-weight: 500; background: #12486B;" scope="col">
@@ -179,7 +188,8 @@
                             </td>
                             <td> {{record.Country.Country_Name}} </td>
                             <td> {{record.Date}} </td>
-                            <td>{{record.Place}}</td>
+                            <td>{{record.Place.Place_Code}}</td>
+                            <td>{{record.Place.Place_Name}}</td>
                             <td>{{record.Temperature_Unit}}</td>
                             <td>{{record.Max_Temperature}}</td>
                             <td>{{record.Min_Temperature}}</td>
@@ -310,6 +320,11 @@
           alert("Delete canceled!");
       }
   }
+
+  function updateSelected(itemId) {
+        document.getElementById("delete-form").action = "{% url 'update_selected_climate' %}";
+        document.getElementById("delete-form").submit();
+    }
 
   function confirmDeleteAll() {
         var confirmDelete = confirm(

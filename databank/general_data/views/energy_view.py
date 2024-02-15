@@ -42,66 +42,108 @@ def upload_energy_excel(request):
             df = pd.read_excel(excel_data, dtype={'Power Code': str})
             df.fillna('', inplace=True)
             df = df.map(strip_spaces)
-            
-            for index, row in df.iterrows():
-                energy_data = {
-                            'Country': row['Country'],
-                            'Year': row['Year'],
-                            'Power_Code':row['Power Code'],
-                            'Potential_Unit': row['Potential Unit'],
-                            'Potential_Capacity_MW': row['Potential Capacity MW'],
-                            'Unit_Production':row['Unit Production'],
-                            'Current_Production_In_MW':row['Current Production In MW'],
-                            'Generating_Company':row['Generating Company']
-                        }
-                
-                try:
-                    Country = Country_meta.objects.get(Country_Name = row['Country'])
-                    Power_Code = Energy_Meta.objects.get(Code = row['Power Code'])
-                    Potential_Unit = Unit_meta.objects.get(Unit_Code = row['Potential Unit'])
-                    Unit_Production= Unit_meta.objects.get(Unit_Code = row['Unit Production'])
-                    
-                    energy_data = {
-                            'Country': Country,
-                            'Year': row['Year'],
-                            'Power_Code': Power_Code,
-                            'Potential_Unit': Potential_Unit,
-                            'Potential_Capacity_MW': row['Potential Capacity MW'],
-                            'Unit_Production':Unit_Production,
-                            'Current_Production_In_MW':row['Current Production In MW'],
-                            'Generating_Company':row['Generating Company']
-                        }
-                    
-                except Exception as e:
-                    energy_data  = {
-                            'Country': row['Country'],
-                            'Year': row['Year'],
-                            'Power_Code':row['Power Code'],
-                            'Energy Type': row['Energy Type'],
-                            'Potential_Unit': row['Potential Unit'],
-                            'Potential_Capacity_MW': row['Potential Capacity MW'],
-                            'Unit_Production':row['Unit Production'],
-                            'Current_Production_In_MW':row['Current Production In MW'],
-                            'Generating_Company':row['Generating Company']
-                        }
-                    errors.append({'row_index': index, 'data': energy_data, 'reason': str(e)})
-                    continue
 
-                existing_record = Energy.objects.filter(
-                    Q(Country = Country) 
-                    & Q(Year = row['Year']) 
-                    & Q(Power_Code = Power_Code) 
-                    & Q(Potential_Unit = Potential_Unit)
-                    & Q(Unit_Production = Unit_Production)
-                    & Q(Generating_Company = row['Generating Company'])
-                ).first()
-
-                if existing_record:
-                    existing_dict = model_to_dict(existing_record)
-                    energy_data_dict = model_to_dict(Energy(**energy_data))
-
-                    if all(existing_dict[key] == energy_data_dict[key] or (pd.isna(existing_dict[key]) and pd.isna(energy_data_dict[key])) for key in energy_data_dict if key != 'id'):
+            # Update existing data
+            if 'id' in df.columns:
+                for index, row in df.iterrows():
+                    id = row.get('id')
+                    try:
+                        energy_instance = Energy.objects.get(id = id)
                         energy_data = {
+                            'Country': row['Country'],
+                            'Year': row['Year'],
+                            'Power_Code':row['Power Code'],
+                            'Potential_Unit': row['Potential Unit'],
+                            'Potential_Capacity_MW': row['Potential Capacity MW'],
+                            'Unit_Production':row['Unit Production'],
+                            'Current_Production_In_MW':row['Current Production In MW'],
+                            'Generating_Company':row['Generating Company']
+                        }
+                        
+                        #Check if all the meta datas exist
+                        try:
+                            Country = Country_meta.objects.get(Country_Name = row['Country'])
+                            Power_Code = Energy_Meta.objects.get(Code = row['Power Code'])
+                            Potential_Unit = Unit_meta.objects.get(Unit_Code = row['Potential Unit'])
+                            Unit_Production= Unit_meta.objects.get(Unit_Code = row['Unit Production'])
+
+                            energy_instance.Country = Country
+                            energy_instance.Year = row['Year']
+                            energy_instance.Power_Code = Power_Code
+                            energy_instance.Potential_Unit = Potential_Unit
+                            energy_instance.Potential_Capacity_MW = row['Potential Capacity MW']
+                            energy_instance.Unit_Production = Unit_Production
+                            energy_instance.Current_Production_In_MW = row['Current Production In MW']
+                            energy_instance.Generating_Company = row['Generating Company']
+
+                            energy_instance.save()
+                            updated_count += 1
+
+                        except Exception as e:
+                            energy_data  = {
+                                        'Country': row['Country'],
+                                        'Year': row['Year'],
+                                        'Power_Code':row['Power Code'],
+                                        'Energy Type': row['Energy Type'],
+                                        'Potential_Unit': row['Potential Unit'],
+                                        'Potential_Capacity_MW': row['Potential Capacity MW'],
+                                        'Unit_Production':row['Unit Production'],
+                                        'Current_Production_In_MW':row['Current Production In MW'],
+                                        'Generating_Company':row['Generating Company']
+                                    }
+                            errors.append({'row_index': index, 'data': energy_data, 'reason': str(e)})
+                            continue
+
+                    except Exception as e:
+                        energy_data = {
+                            'Country': row['Country'],
+                            'Year': row['Year'],
+                            'Power_Code':row['Power Code'],
+                            'Potential_Unit': row['Potential Unit'],
+                            'Potential_Capacity_MW': row['Potential Capacity MW'],
+                            'Unit_Production':row['Unit Production'],
+                            'Current_Production_In_MW':row['Current Production In MW'],
+                            'Generating_Company':row['Generating Company']
+                        }
+                        errors.append({
+                                    'row_index': index,
+                                    'data': energy_data,
+                                    'reason': f'Error inserting row {index}: {e}'
+                                })
+                        continue
+            else:
+                # Add new data
+                for index, row in df.iterrows():
+                    try:
+                        Country = Country_meta.objects.get(Country_Name = row['Country'])
+                        Power_Code = Energy_Meta.objects.get(Code = row['Power Code'])
+                        Potential_Unit = Unit_meta.objects.get(Unit_Code = row['Potential Unit'])
+                        Unit_Production= Unit_meta.objects.get(Unit_Code = row['Unit Production'])
+                        
+                        energy_data = {
+                                'Country': Country,
+                                'Year': row['Year'],
+                                'Power_Code': Power_Code,
+                                'Potential_Unit': Potential_Unit,
+                                'Potential_Capacity_MW': row['Potential Capacity MW'],
+                                'Unit_Production':Unit_Production,
+                                'Current_Production_In_MW':row['Current Production In MW'],
+                                'Generating_Company':row['Generating Company']
+                            }
+                        
+                        existing_record = Energy.objects.filter(
+                            Q(Country = Country) 
+                            & Q(Year = row['Year']) 
+                            & Q(Power_Code = Power_Code) 
+                            & Q(Potential_Unit = Potential_Unit)
+                            & Q(Potential_Capacity_MW = row['Potential Capacity MW'])
+                            & Q(Unit_Production = Unit_Production)
+                            & Q(Current_Production_In_MW = row['Current Production In MW'])
+                            & Q(Generating_Company = row['Generating Company'])
+                        ).first()
+
+                        if existing_record:
+                            energy_data = {
                             'Country': row['Country'],
                             'Year': row['Year'],
                             'Power Code': row['Power Code'],
@@ -111,46 +153,53 @@ def upload_energy_excel(request):
                             'Unit Production':row['Unit Production'],
                             'Current Production In MW':row['Current Production In MW'],
                             'Generating Company':row['Generating Company']
-                        }
-
-                        duplicate_data.append({
+                        }   
+                           
+                            duplicate_data.append({
                              'row_index': index,
                                 'data': {key: str(value) for key, value in energy_data.items()}
                         })
-
-                    else:
-                        for key, value in energy_data.items():
-                                setattr(existing_record, key, value)
-                        try:
-                            existing_record.save()
-                            updated_count += 1
-                        except IntegrityError as e:
-                                errors.append(f"Error updating row {index}: {e}")
-
-                else:
-                    try:
-                        energyData = Energy(**energy_data)
-                        energyData.save()
-                        added_count += 1
+                            
+                        else:
+                            try:
+                                energyData = Energy(**energy_data)
+                                energyData.save()
+                                added_count += 1
+                            except Exception as e:
+                                errors.append(f"Error inserting row {index}: {e}")
+                            
+                    
                     except Exception as e:
-                        errors.append(f"Error inserting row {index}: {e}")
+                        energy_data  = {
+                                'Country': row['Country'],
+                                'Year': row['Year'],
+                                'Power_Code':row['Power Code'],
+                                'Energy Type': row['Energy Type'],
+                                'Potential_Unit': row['Potential Unit'],
+                                'Potential_Capacity_MW': row['Potential Capacity MW'],
+                                'Unit_Production':row['Unit Production'],
+                                'Current_Production_In_MW':row['Current Production In MW'],
+                                'Generating_Company':row['Generating Company']
+                            }
+                        errors.append({'row_index': index, 'data': energy_data, 'reason': str(e)})
+                        continue
 
-            if added_count > 0:
-                messages.success(request, str(added_count) + ' records added.')
+        if added_count > 0:
+            messages.success(request, str(added_count) + ' records added.')
             
-            if updated_count > 0:
-                messages.info(request, str(updated_count) + ' records updated.')
+        if updated_count > 0:
+            messages.info(request, str(updated_count) + ' records updated.')
 
-            if errors:
-                request.session['errors'] = errors
-                return render(request, 'trade_data/error_template.html', {'errors': errors, 'tables': tables, 'meta_tables': views.meta_tables, })
+        if errors:
+            request.session['errors'] = errors
+            return render(request, 'trade_data/error_template.html', {'errors': errors, 'tables': tables, 'meta_tables': views.meta_tables, })
             
-            elif duplicate_data:
-                request.session['duplicate_data'] = duplicate_data
-                return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data, 'tables': tables, 'meta_tables': views.meta_tables,})
+        elif duplicate_data:
+            request.session['duplicate_data'] = duplicate_data
+            return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data, 'tables': tables, 'meta_tables': views.meta_tables,})
             
-            else:
-                return redirect('energy_table')
+        else:
+            return redirect('energy_table')
     else:
         form = UploadEnergyForm()    
 

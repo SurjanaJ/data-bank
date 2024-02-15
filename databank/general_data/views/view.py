@@ -485,7 +485,6 @@ def update_record(request,pk):
         Housing:'housing_table',
         Political_Data:'political_table',
         Road:'road_table',
-
         Climate_Data:'climate_table',
         Exchange: 'exchange_table',
         Energy: 'energy_table'
