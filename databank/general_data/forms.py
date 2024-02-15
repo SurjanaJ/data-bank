@@ -346,3 +346,7 @@ class UpdateEnergy(ModelForm):
         self.fields['Current_Production_In_MW'].label = 'Current Production In MW'
         self.fields['Generating_Company'].label = 'Generating Company'
 
+
+# INDEX_DATA
+class UploadIndexForm(forms.Form):
+    file = forms.FileField() 
