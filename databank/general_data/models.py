@@ -451,3 +451,14 @@ class Energy(models.Model):
 
     def __str__(self):
         return (str(self.id))
+
+class Index(models.Model):
+    id = models.AutoField(primary_key=True)
+    Year=models.IntegerField()
+    Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    Index_Name = models.CharField(max_length = 300)
+    Score = models.FloatField(default = 0.0)
+    Rank = models.IntegerField(default=0)
+    No_Of_Countries = models.IntegerField(default = 0)
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
