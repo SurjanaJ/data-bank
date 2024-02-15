@@ -34,7 +34,7 @@ def upload_forest_excel(request):
 
             Stock_unit_options = [option[0] for option in ForestData.Stock_Unit_Options]
             Area_unit_options = [option[0] for option in ForestData.Area_Unit_Options]
-            if 'id' in df.columns or 'ID' in df.columns:
+            if 'id' in df.columns:
                 cols = df.columns.tolist()
                 for index, row in df.iterrows():
                     id_value = row.get('id')
@@ -150,7 +150,6 @@ def upload_forest_excel(request):
 
                         existing_record = ForestData.objects.filter(
                             Q(Year=Year) & Q(Country=Country) & Q(Name_Of_The_Plant = forest_data['Name_Of_The_Plant']) & Q(Stock_Unit = forest_data['Stock_Unit']) & Q(Area_Unit = forest_data['Area_Unit'])).first()        
-
                         if existing_record:
                             duplicate_data.append({
                                 'row_index':index,

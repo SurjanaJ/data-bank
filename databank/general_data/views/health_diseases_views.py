@@ -88,67 +88,105 @@ def upload_health_diseases_excel(request):
             cols = df.columns.to_list()
             df.fillna('',inplace=True)
 
-
-            for index,row in df.iterrows():
-                health_disease_data = {col: row[col] for col in cols}
-                try:
-                    unit_options = [option[0] for option in Health_disease.Unit_Options]
-
-                    Country = Country_meta.objects.get(Country_Name = row['Country'])
-                    disease_code = Health_disease_Meta.objects.get (Code=row['Disease_Code'])
-                    unit = row['Unit']
-
-                    if unit not in unit_options:
-                        raise ValueError(f"Invalid Unit at row {index}: {unit}")
-
+            unit_options = [option[0] for option in Health_disease.Unit_Options]
+            if 'id' in df.columns:
+                cols = df.columns.to_list()
+                for index, row in df.iterrows():
+                    id_value = row.get('id')
+                    try:
+                        health_disease_instance = Health_disease.objects.get(id=id_value)
+                    except Exception as e:
+                            data = {col: row[col] for col in cols}
+                            errors.append({
+                                        'row_index': index,
+                                        'data': data,
+                                        'reason': f'Error inserting row {index}: {e}'
+                                })
+                            continue
+                    
                     health_disease_data = {
                         'Year':row['Year'],
-                        'Country':Country,
-                        'Disease_Code':disease_code,
-                        'Unit':unit,    
-                        'Number_Of_Case':row['Number_Of_Case']                    
+                        'Country': row['Country'],
+                        'Disease_Code': row['Disease_Code'],
+                        'Unit': row['Unit'],
+                        'Number':row['Number_Of_Case']
                     }
-                except Exception as e:
-                    errors.append({'row_index': index, 'data': health_disease_data, 'reason': str(e)})
-                    continue
 
-                existing_record = Health_disease.objects.filter(
-                    Q(Country=Country) & Q(Year = row['Year']) & Q(Unit = health_disease_data['Unit']) & Q(Disease_Code = disease_code)
-                ).first()
-                
-                if existing_record:
-                    existing_dict = model_to_dict(existing_record)
-                    health_disease_data_dict = model_to_dict(Health_disease(**health_disease_data))
-                    if all(existing_dict[key] == health_disease_data_dict[key] or (pd.isna(existing_dict[key])and pd.isna(health_disease_data_dict[key])) for key in health_disease_data_dict if key != 'id' ):
+                    if health_disease_data['Unit'] not in unit_options:
+
+                        errors.append({'row_index': index, 'reason': f'Error inserting row {index}: Invalid unit value'})
+
+                    else:
+                        country_instance = Country_meta.objects.filter(Country_Name=row['Country']).first()
+                        disease_code = Health_disease_Meta.objects.get(Code = row['Disease_Code'])
+                        if country_instance is None:
+                            health_disease_data = {
+                                'Year':row['Year'],
+                                'Country': row['Country'],
+                                'Disease_Code': row['Disease_Code'],
+                                'Unit': row['Unit'],
+                                'Number':row['Number_Of_Case']
+                            }
+                            errors.append({'row_index': index,'data': health_disease_data, 'reason': f'Error inserting row {index}: Invalid counrty value'})
+                            continue                        
+
+                        health_disease_instance.Year = row['Year']
+                        health_disease_instance.Country = country_instance
+                        health_disease_instance.Disease_Code = disease_code
+                        health_disease_instance.Unit = row['Unit']
+                        health_disease_instance.Number_Of_Case = row['Number_Of_Case']
+                        health_disease_instance.save()
+
+                        updated_count +=1
+            else:                
+                for index,row in df.iterrows():
+                    health_disease_data = {col: row[col] for col in cols}
+                    try:
+                        unit_options = [option[0] for option in Health_disease.Unit_Options]
+
+                        Country = Country_meta.objects.get(Country_Name = row['Country'])
+                        disease_code = Health_disease_Meta.objects.get (Code=row['Disease_Code'])
+                        unit = row['Unit']
+
+                        if unit not in unit_options:
+                            raise ValueError(f"Invalid Unit at row {index}: {unit}")
+
+                        health_disease_data = {
+                            'Year':row['Year'],
+                            'Country':Country,
+                            'Disease_Code':disease_code,
+                            'Unit':unit,    
+                            'Number_Of_Case':row['Number_Of_C ase']                    
+                        }
+                    except Exception as e:
+                        errors.append({'row_index': index, 'data': health_disease_data, 'reason': str(e)})
+                        continue
+
+                    existing_record = Health_disease.objects.filter(
+                        Q(Country=Country) & Q(Year = row['Year']) & Q(Unit = health_disease_data['Unit']) & Q(Disease_Code = disease_code)
+                    ).first()
+                    
+                    if existing_record:
                         health_disease_data = {
                             'Year':row['Year'],
                             'Country':Country,
                             'Disease_Code':disease_code,
                             'Unit':unit,    
                             'Number_Of_Case':row['Number_Of_Case']
-
                         }
                         duplicate_data.append({
                             'row_index':index,
                             'data':{key:str(value)for key,value in health_disease_data.items()}
                         })
+                        continue
                     else:
-                        for key ,value in health_disease_data.items():
-                            setattr(existing_record,key ,  value)
                         try:
-                            existing_record.save()
-                            updated_count +=1
-
-                        except IntegrityError  as e:
+                            HealthDiseaseData = Health_disease(**health_disease_data)
+                            HealthDiseaseData.save()
+                            added_count +=1
+                        
+                        except Exception as e:
                             errors.append({'row_index': index, 'data': health_disease_data, 'reason': str(e)})
-                else:
-                    try:
-                        HealthDiseaseData = Health_disease(**health_disease_data)
-                        HealthDiseaseData.save()
-                        added_count +=1
-                    
-                    except Exception as e:
-                        errors.append({'row_index': index, 'data': health_disease_data, 'reason': str(e)})
 
             if added_count > 0:
                 messages.success(request, str(added_count) + ' records added.')

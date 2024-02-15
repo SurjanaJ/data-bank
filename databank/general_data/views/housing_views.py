@@ -86,65 +86,94 @@ def upload_housing_excel(request):
         if form.is_valid():
             excel_data = request.FILES['file']
             df = pd.read_excel(excel_data,dtype={'House_Code':str})
-            cols = df.columns.to_list()
             df.fillna('',inplace=True)
 
-
-            for index,row in df.iterrows():
-                housing_data = {col:row[col] for col in cols}
-                try:
-                    Country = Country_meta.objects.get(Country_Name = row['Country'])
-                    housing_code = Housing_Meta.objects.get(Code = row['House_Code'])
-
-                    housing_data = {
+            if 'id' in df.columns:
+                cols = df.columns.to_list()
+                for index, row in df.iterrows():
+                    id_value = row.get('id')
+                    try:
+                        housing_instance = Housing.objects.get(id=id_value)
+                    except Exception as e:
+                        data = {col: row[col] for col in cols}
+                        errors.append({
+                            'row_index':index,
+                            'data':data,
+                            'reason':f'Error inserting row {index}:{e}'
+                        })
+                        continue
+                    housing_data =  {
                         'Year':row['Year'],
-                        'Country':Country,
-                        'House_Code':housing_code,
+                        'Country':row['Country'],
+                        'House_Code':row['House_Code'],
                         'City':row['City'],
                         'Number':row['Number']
                     }
-                except Exception as e:
-                    errors.append({'row_index':index,'data':housing_data,'reason':str(e)})
-                    continue
+                    country_instance = Country_meta.objects.filter(Country_Name=row['Country']).first()
+                    housing_id = Housing_Meta.objects.get(Code = row['House_Code'])
+                    if country_instance is None:
+                        raise ValueError(f"Country '{row['Country']}' not found")
+                    
+                    if housing_id is None:
+                        raise ValueError(f"House code '{row[ 'House_Code']}' not found")
+                    housing_instance.Year = row['Year']
+                    housing_instance.Country = country_instance
+                    housing_instance.House_Code = housing_id
+                    housing_instance.City = row['City']
+                    housing_instance.Number = row['Number']
+                    housing_instance.save()
 
-                existing_record = Housing.objects.filter(
-                    Q(Country=Country) & Q(Year = row['Year']) & Q(House_Code = housing_code) & Q(City = row ['City'])
-                ).first()
-
-                if existing_record:
-                    existing_dict = model_to_dict(existing_record)
-                    housing_data_dict = model_to_dict(Housing(**housing_data))
-
-                    if all(existing_dict[key] == housing_data_dict[key] or (pd.isna(existing_dict[key])and pd.isna(housing_data_dict[key])) for key in housing_data_dict if key != 'id' ):
-                        housing_data = {
+                    updated_count +=1
+            else:
+                for index,row in df.iterrows():
+                    housing_data =  {
                         'Year':row['Year'],
-                        'Country':Country,
-                        'House_Code':housing_code,
+                        'Country':row['Country'],
+                        'House_Code':row['House_Code'],
                         'City':row['City'],
                         'Number':row['Number']
-                        }
-                        duplicate_data.append({
-                            'row_index':index,
-                            'data':{key:str(value)for key,value in housing_data.items()}
-                        })
-                    else:
-                        for key ,value in housing_data.items():
-                            setattr(existing_record,key ,  value)
-                        try:
-                            existing_record.save()
-                            updated_count +=1
-
-                        except IntegrityError  as e:
-                            errors.append({'row_index': index, 'data': housing_data, 'reason': str(e)})
-
-                else:
+                    }
+                    Country = None
                     try:
-                        HousingData = Housing(**housing_data)
-                        HousingData.save()
-                        added_count +=1
-                    
+                        country_instance = Country_meta.objects.get(Country_Name = row['Country'])
+                        housing_code = Housing_Meta.objects.get(Code = row['House_Code'])
+
+                        housing_data = {
+                            'Year':row['Year'],
+                            'Country':country_instance,
+                            'House_Code':housing_code,
+                            'City':row['City'],
+                            'Number':row['Number']
+                        }
                     except Exception as e:
-                        errors.append({'row_index': index, 'data': housing_data, 'reason': str(e)})
+                        errors.append({'row_index':index,'data':housing_data,'reason':str(e)})
+                        continue
+
+                    existing_record = Housing.objects.filter(
+                        Q(Country=Country) & Q(Year = row['Year']) & Q(House_Code = housing_code) & Q(City = row ['City'])
+                    ).first()
+
+                    if existing_record:
+                            housing_data = {
+                                'Year':row['Year'],
+                                'Country':Country,
+                                'House_Code':housing_code,
+                                'City':row['City'],
+                                'Number':row['Number']
+                            }
+                            duplicate_data.append({
+                                'row_index':index,
+                                'data':{key:str(value)for key,value in housing_data.items()}
+                            })
+
+                    else:
+                        try:
+                            HousingData = Housing(**housing_data)
+                            HousingData.save()
+                            added_count +=1
+                        
+                        except Exception as e:
+                            errors.append({'row_index': index, 'data': housing_data, 'reason': str(e)})
 
             if added_count > 0:
                 messages.success(request, str(added_count) + ' records added.')

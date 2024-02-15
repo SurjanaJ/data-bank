@@ -89,6 +89,35 @@ def display_mining_table(request):
     return render(request, 'general_data/mining_templates/mining_table.html',context)
 
 
+# def upload_mining_excel(request):
+#     errors=[]
+#     duplicate_data = []
+#     updated_count = 0
+#     added_count = 0
+
+#     if request.method == 'POST':
+#         form = UploadMiningForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             excel_data = request.FILES['file']
+#             df = pd.read_excel(excel_data)    
+
+#             road_unit_options = [option[0] for option in Mining.Unit_Options]
+
+#             if 'id' in df.columns:
+#                 cols = df.columns.tolist()
+#                 for index, row in df.iterrows():
+#                     id_value = row.get('id')
+#                     try:
+#                         mining_instance = Mining.objects.get(id=id_value)
+#                     except Exception as e:
+#                         data = {col: row[col] for col in cols}
+#                         errors.append({
+#                             'row_index':index,
+#                             'data':data,
+#                             'reason':f'Error inserting row {index}:{e}'
+#                         })
+#                         continue 
+
 def upload_mining_excel(request):
     errors = []
     duplicate_data = []
@@ -96,94 +125,123 @@ def upload_mining_excel(request):
     added_count = 0
 
     if request.method == 'POST':
-        form = UploadMiningForm(request.POST,request.FILES)
+        form = UploadMiningForm(request.POST, request.FILES)  # Assuming you have a form for uploading mining data
         if form.is_valid():
             excel_data = request.FILES['file']
             df = pd.read_excel(excel_data)
-            cols = df.columns.to_list()
-            df.fillna('',inplace=True)
 
-            for index,row in df.iterrows():
-                health_disease_data = {col: row[col] for col in cols}
-                try:
-                    unit_options = [option[0] for option in Mining.Unit_Options]
+            unit_options = [option[0] for option in Mining.Unit_Options]
 
-                    Country = Country_meta.objects.get(Country_Name = row['Country'])
-                    mine_type = Mine_Meta.objects.get (Mine_Type=row['Name_Of_Mine'])
-                    unit = row['Unit']
-
-                    if unit not in unit_options:
-                        raise ValueError(f"Invalid Unit at row {index}: {unit}")
+            if 'id' in df.columns:
+                cols = df.columns.tolist()
+                for index, row in df.iterrows():
+                    id_value = row.get('id')
+                    try:
+                        mining_instance = Mining.objects.get(id=id_value)
+                    except Exception as e:
+                        data = {col: row[col] for col in cols}
+                        errors.append({
+                            'row_index': index,
+                            'data': data,
+                            'reason': f'Error inserting row {index}:{e}'
+                        })
+                        continue
 
                     mining_data = {
-                        'Year':row['Year'],
-                        'Country':Country,
-                        'Name_Of_Mine':mine_type,
-                        'Unit':unit,
-                        'Current_Production':row['Current_Production'],                        
-                        'Potential_Stock':row['Potential_stock'],
-                        'Mining_Company_Name':row['Mining_Company_Name'],
+                        'Year': row['Year'],
+                        'Country': row['Country'],
+                        'Name_Of_Mine': row['Name_Of_Mine'],
+                        'Unit': row['Unit'],
+                        'Current_Production': row['Current_Production'],
+                        'Potential_Stock': row['Potential_Stock'],
+                        'Mining_Company_Name': row['Mining_Company_Name']
                     }
-                except Exception as e:
-                    errors.append({'row_index': index, 'data': mining_data, 'reason': str(e)})
-                    continue
 
-                existing_record = Mining.objects.filter(
-                    Q(Country=Country) & Q(Year = row['Year']) & Q(Unit = mining_data['Unit']) & Q(Name_Of_Mine = mine_type)
-                    
-                ).first()
-
-                if existing_record:
-                    existing_dict = model_to_dict(existing_record)
-                    mining_data_dict = model_to_dict(Mining(**mining_data))
-                    if all(existing_dict[key]== mining_data_dict[key] or pd.isna(existing_dict[key]) and pd.isna(mining_data_dict[key]) for key in mining_data_dict if key != 'id'):
-                        mining_data ={
-                            'Year':row['Year'],
-                            'Country':Country,
-                            'Name_Of_Mine':mine_type,
-                            'Unit':unit,
-                            'Current_Production':row['Current_Production'],                        
-                            'Potential_Stock':row['Potential_stock'],
-                            'Mining_Company_Name':row['Mining_Company_Name'],
-                        }
-                        duplicate_data.append({
-                            'row_index':index,
-                            'data':{key:str(value)for key,value in mining_data.items()}
-                        })
+                    if mining_data['Unit'] not in unit_options:
+                        errors.append({'row_index': index, 'reason': f'Error inserting row {index}: Invalid unit value'})
                     else:
-                        for key ,value in mining_data.items():
-                            setattr(existing_record,key ,  value)
+                        country_instance = Country_meta.objects.filter(Country_Name=row['Country']).first()
+                        mine_type = Mine_Meta.objects.filter(Mine_Type=row['Name_Of_Mine']).first()
+
+                        if country_instance is None:
+                            raise ValueError(f"Country '{row['Country']}' not found")
+
+                        if mine_instance is None:
+                            raise ValueError(f"Mine '{row['Name_Of_Mine']}' not found")
+
+                        mining_instance.Year = row['Year']
+                        mining_instance.Country = country_instance
+                        mining_instance.Name_Of_Mine = mine_type
+                        mining_instance.Unit = row['Unit']
+                        mining_instance.Current_Production = row['Current_Production']
+                        mining_instance.Potential_Stock = row['Potential_Stock']
+                        mining_instance.Mining_Company_Name = row['Mining_Company_Name']
+
+                        mining_instance.save()
+                        updated_count += 1
+
+            else:
+                for index, row in df.iterrows():
+                    mining_data = {
+                        'Year': row['Year'],
+                        'Country': row['Country'],
+                        'Name_Of_Mine': row['Name_Of_Mine'],
+                        'Unit': row['Unit'],
+                        'Current_Production': row['Current_Production'],
+                        'Potential_Stock': row['Potential_Stock'],
+                        'Mining_Company_Name': row['Mining_Company_Name']
+                    }
+
+                    if mining_data['Unit'] not in unit_options:
+                        errors.append({'row_index': index, 'reason': f'Error inserting row {index}: Invalid unit value'})
+                    else:
+                        country_instance = None
+                        mine_instance = None
                         try:
-                            existing_record.save()
-                            updated_count +=1
-
-                        except IntegrityError  as e:
+                            country_instance = Country_meta.objects.get(Country_Name=row['Country'])
+                            mine_instance = Mine_Meta.objects.get(Mine_Type=row['Name_Of_Mine'])
+                        except Exception as e:
                             errors.append({'row_index': index, 'data': mining_data, 'reason': str(e)})
+                            continue
 
-                else:
-                    try:
-                        HealthDiseaseData = Mining(**mining_data)
-                        HealthDiseaseData.save()
-                        added_count +=1
-                    
-                    except Exception as e:
-                        errors.append({'row_index': index, 'data': mining_data, 'reason': str(e)})
-            
+                        existing_record = Mining.objects.filter(Q(Year=row['Year']) & Q(Country=country_instance) & Q(Name_Of_Mine=mine_instance)).first()
+                        if existing_record:
+                            duplicate_data.append({
+                                'row_index': index,
+                                'data': mining_data,
+                                'reason': 'Duplicate data found'
+                            })
+                        else:
+                            try:
+                
+                                Miningdata=Mining(**mining_data)
+                                Miningdata.save()
+                                added_count += 1
+                            except Exception as e:
+                                errors.append({
+                                    'row_index': index,
+                                    'data': mining_data,
+                                    'reason': f"Error inserting row {index}: {e}"
+                                })
+
             if added_count > 0:
-                messages.success(request, str(added_count) + ' records added.')
+                messages.success(request, f'{added_count} records added')
 
-            if updated_count >0:
-                messages.info(request, str(updated_count) + ' records updated.')
+            if updated_count > 0:
+                messages.success(request, f'{updated_count} records updated')
 
             if errors:
                 request.session['errors'] = errors
-                return render(request, 'trade_data/error_template.html', {'errors': errors})
-            elif duplicate_data:
-                request.session['duplicate_data'] = duplicate_data
-                return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data})
-            else:
-                return redirect('health_disease_table')
-            
+                return render(request, 'general_data/error_template.html', {'errors': errors})
+
+            if duplicate_data:
+                return render(request, 'general_data/duplicate_template.html', {'duplicate_data': duplicate_data})
+
     else:
         form = UploadMiningForm()
-    return render(request,'general_data/transport_templates/upload_transport_form.html',{'form':form})
+
+    return render(request, 'general_data/upload_form.html', {'form': form, 'tables': tables})
+
+
+                
+

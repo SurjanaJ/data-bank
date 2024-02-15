@@ -567,9 +567,9 @@ def export_road_table_to_excel(request):
 
     )
 
-    df=pd.DataFrame(data.values('Year','country_name','Highway_No','code_type_of_road','Type_Of_The_Road','Length_Unit_Options','Length'))
+    df=pd.DataFrame(data.values('Year','country_name','Highway_No','Name_Of_The_Road','code_type_of_road','Type_Of_The_Road','Length_Unit_Options','Length'))
     df.rename(columns={'country_name':'Country','code_type_of_road':'Code_Type_Of_Road','Length_Unit_Options':'Length_Unit'},inplace=True)
-    df = df[['Year','Country','Highway_No','Code_Type_Of_Road','Type_Of_The_Road','Length_Unit','Length']]
+    df = df[['Year','Country','Highway_No','Name_Of_The_Road','Code_Type_Of_Road','Type_Of_The_Road','Length_Unit','Length']]
     output=BytesIO()
     writer=pd.ExcelWriter(output,engine='xlsxwriter')
     df.to_excel(writer,sheet_name='sheet1',index=False)

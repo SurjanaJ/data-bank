@@ -1,8 +1,7 @@
 from django.urls import include, path
+from .views import climate_view, occupation_view, health_diseases_views, education_view, view, population_view, hotel_view, land_view, political_views, tourism_view, mining_views, water_view, housing_views, road_views, transport_view, services_view, crime_view, public_unitillity_views, disaster_views, energy_view, exchange_view, export_views
 
-from .views import climate_view,occupation_view,health_diseases_views,education_view, view,population_view,hotel_view,land_view,political_views,tourism_view,mining_views,water_view,housing_views,road_views,transport_view,services_view, crime_view,public_unitillity_views,disaster_views
-from .views import energy_view,exchange_view,climate_view,occupation_view,education_view, view,population_view,hotel_view,land_view,tourism_view,water_view,transport_view,services_view, crime_view
-from .views import export_views
+
 
 urlpatterns = [
 
@@ -103,6 +102,7 @@ urlpatterns = [
     path('delete_road_record/<int:pk>/', view.delete_record, name ='delete_road_record' ),
     path('delete_road_disease/', view.delete_selected, name='delete_selected_road'),
     path('export_road_table_to_excel/', export_views.export_road_table_to_excel, name='export_road_table_to_excel'),
+    path('upload_road_excel', road_views.upload_road_excel, name = 'upload_road_excel'),
 
 
     path('housing_table',housing_views.display_housing_table, name='housing_table'),
@@ -118,6 +118,7 @@ urlpatterns = [
     path('delete_mining_record/<int:pk>/', view.delete_record, name ='delete_mining_record'),
     path('delete_selected_mining/', view.delete_selected, name='delete_selected_mining'),
     path('export_mining_table_to_excel/', export_views.export_mining_table_to_excel, name='export_mining_table_to_excel'),
+    path('upload_mining_excel', mining_views.upload_mining_excel, name = 'upload_mining_excel'),
 
 
     path('political_table',political_views.display_political_table, name='political_table'),
