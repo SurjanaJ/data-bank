@@ -148,10 +148,26 @@ def upload_index_excel(request):
             return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data, 'tables': tables, 'meta_tables': views.meta_tables,})
             
         else:
-            return redirect('energy_table')
+            return redirect('index_table')
     
     else:
         form = UploadIndexForm()
 
     return render(request,'general_data/transport_templates/upload_transport_form.html',{'form':form, 'tables': tables, 'meta_tables': views.meta_tables,})
     
+def display_index_table(request):
+    data = Index.objects.all()
+
+    country_categories = Country_meta.objects.all()
+    paginator = Paginator(data, 40)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+
+    context ={'data_len':len(data),
+              'page':page, 
+              'query_len':len(page), 
+              'tables': tables, 
+              'meta_tables': views.meta_tables,
+              'country_categories':country_categories,
+            }
+    return render(request, 'general_data/index_templates/index_table.html', context)

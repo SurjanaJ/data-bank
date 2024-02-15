@@ -85,7 +85,7 @@ tables =[
     ,
     {
         "name": "Index Data",
-        "url": "energy_table"
+        "url": "index_table"
     }
     ]
 
