@@ -159,6 +159,12 @@ def display_index_table(request):
     data = Index.objects.all()
 
     country_categories = Country_meta.objects.all()
+
+    country = request.GET.get('country')
+
+    if is_valid_queryparam(country) and country != '--':
+        data = data.filter(Country_id=country)
+
     paginator = Paginator(data, 40)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
