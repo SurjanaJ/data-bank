@@ -1,6 +1,6 @@
 from django.urls import include, path
 
-from .views import index_view,climate_view,occupation_view,health_diseases_views,education_view, view,population_view,hotel_view,land_view,political_views,tourism_view,mining_views,water_view,housing_views,road_views,transport_view,services_view, crime_view,public_unitillity_views,disaster_views, energy_view,exchange_view,climate_view,occupation_view,education_view, view,population_view,hotel_view,land_view,tourism_view,water_view,transport_view,services_view, crime_view
+from .views import publication_view,index_view,climate_view,occupation_view,health_diseases_views,education_view, view,population_view,hotel_view,land_view,political_views,tourism_view,mining_views,water_view,housing_views,road_views,transport_view,services_view, crime_view,public_unitillity_views,disaster_views, energy_view,exchange_view,climate_view,occupation_view,education_view, view,population_view,hotel_view,land_view,tourism_view,water_view,transport_view,services_view, crime_view
 from .views import export_views
 
 urlpatterns = [
@@ -208,4 +208,6 @@ urlpatterns = [
     path('export_index_excel', index_view.export_index_excel, name='export_index_excel'),
     path('update_selected_index/', index_view.update_selected_index, name='update_selected_index'),
     
+    path('publication_table', publication_view.display_publication_table, name='publication_table'), 
+
 ]   
