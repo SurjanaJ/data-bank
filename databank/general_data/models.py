@@ -472,3 +472,6 @@ class Publication(models.Model):
     Writer_Name = models.CharField(max_length = 300)
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return (self.Book_Name)
