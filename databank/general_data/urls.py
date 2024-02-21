@@ -206,5 +206,6 @@ urlpatterns = [
     path('delete_index_record/<int:pk>/', view.delete_record, name ='delete_index_record' ),
     path('delete_selected_index/', view.delete_selected, name='delete_selected_index'),
     path('export_index_excel', index_view.export_index_excel, name='export_index_excel'),
+    path('update_selected_index/', index_view.update_selected_index, name='update_selected_index'),
     
 ]   
