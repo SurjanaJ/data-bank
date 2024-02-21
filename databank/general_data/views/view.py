@@ -8,8 +8,8 @@ from django.db.models import Q
 import pandas as pd
 
 from trade_data import views
-from ..models import Climate_Data, Crime, Crime_Meta, Disaster_Data, Health_disease,Road,Mining,Housing,Political_Data, Education, Education_Degree_Meta, Education_Level_Meta, Energy, Energy_Meta, Exchange, ForestData, Country_meta, Land_Code_Meta, Occupation, Occupation_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
-from ..forms import UpdateClimate, UpdateCrime, UpdateDisaster, UpdateHealthDisease,UpdateHousing,UpdateMining,UpdatePolitical,UpdateRoad, UpdateEducation, UpdateEnergy, UpdateExchange, UpdateOccupation, UpdateServices, UploadCrimeMetaForm,  UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadEnergyMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadOccupationMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
+from ..models import Index,Climate_Data, Crime, Crime_Meta, Disaster_Data, Health_disease,Road,Mining,Housing,Political_Data, Education, Education_Degree_Meta, Education_Level_Meta, Energy, Energy_Meta, Exchange, ForestData, Country_meta, Land_Code_Meta, Occupation, Occupation_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta
+from ..forms import UpdateClimate, UpdateCrime, UpdateDisaster, UpdateHealthDisease,UpdateHousing, UpdateIndex,UpdateMining,UpdatePolitical,UpdateRoad, UpdateEducation, UpdateEnergy, UpdateExchange, UpdateOccupation, UpdateServices, UploadCrimeMetaForm,  UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadEnergyMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadOccupationMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -457,6 +457,7 @@ def update_record(request,pk):
         'update_climate_record': Climate_Data,
         'update_exchange_record':Exchange,
         'update_energy_record':Energy,
+        'update_index_record':Index,
     }
 
     form_mapping = {
@@ -473,6 +474,7 @@ def update_record(request,pk):
         Climate_Data: UpdateClimate,
         Exchange: UpdateExchange,
         Energy: UpdateEnergy,
+        Index: UpdateIndex,
     }
 
     view_mapping = {
@@ -488,7 +490,8 @@ def update_record(request,pk):
         Road:'road_table',
         Climate_Data:'climate_table',
         Exchange: 'exchange_table',
-        Energy: 'energy_table'
+        Energy: 'energy_table',
+        Index: 'index_table'
     }
 
     model_class = model_mapping.get(view_name)
@@ -521,10 +524,10 @@ def delete_record(request,pk):
         'delete_mining_record':Mining,
         'delete_housing_record':Housing,
         'delete_political_record':Political_Data,
-
         'delete_climate_record': Climate_Data,
         'delete_exchange_record': Exchange,
         'delete_energy_record':Energy,
+        'delete_index_record': Index,
     }
 
     view_mapping = {
@@ -541,6 +544,7 @@ def delete_record(request,pk):
         Climate_Data:'climate_table',
         Exchange: 'exchange_table',
         Energy:'energy_table',
+        Index : 'index_table'
     }
 
     model_class = model_mapping.get(view_name)
@@ -568,10 +572,10 @@ def delete_selected(request):
         'delete_selected_housing':Housing,
         'delete_selected_road':Road,
         'delete_selected_political':Political_Data,
-
         'delete_selected_climate':Climate_Data,
         'delete_selected_exchange':Exchange,
         'delete_selected_energy':Energy,
+        'delete_selected_index': Index,
     }
 
     view_mapping = {
@@ -588,6 +592,7 @@ def delete_selected(request):
         Climate_Data: 'climate_table',
         Exchange:'exchange_table',
         Energy:'energy_table',
+        Index:'index_table',
     }
     model_class = model_mapping.get(view_name)
     model_view = view_mapping.get(model_class)

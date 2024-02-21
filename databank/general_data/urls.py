@@ -1,6 +1,6 @@
 from django.urls import include, path
 
-from .views import climate_view,occupation_view,health_diseases_views,education_view, view,population_view,hotel_view,land_view,political_views,tourism_view,mining_views,water_view,housing_views,road_views,transport_view,services_view, crime_view,public_unitillity_views,disaster_views, energy_view,exchange_view,climate_view,occupation_view,education_view, view,population_view,hotel_view,land_view,tourism_view,water_view,transport_view,services_view, crime_view
+from .views import index_view,climate_view,occupation_view,health_diseases_views,education_view, view,population_view,hotel_view,land_view,political_views,tourism_view,mining_views,water_view,housing_views,road_views,transport_view,services_view, crime_view,public_unitillity_views,disaster_views, energy_view,exchange_view,climate_view,occupation_view,education_view, view,population_view,hotel_view,land_view,tourism_view,water_view,transport_view,services_view, crime_view
 from .views import export_views
 
 urlpatterns = [
@@ -199,4 +199,13 @@ urlpatterns = [
     path('delete_selected_energy/', view.delete_selected, name='delete_selected_energy'),
     path('export_energy_excel', energy_view.export_energy_excel, name='export_energy_excel'),
     path('update_selected_energy/', energy_view.update_selected_energy, name='update_selected_energy'),
+
+    path('upload_index_excel', index_view.upload_index_excel, name = 'upload_index_excel'),
+    path('index_table', index_view.display_index_table, name='index_table'), 
+    path('update_index_record/<int:pk>/', view.update_record, name = 'update_index_record'),
+    path('delete_index_record/<int:pk>/', view.delete_record, name ='delete_index_record' ),
+    path('delete_selected_index/', view.delete_selected, name='delete_selected_index'),
+    path('export_index_excel', index_view.export_index_excel, name='export_index_excel'),
+    path('update_selected_index/', index_view.update_selected_index, name='update_selected_index'),
+    
 ]   

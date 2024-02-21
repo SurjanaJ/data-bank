@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Climate_Data, Crime,ForestData, Disaster_Data, Education, Health_disease,Road,Mining,Housing,Political_Data,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land,Public_Unitillity
+from .models import Climate_Data,Index, Crime,ForestData, Disaster_Data, Education, Health_disease,Road,Mining,Housing,Political_Data,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land,Public_Unitillity
 from .models import Climate_Data, Crime, Education, Energy, Exchange, ForestData,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land
 
 class UploadForestDataForm(forms.Form):
@@ -346,3 +346,29 @@ class UpdateEnergy(ModelForm):
         self.fields['Current_Production_In_MW'].label = 'Current Production In MW'
         self.fields['Generating_Company'].label = 'Generating Company'
 
+
+# INDEX_DATA
+class UploadIndexForm(forms.Form):
+    file = forms.FileField() 
+
+class UpdateIndex(ModelForm):
+    class Meta:
+        model = Index
+        fields='__all__'
+
+        widgets={
+            'Year': forms.NumberInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Index_Name': forms.TextInput(attrs={'class': 'form-control '}),
+            'Score':forms.NumberInput(attrs={'class': 'form-control '}),
+            'Rank':forms.NumberInput(attrs={'class': 'form-control '}),
+            'No_Of_Countries': forms.NumberInput(attrs={'class': 'form-control '}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateIndex, self).__init__(*args, **kwargs)
+
+        # Set the label for 'Selling' field
+        self.fields['Index_Name'].label = 'Index Name'
+        self.fields['No_Of_Countries'].label = 'No Of Countries'
+        
