@@ -177,3 +177,39 @@ def display_index_table(request):
               'country_categories':country_categories,
             }
     return render(request, 'general_data/index_templates/index_table.html', context)
+
+def export_index_excel(request):
+    country = request.GET.get('country')
+
+    filter_conditions = {}
+    if is_valid_queryparam(country) and country != '--':
+        filter_conditions['Country'] = country
+
+    queryset = Index.objects.filter(**filter_conditions)
+    queryset = queryset.annotate(
+        country = F('Country__Country_Name'),
+    )
+
+    data = pd.DataFrame(list(queryset.values('Year','country','Index_Name','Score','Rank','No_Of_Countries')))
+
+    data.rename(columns = {
+        'country':'Country',
+        'Index_Name':'Index Name',
+        'No_Of_Countries':'No Of Countries'
+    }, inplace=True)
+
+    column_order = ['Year','Country','Index Name','Score','Rank','No Of Countries']
+
+    data = data[column_order]
+    output = BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')  
+    data.to_excel(writer, sheet_name='Sheet1', index=False)
+
+    writer.close()  
+    output.seek(0)
+
+    response = HttpResponse(
+        output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
+    return response
