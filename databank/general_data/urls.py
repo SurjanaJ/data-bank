@@ -202,5 +202,8 @@ urlpatterns = [
 
     path('upload_index_excel', index_view.upload_index_excel, name = 'upload_index_excel'),
     path('index_table', index_view.display_index_table, name='index_table'), 
-
+    path('update_index_record/<int:pk>/', view.update_record, name = 'update_index_record'),
+    path('delete_index_record/<int:pk>/', view.delete_record, name ='delete_index_record' ),
+    path('delete_selected_index/', view.delete_selected, name='delete_selected_index'),
+    
 ]   

@@ -39,7 +39,7 @@
     No Records
 </div>
 {% else %}
-<form action="" method='post' id="delete-form">
+<form action="{% url 'delete_selected_index' %}" method='post' id="delete-form">
     {% csrf_token %}
     <div class="table-responsive mt-4 bg-light p-3">
         <div class="d-flex align-items-center justify-content-between px-2">
@@ -124,7 +124,7 @@
 
                             </div>
                             <div class="btn ">
-                                <a class="" href="{% url 'update_energy_record' record.id %}"><i
+                                <a class="" href="{% url 'update_index_record' record.id %}"><i
                                         class="fa-regular fa-pen-to-square" style="color: rgb(3, 10, 86)"></i></a>
                             </div>
                         </td>
@@ -170,6 +170,31 @@
         </span>
     </div>
 </form>
+
+<script>
+    function confirmDelete(itemId) {
+        var result = confirm("Are you sure you want to delete this record?");
+        if (result) {
+            window.location.href = 'delete_index_record/' + itemId + '/';
+        } else {
+            alert("Delete canceled!");
+        }
+    }
+
+    function updateSelected(itemId) {
+        document.getElementById("delete-form").action = "{% url 'update_selected_energy' %}";
+        document.getElementById("delete-form").submit();
+    }
+
+    function confirmDeleteAll() {
+        var confirmDelete = confirm(
+            "Are you sure you want to delete all selected items?"
+        );
+        if (confirmDelete) {
+            document.getElementById("delete-form").submit();
+        }
+    }
+</script>
 {% endif %}
 
 {% endblock content %}
