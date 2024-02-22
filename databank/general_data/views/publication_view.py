@@ -68,8 +68,8 @@ def upload_publication_excel(request):
                     data = {
                         'Year': row['Year'],
                         'Country': row['Country'],
-                        'Book_Name': row['Book Name'],
-                        'Writer_Name':row['Writer Name'],
+                        'Book Name': row['Book Name'],
+                        'Writer Name':row['Writer Name'],
                     }
 
                     #get the existing instance
@@ -113,8 +113,8 @@ def upload_publication_excel(request):
                     data = {
                         'Year': row['Year'],
                         'Country': row['Country'],
-                        'Book_Name': row['Book Name'],
-                        'Writer_Name':row['Writer Name'],
+                        'Book Name': row['Book Name'],
+                        'Writer Name':row['Writer Name'],
                     }
 
                     #check if the meta values exist
