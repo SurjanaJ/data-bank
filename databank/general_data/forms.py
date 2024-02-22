@@ -371,4 +371,8 @@ class UpdateIndex(ModelForm):
         # Set the label for 'Selling' field
         self.fields['Index_Name'].label = 'Index Name'
         self.fields['No_Of_Countries'].label = 'No Of Countries'
-        
+
+
+# PUBLICATION DATA
+class UploadPublicationForm(forms.Form):
+    file = forms.FileField() 

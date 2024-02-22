@@ -209,5 +209,6 @@ urlpatterns = [
     path('update_selected_index/', index_view.update_selected_index, name='update_selected_index'),
     
     path('publication_table', publication_view.display_publication_table, name='publication_table'), 
+    path('upload_publication_excel', publication_view.upload_publication_excel, name = 'upload_publication_excel'),
 
 ]   
