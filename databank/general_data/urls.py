@@ -211,5 +211,6 @@ urlpatterns = [
     path('publication_table', publication_view.display_publication_table, name='publication_table'), 
     path('upload_publication_excel', publication_view.upload_publication_excel, name = 'upload_publication_excel'),
     path('update_publication_record/<int:pk>/', view.update_record, name = 'update_publication_record'),
+    path('delete_publication_record/<int:pk>/', view.delete_record, name ='delete_publication_record' ),
 
 ]   

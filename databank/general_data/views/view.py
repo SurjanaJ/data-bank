@@ -531,6 +531,7 @@ def delete_record(request,pk):
         'delete_exchange_record': Exchange,
         'delete_energy_record':Energy,
         'delete_index_record': Index,
+        'delete_publication_record': Publication,
     }
 
     view_mapping = {
@@ -547,7 +548,8 @@ def delete_record(request,pk):
         Climate_Data:'climate_table',
         Exchange: 'exchange_table',
         Energy:'energy_table',
-        Index : 'index_table'
+        Index : 'index_table',
+        Publication: 'publication_table',
     }
 
     model_class = model_mapping.get(view_name)

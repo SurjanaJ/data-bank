@@ -172,6 +172,31 @@
         </span>
     </div>
 </form>
+
+<script>
+    function confirmDelete(itemId) {
+        var result = confirm("Are you sure you want to delete this record?");
+        if (result) {
+            window.location.href = 'delete_publication_record/' + itemId + '/';
+        } else {
+            alert("Delete canceled!");
+        }
+    }
+
+    function updateSelected(itemId) {
+        document.getElementById("delete-form").action = "{% url 'update_selected_energy' %}";
+        document.getElementById("delete-form").submit();
+    }
+
+    function confirmDeleteAll() {
+        var confirmDelete = confirm(
+            "Are you sure you want to delete all selected items?"
+        );
+        if (confirmDelete) {
+            document.getElementById("delete-form").submit();
+        }
+    }
+</script>
 {% endif %}
 
 
