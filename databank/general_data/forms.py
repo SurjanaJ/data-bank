@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Climate_Data,Index, Crime,ForestData, Disaster_Data, Education, Health_disease,Road,Mining,Housing,Political_Data,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land,Public_Unitillity
+from .models import Publication,Climate_Data,Index, Crime,ForestData, Disaster_Data, Education, Health_disease,Road,Mining,Housing,Political_Data,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land,Public_Unitillity
 from .models import Climate_Data, Crime, Education, Energy, Exchange, ForestData,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land
 
 class UploadForestDataForm(forms.Form):
@@ -376,3 +376,22 @@ class UpdateIndex(ModelForm):
 # PUBLICATION DATA
 class UploadPublicationForm(forms.Form):
     file = forms.FileField() 
+
+class UpdatePublication(ModelForm):
+    class Meta:
+        model = Publication
+        fields='__all__'
+
+        widgets={
+            'Year': forms.NumberInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Book_Name': forms.TextInput(attrs={'class': 'form-control '}),
+            'Writer_Name': forms.TextInput(attrs={'class': 'form-control '}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UpdatePublication, self).__init__(*args, **kwargs)
+
+        # Set the labels
+        self.fields['Book_Name'].label = 'Book Name'
+        self.fields['Writer_Name'].label = 'Writer Name'
