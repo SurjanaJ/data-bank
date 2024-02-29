@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Index,Climate_Data, Climate_Place_Meta, Crime, Crime_Meta, Currency_Meta,  Education, Education_Degree_Meta, Education_Level_Meta, Energy, Energy_Meta, ForestData, Occupation, Occupation_Meta,PopulationData,Land_Code_Meta,Land, Services, Services_Meta,Transport_Meta,Transport,Tourism,Tourism_Meta,Hotel,Water,Water_Meta,Public_Unitillity,Mine_Meta,Mining,Road_Meta,Road,Housing_Meta,Housing,Health_disease_Meta,Health_disease,Budgetary_Data,Political_Data,Disaster_Data_Meta,Disaster_Data
+from .models import Publication,Index,Climate_Data, Climate_Place_Meta, Crime, Crime_Meta, Currency_Meta,  Education, Education_Degree_Meta, Education_Level_Meta, Energy, Energy_Meta, ForestData, Occupation, Occupation_Meta,PopulationData,Land_Code_Meta,Land, Services, Services_Meta,Transport_Meta,Transport,Tourism,Tourism_Meta,Hotel,Water,Water_Meta,Public_Unitillity,Mine_Meta,Mining,Road_Meta,Road,Housing_Meta,Housing,Health_disease_Meta,Health_disease,Budgetary_Data,Political_Data,Disaster_Data_Meta,Disaster_Data
 
 class LandCodeMeta_Admin(admin.ModelAdmin ):
     list_display=('id','Code','Land_Type')
@@ -70,6 +70,10 @@ class Index_Admin(admin.ModelAdmin):
     list_display = ['id','Country','Year','Index_Name','Score','Rank','No_Of_Countries','created_date','modified_date']
 admin.site.register(Index, Index_Admin)
 
+
+class Publication_Admin(admin.ModelAdmin):
+    list_display = ['id','Country','Year','Book_Name','Writer_Name','created_date','modified_date']
+admin.site.register(Publication, Publication_Admin)
 
 
 admin.site.register(Currency_Meta)

@@ -86,7 +86,11 @@ tables =[
     {
         "name": "Index Data",
         "url": "index_table"
-    }
+    },
+    {
+        "name": "Publication Data",
+        "url": "publication_table"
+    },
     ]
 
 
