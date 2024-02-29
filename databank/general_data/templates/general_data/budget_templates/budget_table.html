@@ -9,7 +9,7 @@
 <div class="bg-light mt-3">
     <div class="collapse shadow rounded-2" id="collapseFilter">
         <div class="px-2 py-2">
-            <form action="publication_table" method="GET" class="row g-3">
+            <form action="budget_table" method="GET" class="row g-3">
                 <div class="form-group col-md-3">
                     <label for="country">Country</label>
                     <select id="country" class="form-control" name="country">
@@ -20,15 +20,6 @@
                     </select>
                     
                 </div>
-                <div class="col-md-3">
-                    <label for="year_min">Minimum Year</label>
-                    <input type="number"  class="form-control" name="year_min" id="year_min">
-                </div>
-                <div class="col-md-3">
-                    <label for="year_max">Maximum Year</label>
-                    <input type="number" class="form-control" name="year_max" id="year_max">
-                </div>
-                
                 <div class="col-md-3 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary">
                         Search
@@ -137,16 +128,12 @@
         <span class="step-links bg-light rounded-1 d-flex justify-content-center gap-3 p-3">
             {% if page.has_previous %}
             <a href="?page=1
-            {% if request.GET.country %}&country={{ request.GET.country }}{% endif %}
-            {% if request.GET.year_max %}&year_max={{ request.GET.year_max }}{% endif %}
-            {% if request.GET.year_min %}&year_min={{ request.GET.year_min }}{% endif %}
-            ">
+            {% if request.GET.country %}&country={{ request.GET.country }}{% endif %} ">
                 &laquo; First
             </a>
             <a href="?page={{page.previous_page_number}}
             {% if request.GET.country %}&country={{ request.GET.country }}{% endif %}
-            {% if request.GET.year_max %}&year_max={{ request.GET.year_max }}{% endif %}
-            {% if request.GET.year_min %}&year_min={{ request.GET.year_min }}{% endif %}
+            
             ">
                 Previous
             </a>
@@ -158,14 +145,12 @@
             {% if page.has_next %}
             <a href="?page={{page.next_page_number}}
             {% if request.GET.country %}&country={{ request.GET.country }}{% endif %}
-            {% if request.GET.year_max %}&year_max={{ request.GET.year_max }}{% endif %}
-            {% if request.GET.year_min %}&year_min={{ request.GET.year_min }}{% endif %}">
+           ">
                 Next
             </a>
             <a href="?page={{ page.paginator.num_pages }}
             {% if request.GET.country %}&country={{ request.GET.country }}{% endif %}
-            {% if request.GET.year_max %}&year_max={{ request.GET.year_max }}{% endif %}
-            {% if request.GET.year_min %}&year_min={{ request.GET.year_min }}{% endif %}">
+            ">
                 Last &raquo;
             </a>
             {% endif %}
