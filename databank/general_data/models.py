@@ -474,3 +474,9 @@ class Budgetary_Data(models.Model):
     Fiscal_Year = models.CharField(max_length=30)
     Amount_In_USD = models.FloatField(default = 0.0)
     Prefered_Denomination = models.CharField(max_length = 100)
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.id)
+    
