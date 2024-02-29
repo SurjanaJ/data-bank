@@ -214,5 +214,6 @@ urlpatterns = [
     path('delete_publication_record/<int:pk>/', view.delete_record, name ='delete_publication_record' ),
     path('delete_selected_publication/', view.delete_selected, name='delete_selected_publication'),
     path('export_publication_excel', publication_view.export_publication_excel, name='export_publication_excel'),
+    path('update_selected_publication/', publication_view.update_selected_publication, name='update_selected_publication'),
 
 ]   
