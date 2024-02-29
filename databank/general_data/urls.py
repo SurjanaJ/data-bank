@@ -212,5 +212,7 @@ urlpatterns = [
     path('upload_publication_excel', publication_view.upload_publication_excel, name = 'upload_publication_excel'),
     path('update_publication_record/<int:pk>/', view.update_record, name = 'update_publication_record'),
     path('delete_publication_record/<int:pk>/', view.delete_record, name ='delete_publication_record' ),
+    path('delete_selected_publication/', view.delete_selected, name='delete_selected_publication'),
+    path('export_publication_excel', publication_view.export_publication_excel, name='export_publication_excel'),
 
 ]   

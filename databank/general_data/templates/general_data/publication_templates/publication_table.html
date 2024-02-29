@@ -50,7 +50,7 @@
     No Records
 </div>
 {% else %}
-<form action="" method="post">
+<form action="{% url 'delete_selected_publication' %}" method="post" id="delete-form">
     {% csrf_token %}
     <div class="table-responsive mt-4 bg-light p-3">
         <div class="d-flex align-items-center justify-content-between px-2">
@@ -67,7 +67,7 @@
                     <i class="fa-regular fa-trash-can" style="color: #ff0000"></i>
                     <span>Delete Selected</span>
                 </button>
-                <a href="{% url 'export_energy_excel' %}?{{ request.GET.urlencode }}" class="border p-2 styled-link">
+                <a href="{% url 'export_publication_excel' %}?{{ request.GET.urlencode }}" class="border p-2 styled-link">
                     <i class="fa-solid fa-table"></i>
                     <span class="fw-normal">Export to Excel</span>
                 </a>
