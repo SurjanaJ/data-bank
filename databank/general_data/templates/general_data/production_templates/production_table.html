@@ -8,7 +8,25 @@
 
 <div class="bg-light mt-3">
     <div class="collapse shadow rounded-2" id="collapseFilter">
+        <div class="px-2 py-2">
+            <form action="" method="GET" class="row g-3">
+                <div class="form-group col-md-3  ">
+                    <label for="code">Code</label>
+                    <select id="code" class=" form-control" name="code">
+                        <option selected>--</option>
+                        {% for code in production_categories %}
+                        <option class="" value="{{code.id}}">{{code.Code}} - {{code.Description}} </option>
+                        {% endfor %}
+                    </select>
+                </div>
 
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary">
+                        Search
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 

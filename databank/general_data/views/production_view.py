@@ -28,6 +28,11 @@ def display_production_table(request):
     data = Production.objects.all()
 
     production_categories = Production_Meta.objects.all()
+
+    code = request.GET.get('code')
+    if is_valid_queryparam(code) and code != '--':
+        data = data.filter(Code_id=code)
+
     
     paginator = Paginator(data, 40)
     page_number = request.GET.get('page')
