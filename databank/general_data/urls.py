@@ -218,4 +218,5 @@ urlpatterns = [
 
     path('budget_table', budget_view.display_budget_table, name='budget_table'), 
     path('upload_budget_excel', budget_view.upload_budget_excel, name = 'upload_budget_excel'),
+    path('update_budget_record/<int:pk>/', view.update_record, name = 'update_budget_record'),
 ]   

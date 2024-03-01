@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Publication,Climate_Data,Index, Crime,ForestData, Disaster_Data, Education, Health_disease,Road,Mining,Housing,Political_Data,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land,Public_Unitillity
+from .models import Budgetary_Data, Publication,Climate_Data,Index, Crime,ForestData, Disaster_Data, Education, Health_disease,Road,Mining,Housing,Political_Data,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land,Public_Unitillity
 from .models import Climate_Data, Crime, Education, Energy, Exchange, ForestData,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land
 
 class UploadForestDataForm(forms.Form):
@@ -400,4 +400,27 @@ class UpdatePublication(ModelForm):
 # BUDGETARY DATA
 class UploadBudgetForm(forms.Form):
     file = forms.FileField() 
+
+class UpdateBudget(ModelForm):
+    class Meta:
+        model = Budgetary_Data
+        fields='__all__'
+
+        widgets={
+            'Fiscal_Year': forms.TextInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Amount_In_USD': forms.NumberInput(attrs={'class': 'form-control '}),
+            'Prefered_Denomination': forms.TextInput(attrs={'class': 'form-control '}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateBudget, self).__init__(*args, **kwargs)
+
+        # Set the labels
+        self.fields['Fiscal_Year'].label = 'Fiscal Year'
+        self.fields['Amount_In_USD'].label = 'Amount In USD'
+        self.fields['Prefered_Denomination'].label = 'Prefered Denomination'
+
+
+
        
