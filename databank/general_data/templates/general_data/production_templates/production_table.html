@@ -109,7 +109,37 @@
                 </tbody>
             </table>
         </div>
+    </div>
 
+    <div class="pagination m-3 d-flex justify-content-center">
+        <span class="step-links bg-light rounded-1 d-flex justify-content-center gap-3 p-3">
+            {% if page.has_previous %}
+            <a href="?page=1
+            {% if request.GET.code %}&code={{ request.GET.code }}{% endif %}
+            ">
+                &laquo; First
+            </a>
+            <a href="?page={{page.previous_page_number}}
+            {% if request.GET.code %}&code={{ request.GET.code }}{% endif %}">
+                Previous
+            </a>
+            {% endif %}
+
+            <span class="current-page">
+                Page {{ page.number }} of {{ page.paginator.num_pages }}.
+            </span>
+
+            {% if page.has_next %}
+            <a href="?page={{page.next_page_number}}
+            {% if request.GET.code %}&code={{ request.GET.code }}{% endif %}">
+                Next
+            </a>
+            <a href="?page={{ page.paginator.num_pages }}
+            {% if request.GET.code %}&code={{ request.GET.code }}{% endif %}">
+                Last &raquo;
+            </a>
+            {% endif %}
+        </span>
     </div>
 </form>
 {% endif %}
