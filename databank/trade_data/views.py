@@ -175,6 +175,11 @@ meta_tables =[
         "url":"energy_meta",
         "upload_url":"upload_energy_meta_excel"
     },
+    {
+        "name":"Production Meta",
+        "url":"production_meta",
+        "upload_url":"upload_production_meta_excel"
+    },
     ]
 
 def is_valid_queryparam(param):

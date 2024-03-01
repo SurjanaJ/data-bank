@@ -423,6 +423,6 @@ class UpdateBudget(ModelForm):
 
 
 
-#PUBLICATION DATA
-class UploadPublicationMetaForm(forms.Form):
+#PRODUCTION DATA
+class UploadProductionMetaForm(forms.Form):
     meta_file = forms.FileField()
