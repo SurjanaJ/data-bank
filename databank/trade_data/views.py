@@ -91,6 +91,10 @@ tables =[
         "name": "Publication Data",
         "url": "publication_table"
     },
+    {
+        "name": "Budgetary Data",
+        "url": "budget_table"
+    },
     ]
 
 
