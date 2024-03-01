@@ -211,3 +211,39 @@ def export_budget_excel(request):
     response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
     return response
 
+def update_selected_budget(request):
+    selected_ids = request.POST.getlist('selected_items')
+    if not selected_ids:
+        messages.error(request, 'No items selected.')
+        return redirect('budget_table')
+    else:
+        queryset = Budgetary_Data.objects.filter(id__in=selected_ids)
+        queryset = queryset.annotate(
+        country = F('Country__Country_Name'))
+
+        data = pd.DataFrame(list(queryset.values('id','Fiscal_Year','country','Amount_In_USD','Prefered_Denomination')))
+
+        data.rename(columns = {
+        'country':'Country',
+        'Fiscal_Year':'Fiscal Year',
+        'Amount_In_USD':'Amount In USD',
+        'Prefered_Denomination':'Prefered Denomination'
+    }, inplace=True)
+
+    column_order = ['id','Country','Fiscal Year','Amount In USD','Prefered Denomination']
+
+
+    data = data[column_order]
+    output = BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')  
+    data.to_excel(writer, sheet_name='Sheet1', index=False)
+
+    writer.close()  
+    output.seek(0)
+
+    response = HttpResponse(
+        output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
+    return response
+   

@@ -222,5 +222,7 @@ urlpatterns = [
     path('delete_budget_record/<int:pk>/', view.delete_record, name ='delete_budget_record' ),
     path('delete_selected_budget/', view.delete_selected, name='delete_selected_budget'),
     path('export_budget_excel', budget_view.export_budget_excel, name='export_budget_excel'),
+    path('update_selected_budget/', budget_view.update_selected_budget, name='update_selected_budget'),
+
 
 ]   
