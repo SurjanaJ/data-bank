@@ -220,5 +220,6 @@ urlpatterns = [
     path('upload_budget_excel', budget_view.upload_budget_excel, name = 'upload_budget_excel'),
     path('update_budget_record/<int:pk>/', view.update_record, name = 'update_budget_record'),
     path('delete_budget_record/<int:pk>/', view.delete_record, name ='delete_budget_record' ),
+    path('delete_selected_budget/', view.delete_selected, name='delete_selected_budget'),
 
 ]   
