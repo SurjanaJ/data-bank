@@ -95,6 +95,10 @@ tables =[
         "name": "Budgetary Data",
         "url": "budget_table"
     },
+    {
+        "name": "Production Data",
+        "url": "production_table"
+    },
     ]
 
 

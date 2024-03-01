@@ -226,7 +226,5 @@ urlpatterns = [
 
     path('upload_production_meta_excel', view.upload_meta_excel, name='upload_production_meta_excel'),
     path('production_meta',  production_view.display_production_meta, name='production_meta'),
-
-
-
+    path('production_table', production_view.display_production_table, name='production_table'), 
 ]   
