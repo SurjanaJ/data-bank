@@ -395,3 +395,9 @@ class UpdatePublication(ModelForm):
         # Set the labels
         self.fields['Book_Name'].label = 'Book Name'
         self.fields['Writer_Name'].label = 'Writer Name'
+
+
+# BUDGETARY DATA
+class UploadBudgetForm(forms.Form):
+    file = forms.FileField() 
+       

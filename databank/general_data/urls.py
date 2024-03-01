@@ -217,4 +217,5 @@ urlpatterns = [
     path('update_selected_publication/', publication_view.update_selected_publication, name='update_selected_publication'),
 
     path('budget_table', budget_view.display_budget_table, name='budget_table'), 
+    path('upload_budget_excel', budget_view.upload_budget_excel, name = 'upload_budget_excel'),
 ]   
