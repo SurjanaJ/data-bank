@@ -484,7 +484,7 @@ class Production_Meta(models.Model):
     id = models.AutoField(primary_key=True)
     Code = Code=models.CharField(max_length=100)
     Description = models.TextField()
-    created_date = models.DateTimeField(auto_now=True)
+    created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
