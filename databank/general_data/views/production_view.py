@@ -216,3 +216,40 @@ def export_production_excel(request):
     )
     response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
     return response
+
+
+def update_selected_production(request):
+    selected_ids = request.POST.getlist('selected_items')
+    if not selected_ids:
+        messages.error(request, 'No items selected.')
+        return redirect('production_table')
+    else:
+        queryset = Production.objects.filter(id__in=selected_ids)
+        queryset = queryset.annotate(
+        code = F('Code__Code'),
+        description = F('Code__Description'))
+
+        data = pd.DataFrame(list(queryset.values('id','code','description', 'Producer_Name','Province','District')))
+
+        data.rename(columns = {
+            'code':'Code',
+            'description': 'Description',
+            'Producer_Name':'Producer Name'
+        }, inplace=True)
+
+        column_order = ['id','Code','Description','Producer Name','Province','District']
+
+        data = data[column_order]
+        output = BytesIO()
+        writer = pd.ExcelWriter(output, engine='xlsxwriter')  
+        data.to_excel(writer, sheet_name='Sheet1', index=False)
+
+        writer.close()  
+        output.seek(0)
+
+        response = HttpResponse(
+            output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
+        return response
+

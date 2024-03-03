@@ -232,5 +232,6 @@ urlpatterns = [
     path('delete_production_record/<int:pk>/', view.delete_record, name ='delete_production_record' ),
     path('delete_selected_production/', view.delete_selected, name='delete_selected_production'),
     path('export_production_excel', production_view.export_production_excel, name='export_production_excel'),
+    path('update_selected_production/', production_view.update_selected_production, name='update_selected_production'),
 
 ]   
