@@ -95,6 +95,10 @@ tables =[
         "name": "Budgetary Data",
         "url": "budget_table"
     },
+    {
+        "name": "Production Data",
+        "url": "production_table"
+    },
     ]
 
 
@@ -174,6 +178,11 @@ meta_tables =[
         "name":"Energy Meta",
         "url":"energy_meta",
         "upload_url":"upload_energy_meta_excel"
+    },
+    {
+        "name":"Production Meta",
+        "url":"production_meta",
+        "upload_url":"upload_production_meta_excel"
     },
     ]
 

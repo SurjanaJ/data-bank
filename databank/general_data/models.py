@@ -479,4 +479,26 @@ class Budgetary_Data(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+class Production_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    Code = Code=models.CharField(max_length=100)
+    Description = models.TextField()
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return (f'{self.Code} - {self.Description}')
+
+class Production(models.Model):
+    id = models.AutoField(primary_key=True)
+    Code = models.ForeignKey(Production_Meta, on_delete=models.CASCADE)
+    Producer_Name = models.CharField(max_length = 200)
+    Province = models.CharField(max_length = 100)
+    District = models.CharField(max_length = 100)
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return (f'{self.Code} - {self.Producer_Name}')
     

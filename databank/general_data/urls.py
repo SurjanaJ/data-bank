@@ -1,6 +1,6 @@
 from django.urls import include, path
 
-from .views import budget_view, publication_view,index_view,climate_view,occupation_view,health_diseases_views,education_view, view,population_view,hotel_view,land_view,political_views,tourism_view,mining_views,water_view,housing_views,road_views,transport_view,services_view, crime_view,public_unitillity_views,disaster_views, energy_view,exchange_view,climate_view,occupation_view,education_view, view,population_view,hotel_view,land_view,tourism_view,water_view,transport_view,services_view, crime_view
+from .views import production_view,budget_view, publication_view,index_view,climate_view,occupation_view,health_diseases_views,education_view, view,population_view,hotel_view,land_view,political_views,tourism_view,mining_views,water_view,housing_views,road_views,transport_view,services_view, crime_view,public_unitillity_views,disaster_views, energy_view,exchange_view,climate_view,occupation_view,education_view, view,population_view,hotel_view,land_view,tourism_view,water_view,transport_view,services_view, crime_view
 from .views import export_views
 
 urlpatterns = [
@@ -224,5 +224,14 @@ urlpatterns = [
     path('export_budget_excel', budget_view.export_budget_excel, name='export_budget_excel'),
     path('update_selected_budget/', budget_view.update_selected_budget, name='update_selected_budget'),
 
+    path('upload_production_meta_excel', view.upload_meta_excel, name='upload_production_meta_excel'),
+    path('production_meta',  production_view.display_production_meta, name='production_meta'),
+    path('production_table', production_view.display_production_table, name='production_table'), 
+    path('upload_production_excel', production_view.upload_production_excel, name = 'upload_production_excel'),
+    path('update_production_record/<int:pk>/', view.update_record, name = 'update_production_record'),
+    path('delete_production_record/<int:pk>/', view.delete_record, name ='delete_production_record' ),
+    path('delete_selected_production/', view.delete_selected, name='delete_selected_production'),
+    path('export_production_excel', production_view.export_production_excel, name='export_production_excel'),
+    path('update_selected_production/', production_view.update_selected_production, name='update_selected_production'),
 
 ]   
