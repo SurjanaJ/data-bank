@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Budgetary_Data, Publication,Climate_Data,Index, Crime,ForestData, Disaster_Data, Education, Health_disease,Road,Mining,Housing,Political_Data,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land,Public_Unitillity
+from .models import Production,Budgetary_Data, Publication,Climate_Data,Index, Crime,ForestData, Disaster_Data, Education, Health_disease,Road,Mining,Housing,Political_Data,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land,Public_Unitillity
 from .models import Climate_Data, Crime, Education, Energy, Exchange, ForestData,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land
 
 class UploadForestDataForm(forms.Form):
@@ -429,3 +429,21 @@ class UploadProductionMetaForm(forms.Form):
 
 class UploadProductionForm(forms.Form):
     file = forms.FileField() 
+
+class UpdateProduction(ModelForm):
+    class Meta:
+        model = Production
+        fields='__all__'
+
+        widgets={
+            'Code': forms.Select(attrs={'class': 'form-control '}),
+            'Producer_Name': forms.TextInput(attrs={'class': 'form-control '}),
+            'Province': forms.TextInput(attrs={'class': 'form-control '}),
+            'District': forms.TextInput(attrs={'class': 'form-control '}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateProduction, self).__init__(*args, **kwargs)
+
+        # Set the labels
+        self.fields['Producer_Name'].label = 'Producer Name'
