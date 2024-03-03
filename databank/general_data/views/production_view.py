@@ -179,3 +179,40 @@ def upload_production_excel(request):
         form = UploadProductionForm()   
     
     return render(request,'general_data/transport_templates/upload_transport_form.html',{'form':form, 'tables': tables, 'meta_tables': views.meta_tables,})
+
+
+def export_production_excel(request):
+    code = request.GET.get('code')
+
+    filter_conditions = {}
+    if is_valid_queryparam(code) and code != '--':
+        filter_conditions['Code'] = code
+
+    queryset = Production.objects.filter(**filter_conditions)
+    queryset = queryset.annotate(
+        code = F('Code__Code'),
+        description = F('Code__Description'),
+    )
+
+    data = pd.DataFrame(list(queryset.values('code','description','Producer_Name','Province','District')))
+    data.rename(columns={
+                         'code': 'Code',
+                         'description':'Description',
+                         'Producer_Name':'Producer Name',
+                         }, inplace=True)
+    
+    column_order = ['Code','Description','Producer Name', 'Province','District']
+
+    data = data[column_order]
+    output = BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')  
+    data.to_excel(writer, sheet_name='Sheet1', index=False)
+
+    writer.close()  
+    output.seek(0)
+
+    response = HttpResponse(
+        output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
+    return response
