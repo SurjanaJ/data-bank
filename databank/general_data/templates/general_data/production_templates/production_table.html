@@ -40,7 +40,7 @@
     No Records
 </div>
 {% else %}
-<form action="" method="post" id="delete-form">
+<form action="{% url 'delete_selected_production' %}" method="post" id="delete-form">
     {% csrf_token %}
     <div class="table-responsive mt-4 bg-light p-3">
         <div class="d-flex align-items-center justify-content-between px-2">

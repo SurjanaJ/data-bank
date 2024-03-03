@@ -596,6 +596,7 @@ def delete_selected(request):
         'delete_selected_index': Index,
         'delete_selected_publication':Publication,
         'delete_selected_budget':Budgetary_Data,
+        'delete_selected_production':Production
     }
 
     view_mapping = {
@@ -614,7 +615,8 @@ def delete_selected(request):
         Energy:'energy_table',
         Index:'index_table',
         Publication:'publication_table',
-        Budgetary_Data: 'budget_table'
+        Budgetary_Data: 'budget_table',
+        Production: 'production_table'
     }
     model_class = model_mapping.get(view_name)
     model_view = view_mapping.get(model_class)
