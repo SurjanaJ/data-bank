@@ -542,6 +542,7 @@ def delete_record(request,pk):
         'delete_index_record': Index,
         'delete_publication_record': Publication,
         'delete_budget_record': Budgetary_Data,
+        'delete_production_record':Production,
     }
 
     view_mapping = {
@@ -560,7 +561,8 @@ def delete_record(request,pk):
         Energy:'energy_table',
         Index : 'index_table',
         Publication: 'publication_table',
-        Budgetary_Data:'budget_table'
+        Budgetary_Data:'budget_table',
+        Production:'production_table'
     }
 
     model_class = model_mapping.get(view_name)

@@ -229,5 +229,6 @@ urlpatterns = [
     path('production_table', production_view.display_production_table, name='production_table'), 
     path('upload_production_excel', production_view.upload_production_excel, name = 'upload_production_excel'),
     path('update_production_record/<int:pk>/', view.update_record, name = 'update_production_record'),
+    path('delete_production_record/<int:pk>/', view.delete_record, name ='delete_production_record' ),
 
 ]   
