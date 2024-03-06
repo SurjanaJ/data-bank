@@ -19,7 +19,8 @@
             <div class="col-6 bg-body-tertiary rounded p-5 d-flex flex-column">
                 <div class="display-6 text-center fw-bold mb-4">Databank Register</div>
                 <div>
-                    <!-- <form>
+                    <form action="" method="POST">
+                        {% csrf_token %}
                         <div class="mb-3">
                             <label for="username" class="form-label"> {{form.username.label}} </label>
                             {{ form.username}}
@@ -38,13 +39,13 @@
                         </div>
 
                         <button type="submit" class="btn btn-primary">Register</button>
-                    </form> -->
+                    </form>
 
-                    <form action="" method="POST">
+                    <!-- <form action="" method="POST">
                         {% csrf_token %}
                         {{form.as_p}}
                         <input type="submit" value="Create User">
-                      </form>
+                      </form> -->
                 </div>
             </div>
             <div class="col">
