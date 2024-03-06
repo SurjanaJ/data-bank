@@ -14,32 +14,41 @@
     <div class="container mt-5">
         <div class="row ">
             <div class="col">
-               
+
             </div>
             <div class="col-6 bg-body-tertiary rounded p-5 d-flex flex-column">
                 <div class="display-6 text-center fw-bold mb-4">Databank Register</div>
                 <div>
-                    <form>
+                    <!-- <form>
                         <div class="mb-3">
-                          <label for="exampleInputEmail1" class="form-label">Username</label>
-                          <input type="text" class="form-control" placeholder="Enter Username" id="" aria-describedby="">
-                          
+                            <label for="username" class="form-label"> {{form.username.label}} </label>
+                            {{ form.username}}
                         </div>
                         <div class="mb-3">
-                            <label for="exampleInputEmail1" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="" aria-describedby="">
-                          </div>
-                        <div class="mb-3">
-                          <label for="exampleInputPassword1" class="form-label">Password</label>
-                          <input type="password" class="form-control" id="exampleInputPassword1">
+                            <label for="email" class="form-label"> {{form.email.label}} </label>
+                            {{form.email}}
                         </div>
-                        
+                        <div class="mb-3">
+                            <label for="password1" class="form-label">{{form.password1.label}}</label>
+                            {{form.password1}}
+                        </div>
+                        <div class="mb-3">
+                            <label for="password2" class="form-label">{{form.password2.label}}</label>
+                            {{form.password2}}
+                        </div>
+
                         <button type="submit" class="btn btn-primary">Register</button>
+                    </form> -->
+
+                    <form action="" method="POST">
+                        {% csrf_token %}
+                        {{form.as_p}}
+                        <input type="submit" value="Create User">
                       </form>
                 </div>
             </div>
             <div class="col">
-                
+
             </div>
         </div>
 
