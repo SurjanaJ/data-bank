@@ -15,6 +15,9 @@ from django.db.utils import DataError
 from django.db import IntegrityError, transaction
 from django.contrib import messages
 from django.views.decorators.http import require_POST
+
+from accounts.decorators import allowed_users
+
 from .forms import UploadTradeData
 from django.contrib.auth.decorators import login_required
 
@@ -246,6 +249,8 @@ def display_trade_table(request):
 
     return render(request, 'trade_data/display_trade_table.html', context)
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_country_meta_excel(request):
     errors = []
     duplicate_data = []

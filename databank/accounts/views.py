@@ -5,6 +5,8 @@ from django.contrib.auth import authenticate, login, logout
 from .decorators import unauthenticated_user
 
 from .forms import CreateUserForm
+from django.contrib.auth.models import Group
+
 
 @unauthenticated_user
 def loginPage(request):
@@ -30,7 +32,11 @@ def registerPage(request):
     if request.method == 'POST':
         form  = CreateUserForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
+
+            group = Group.objects.get(name = 'downloader')
+            user.groups.add(group)
+            
             messages.success(request, 'Account created successfully.')
             return redirect('login')
     context ={'form':form}

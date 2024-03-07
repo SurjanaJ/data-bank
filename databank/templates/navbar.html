@@ -23,6 +23,7 @@
             <a class="nav-link active" aria-current="page" href="{% url 'time_series_analysis' %}">Time Series
               Analysis</a>
           </li>
+          {% if request.user.is_staff %}
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               Upload Excel File
@@ -109,7 +110,7 @@
               </li>
             </ul>
           </li>
-
+          {% endif %}
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               Show Tables
@@ -142,6 +143,7 @@
 
 
           </li>
+          {% if request.user.is_staff %}
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
               Upload Meta Data
@@ -158,7 +160,7 @@
 
 
           </li>
-
+          {% endif %}
           <!-- Upload single record -->
 
           <!-- <li class="nav-item">
