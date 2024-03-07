@@ -1,10 +1,14 @@
 <nav class="navbar bg-body-tertiary sticky-top bg-primary">
-  <div class="container-fluid">
+  <div class="container-fluid d-flex justify-content-between">
     <a class="navbar-brand" href="{% url 'display_trade_table' %}">DataBank</a>
+    <div class="">
+      <span class="fw-bold"> {{request.user}}</span>
+      <span><a href=" {% url 'logout' %} ">Logout</a></span>
+    
     <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
       aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
-    </button>
+    </button></div>
     <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
       <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Offcanvas</h5>
