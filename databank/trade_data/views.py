@@ -16,6 +16,7 @@ from django.db import IntegrityError, transaction
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from .forms import UploadTradeData
+from django.contrib.auth.decorators import login_required
 
 from .models import Country_meta, HS_Code_meta, TradeData,  Unit_meta
 from .forms import UploadCountryMetaForm, UploadHSCodeMetaForm, UploadTradeDataForm, UploadUnitMetaForm,UploadTradeData
@@ -189,7 +190,7 @@ meta_tables =[
 def is_valid_queryparam(param):
     return param !='' and param is not None
 
-
+@login_required(login_url = 'login')
 def display_trade_table(request):
     data = TradeData.objects.all()
     country_categories = Country_meta.objects.all()
