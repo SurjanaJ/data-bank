@@ -15,11 +15,14 @@ from django.db import IntegrityError, transaction
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import allowed_users
 
 def is_valid_queryparam(param):
     return param !='' and param is not None
     
-
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_forest_excel(request):
     errors = []
     duplicate_data = []
@@ -190,6 +193,8 @@ def upload_forest_excel(request):
 
     return render(request, 'general_data/upload_form.html', {'form': form, 'tables':tables})
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def update_forest_record(request,pk):
     forest_record = ForestData.objects.get(id=pk)
     form = UploadForestData(instance=forest_record)
@@ -210,7 +215,7 @@ def update_forest_record(request,pk):
 
 #     return redirect('forest_table')
 
-
+@login_required(login_url = 'login')
 def display_forest_table(request):
     url=reverse('forest_table')
     data=ForestData.objects.all()
@@ -263,6 +268,8 @@ def display_forest_table(request):
 
     return render(request, 'general_data/forest_table.html', context)
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def delete_forest_record(request, item_id):
     try:
         item_to_delete = get_object_or_404(ForestData, id=item_id)
@@ -272,6 +279,8 @@ def delete_forest_record(request, item_id):
     except Exception as e:
         return HttpResponse(f"An error occurred: {str(e)}")
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 @require_POST
 def delete_selected_forest(request):
     selected_ids = request.POST.getlist('selected_items')
@@ -330,7 +339,9 @@ def download_error_excel(request):
         return response
     else:
         return HttpResponse('No data to export.')
-    
+
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])    
 def upload_meta_excel(request):
     errors = []
     duplicate_data = []
@@ -443,6 +454,8 @@ def upload_meta_excel(request):
         form = form_class()
     return render(request, 'general_data/upload_form.html',  {'form': form, 'tables': tables, 'meta_tables':views.meta_tables,})
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def update_record(request,pk):
     resolved =  resolve(request.path_info)
     view_name = resolved.url_name
@@ -521,7 +534,9 @@ def update_record(request,pk):
 
     context = {'form': form, 'meta_tables': views.meta_tables}
     return render(request, 'general_data/update_record.html', context)
-   
+
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])  
 def delete_record(request,pk):
     resolved =  resolve(request.path_info)
     view_name = resolved.url_name
@@ -575,7 +590,9 @@ def delete_record(request,pk):
         return redirect(model_view)
     except Exception as e:
         return HttpResponse(f"An error occurred: {str(e)}")
-    
+
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])    
 def delete_selected(request):
     resolved =  resolve(request.path_info)
     view_name = resolved.url_name
