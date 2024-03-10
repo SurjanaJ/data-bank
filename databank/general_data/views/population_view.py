@@ -1,6 +1,5 @@
 from datetime import datetime
 from django.db import DataError
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render,redirect
 from django.core.paginator import Paginator
 from django.urls import reverse
@@ -12,6 +11,9 @@ from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
 from django.views.decorators.http import require_POST
+from django.db.models import F
+from io import BytesIO
+from django.http import HttpResponse
 
 
 def is_valid_queryparam(param):
@@ -93,7 +95,7 @@ def delete_population_record(request,item_id):
         messages.success(request, 'Deleted successfully')
         return redirect('population_table')
     except Exception as e:
-        return HttpResponse(f"An error occurred: {str(e)}")
+        messages.error(request, f'Error deleting item: {e}')
 
 
 
@@ -123,44 +125,81 @@ def upload_population_excel(request):
         if form.is_valid():
             excel_data = request.FILES['population_data_file']
             df = pd.read_excel(excel_data)
-
-
-
-            if 'ID' in df.columns or 'id' in df.columns:
+            age_group_options = [option[0] for option in PopulationData.Age_Group_Options]
+            gender_options = [option[0] for option in PopulationData.Gender_Options]
+            if 'id' in df.columns:
+                cols = df.columns.to_list()
                 for index, row in df.iterrows():
-                    id_value = row['ID']
+                    id_value = row['id']
 
                     try:
-                        # Try to get an existing record with the given 'ID'
                         population_instance = PopulationData.objects.get(id=id_value)
                     except:
-                        # If not found, create a new instance
-                        population_instance = PopulationData()
-
-                    Year = row['Year']
-                    Country = row['Country']
-
+                        data = {col: row[col] for col in cols}
+                        errors.append({
+                            'row_index':index,
+                            'data':data,
+                            'reason':f'Error inserting row {index}:{e}'
+                        })
+                        continue
+                    population_data = {
+                        'Year' : row['Year'].date().strftime('%Y-%m-%d'),
+                        'Country' : row['Country'],
+                        'Gender' : row['Gender'],
+                        'Age_Group' : row['Age_Group'],
+                        'Population' : row['Population']
+                    }
                     try:
+                        Year = row['Year']
+                        Country = row['Country']
                         # Convert 'Year' to a datetime object
                         calender_year =pd.to_datetime(Year).date()
-                    except ValueError:
-                        print(f"Error converting date in row {index}: {e}")
-                        print(f"Problematic row data: {row}")
+                    except ValueError as e:
+                        errors.append({'row_index': index, 'data': population_data, 'reason': str(e)})
+                        continue
                     try:
-                        Year = calender_year
-                        Country = Country_meta.objects.get(Country_Name = Country )
-                    except DataError as e:
-                        print(f'error handling the row at {index}:{e}')
+                        if population_data['Age_Group'] not in age_group_options:
+                            population_data = {
+                                'Year' : row['Year'].date().strftime('%Y-%m-%d'),
+                                'Country' : row['Country'],
+                                'Gender' : row['Gender'],
+                                'Age_Group' : row['Age_Group'],
+                                'Population' : row['Population']
+                            }
+                            errors.append({'row_index': index, 'data': population_data, 'reason': f'Error inserting row {index}: Invalid unit value'})
+
+                        elif population_data['Gender'] not in gender_options:
+                            population_data = {
+                                'Year' : row['Year'].date().strftime('%Y-%m-%d'),
+                                'Country' : row['Country'],
+                                'Gender' : row['Gender'],
+                                'Age_Group' : row['Age_Group'],
+                                'Population' : row['Population']
+                            }
+                            errors.append({'row_index': index, 'data': population_data, 'reason': f'Error inserting row {index}: Invalid unit value'})
+                        else:    
+                            Year = calender_year
+                            Country = Country_meta.objects.get(Country_Name = Country )
+
+                            population_instance.Year = Year
+                            population_instance.Country = Country_meta.objects.get(Country_Name=Country)
+                            population_instance.Gender = row['Gender']
+                            population_instance.Age_Group = row['Age_Group']
+                            population_instance.Population = row['Population']
+                            population_instance.save()
+
+                            updated_count +=1
+                    except Exception as e:
+                        population_data = {
+                            'Year' : row['Year'].date().strftime('%Y-%m-%d'),
+                            'Country' : row['Country'],
+                            'Gender' : row['Gender'],
+                            'Age_Group' : row['Age_Group'],
+                            'Population' : row['Population']
+                        }
+                        errors.append({'row_index': index, 'data': population_data, 'reason': str(e)})
                         continue
                         # Update the instance with the new values
-                    population_instance.Year = calender_year.strftime('%Y-%m-%d')
-                    population_instance.Country = Country_meta.objects.get(Country_Name=Country)
-                    population_instance.Gender = row['Gender']
-                    population_instance.Age_Group = row['Age_Group']
-                    population_instance.Population = row['Population']
-                    population_instance.save()
-
-                    updated_count +=1
             else:
                 gender_options = [option[0] for option in PopulationData.Gender_Options]
                 age_group_options = [option[0] for option in PopulationData.Age_Group_Options]
@@ -236,18 +275,18 @@ def upload_population_excel(request):
                                     'data': population_data,
                                     'reason': f'Error inserting row  {index}: {e}'
                                 })
-                if added_count > 0 :
-                    messages.success(request,str(added_count)+'records added')
-                
-                if updated_count > 0 :
-                    messages.info(request,str(updated_count)+'records updated')
-                
-                if errors:
-                    request.session['errors'] = errors
-                    return render(request, 'general_data/error_template.html', {'errors': errors})
-                
-                if duplicate_data:
-                    return render(request,'general_data/duplicate_template.html',{'duplicate_data':duplicate_data})
+            if added_count > 0 :
+                messages.success(request,str(added_count)+'records added')
+            
+            if updated_count > 0 :
+                messages.info(request,str(updated_count)+'records updated')
+            
+            if errors:
+                request.session['errors'] = errors
+                return render(request, 'general_data/error_template.html', {'errors': errors})
+            
+            if duplicate_data:
+                return render(request,'general_data/duplicate_template.html',{'duplicate_data':duplicate_data})
                 
     else:
         form = UploadPopulationDataForm()
@@ -255,7 +294,32 @@ def upload_population_excel(request):
     return render(request,'general_data/population_templates/upload_population_form.html',{'form':form})
 
 
+def update_selected_population(request):
+    selected_ids = request.POST.getlist('selected_items')
+    if not selected_ids:
+        messages.error(request, 'No items selected.')
+        return redirect('population_table')
 
+    else:
+        queryset = PopulationData.objects.filter(id__in=selected_ids)
+        queryset = queryset.annotate(
+        country = F('Country__Country_Name'),
+        )
+
+        df = pd.DataFrame(list(queryset.values('id','Year','country','Gender','Age_Group','Population')))
+        df.rename(columns={'country': 'Country'}, inplace=True)
+        df = df[['id','Year','Country','Gender','Age_Group','Population']]
+        output = BytesIO()
+        writer = pd.ExcelWriter(output, engine='xlsxwriter')  
+        df.to_excel(writer, sheet_name='Sheet1', index=False)
+        writer.close()  
+        output.seek(0)
+
+        response = HttpResponse(
+            output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
+        return response
                 
 
 

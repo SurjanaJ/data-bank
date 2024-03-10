@@ -12,6 +12,9 @@ from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
 from django.views.decorators.http import require_POST
+from django.db.models import F
+from io import BytesIO
+from django.http import HttpResponse
 
 from trade_data import views
 
@@ -81,8 +84,6 @@ def display_political_table(request):
     }
     return render(request, 'general_data/political_templates/political_table.html',context)
 
-
-
 def upload_political_excel(request):
     errors = []
     duplicate_data = []
@@ -94,7 +95,7 @@ def upload_political_excel(request):
             excel_data = request.FILES['file']
             df = pd.read_excel(excel_data)
 
-            if 'id' in df.columns or 'ID' in df.columns:
+            if 'id' in df.columns:
                 cols = df.columns.tolist()
                 for index,row in df.iterrows():
                     id_value = row.get('id')
@@ -103,34 +104,42 @@ def upload_political_excel(request):
 
                     except Exception as e:
                         data = {col:row[col] for col in cols}
-                        data['Year'] = data['Year'].isoformat()
                         errors.append({
                             'row_index': index,
                             'data':data,
-                            'reason':f'Error'
-                            'inserting row {index}:{e}'
+                            'reason':f'Error inserting row {index}:{e}'
                         })
                         continue
-                    
+
+                    political_data ={
+                        'Year':row['Year'].date().strftime('%Y-%m-%d'),
+                        'Country':row['Country'],
+                        'Political_Party_Name': row['Political_Party_Name'],
+                        'No_Of_Member':row['No_Of_Member'],
+                        'Province':row['Province'],
+                        'District':row['District'],
+                        'Municipality':row['Municipality'],
+                        'Wards':row['Wards'],
+                    }                
 
                     try:
-                        Country = Country_meta.objects.get(Country_Name=row['Country'])
                         Year = pd.to_datetime(row['Year']).date()
-                        political_data ={
-                            'Year':Year,
-                            'Country':Country,
-                            'Political_Party_Name': row['Political_Party_Name'],
-                            'No_Of_Member':row['No_Of_Member'],
-                            'Province':row['Province'],
-                            'District':row['District'],
-                            'Municipality':row['Municipality'],
-                            'Wards':row['Wards'],
-                        }
+                        Country = Country_meta.objects.get(Country_Name=row['Country'])
+                        
+                        political_instance.Year = Year
+                        political_instance.Country = Country
+                        political_instance.Political_Party_Name = row['Political_Party_Name']
+                        political_instance.Number_Of_Member = row['No_Of_Member']
+                        political_instance.Province= row['Province']
+                        political_instance.District = row['District']
+                        political_instance.Municipality = row['Municipality']
+                        political_instance.Wards = row['Wards']
+                        political_instance.save()
+                        updated_count += 1
 
                     except Exception as e:
-                        Year = pd.to_datetime(row['Year']).date()
                         political_data ={
-                            'Year':Year.isoformat(),
+                            'Year':row['Year'].date().strftime('%Y-%m-%d'),
                             'Country':row['Country'],
                             'Political_Party_Name': row['Political_Party_Name'],
                             'No_Of_Member':row['No_Of_Member'],
@@ -140,45 +149,32 @@ def upload_political_excel(request):
                             'Wards':row['Wards'],
                         }
                         errors.append({'row_index': index, 'data': political_data, 'reason': str(e)})
-                        continue
-
-                    
-
-                    
-                        
-                    political_instance.Year = Year
-                    political_instance.Country = Country
-                    political_instance.Political_Party_Name = row['Political_Party_Name']
-                    political_instance.Number_Of_Member = row['No_Of_Member']
-                    political_instance.Province= row['Province']
-                    political_instance.District = row['District']
-                    political_instance.Municipality = row['Municipality']
-                    political_instance.Wards = row['Wards']
-                    political_instance.save()
-                    updated_count += 1
+                        continue           
 
             else:
                 for index,row in df.iterrows():
                     political_data = {
-                    'Year':row['Year'],
-                    'Country':row['Country'],
-                    'Political_Party_Name': row['Political_Party_Name'],
-                    'No_Of_Member':row['No_Of_Member'],
-                    'Province':row['Province'],
-                    'District':row['District'],
-                    'Municipality':row['Municipality'],
-                    'Wards':row['Wards'], 
+                        'Year':row['Year'].date().strftime('%Y-%m-%d'),
+                        'Country':row['Country'],
+                        'Political_Party_Name': row['Political_Party_Name'],
+                        'No_Of_Member':row['No_Of_Member'],
+                        'Province':row['Province'],
+                        'District':row['District'],
+                        'Municipality':row['Municipality'],
+                        'Wards':row['Wards'], 
                     }
                     
                     try:
                         calender_date = datetime.strptime(str(row['Year'].date().strftime('%Y-%m-%d')), '%Y-%m-%d').date()
                     except:
                         calender_date = datetime.strptime(f'{str(row["Year"].date().strftime("%Y-%m-%d"))}-01-01', '%Y-%m-%d').date()
+                    
                     Country = None
 
                     try:
                         Year = calender_date.strftime('%Y-%m-%d')
                         Country = Country_meta.objects.get(Country_Name=row['Country'])
+                        
                         political_data = {
                             'Year':Year,
                             'Country':Country,
@@ -189,23 +185,15 @@ def upload_political_excel(request):
                             'Municipality':row['Municipality'],
                             'Wards':row['Wards'], 
                         }
+
                     except Exception as e:
-                            political_data = {
-                                'Year':row['Year'],
-                                'Country':row['Country'],
-                                'Political_Party_Name': row['Political_Party_Name'],
-                                'No_Of_Member':row['No_Of_Member'],
-                                'Province':row['Province'],
-                                'District':row['District'],
-                                'Municipality':row['Municipality'],
-                                'Wards':row['Wards'], 
-                    }
-                            errors.append({
-                                'row_index': index,
-                                'data': political_data,
-                                'reason': f'Error inserting row {index}: {e}'
-                            })
-                            continue
+                        errors.append({
+                            'row_index': index, 
+                            'data': political_data,
+                            'reason': f'Error inserting row {index}: {e}'
+                        })
+                        continue
+
                     existing_record = Political_Data.objects.filter(Q(Year=Year) & Q(Country=Country) & Q(Political_Party_Name=political_data['Political_Party_Name']) & Q(Number_Of_Member = political_data['No_Of_Member']) & Q(Province = political_data['Province']) & Q(District = political_data['District']) & Q(Municipality = political_data['Municipality']) & Q(Wards = political_data['Wards']))
 
                     if existing_record:
@@ -231,7 +219,6 @@ def upload_political_excel(request):
         if updated_count > 0:
             messages.success(request, f'{updated_count} records updated')
         if errors:
-            
             request.session['errors'] = errors
             return render(request, 'general_data/error_template.html', {'errors': errors})
         if duplicate_data:
@@ -241,4 +228,32 @@ def upload_political_excel(request):
         form = UploadPoliticalForm()
 
     return render(request, 'general_data/upload_form.html', {'form': form, 'tables':tables})
+
+
+def update_selected_political(request):
+    selected_ids = request.POST.getlist('selected_items')
+    if not selected_ids:
+        messages.error(request, 'No items selected.')
+        return redirect('political_table')
+
+    else:
+        queryset = Political_Data.objects.filter(id__in=selected_ids)
+        queryset = queryset.annotate(
+        country = F('Country__Country_Name'),
+        )
+
+        df = pd.DataFrame(list(queryset.values('id','Year','country','Political_Party_Name','Number_Of_Member','Province','District','Municipality','Wards')))
+        df.rename(columns={'country': 'Country','Number_Of_Member':'No_Of_Member'}, inplace=True)
+        df = df[['id','Year','Country','Political_Party_Name','No_Of_Member','Province','District','Municipality','Wards']]
+        output = BytesIO()
+        writer = pd.ExcelWriter(output, engine='xlsxwriter')  
+        df.to_excel(writer, sheet_name='Sheet1', index=False)
+        writer.close()  
+        output.seek(0)
+
+        response = HttpResponse(
+            output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
+        return response
 

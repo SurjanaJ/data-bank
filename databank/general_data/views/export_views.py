@@ -1,6 +1,6 @@
-from ..models import Disaster_Data, ForestData, Health_disease,Land,Hotel,Transport,Tourism,Water,PopulationData,Mining,Political_Data,Road,Housing,Public_Unitillity
+from ..models import ActivityData,Disaster_Data, ForestData, Health_disease,Land,Hotel,Transport,Tourism,Water,PopulationData,Mining,Political_Data,Road,Housing,Public_Unitillity
 from io import BytesIO
-from ..views import view,population_view,health_diseases_views,tourism_view,transport_view,public_unitillity_views,hotel_view,water_view,political_views,road_views,mining_views,housing_views,disaster_views
+from ..views import activity_view,view,population_view,health_diseases_views,tourism_view,transport_view,public_unitillity_views,hotel_view,water_view,political_views,road_views,mining_views,housing_views,disaster_views
 import xlsxwriter
 from django.db.models import Q
 from django.db.models import F
@@ -137,6 +137,64 @@ def export_land_table_to_excel(request):
         output,content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
     response['Content-Disposition'] = 'attachment; filename=Land.xlsx'
+    return response
+
+
+
+#filter activity
+
+def filter_activity_data(request):
+    data = ActivityData.objects.all()
+
+    date_min = request.GET.get('date_min')
+    date_max = request.GET.get('date_max')
+    country_category = request.GET.get('country_category')
+    activity_code = request.GET.get('activity_code')
+    minimum_person = request.GET.get('minimum_person')
+
+    if view.is_valid_queryparam(date_min):
+        data = data.filter(Year__gte=date_min)
+
+    if view.is_valid_queryparam(date_max):
+        data = data.filter(Year__lt=date_max)
+
+    if view.is_valid_queryparam(country_category) and country_category != '--':
+        data = data.filter(Country_id=country_category)
+
+    if view.is_valid_queryparam(activity_code) and activity_code != '--':
+        data = data.filter(Activity_Code=activity_code)
+
+    if view.is_valid_queryparam(minimum_person):
+        data = data.filter(Person__gte=minimum_person)
+
+    return data
+
+
+def export_activity_data_to_excel(request):
+    data = filter_activity_data(request)
+
+    data = data.annotate(
+        country_name=F('Country__Country_Name'),
+        activity_code=F('Activity_Code__Code'),
+    )
+
+    df = pd.DataFrame(data.values('Year', 'country_name', 'activity_code', 'Person', 'Districts', 'Text_Documents_Upload'))
+
+    df.rename(columns={'country_name': 'Country', 'activity_code': 'Activity_Code'}, inplace=True)
+
+    df = df[['Year', 'Country', 'Activity_Code', 'Person', 'Districts', 'Text_Documents_Upload']]
+
+    output = BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+    df.to_excel(writer, sheet_name='Sheet1', index=False)
+
+    writer.close()
+    output.seek(0)
+
+    response = HttpResponse(
+        output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename=activity_data.xlsx'
     return response
 
 

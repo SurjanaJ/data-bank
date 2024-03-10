@@ -31,15 +31,6 @@
   <div class="collapse shadow rounded-2 " id="collapseFilter">
     <div class="px-2 py-2"> 
       <form class="row" method="GET" action="./land_table">
-        
-        <!-- <div class="form-group col-12">
-                  <div class="input-group">
-                      <input class="form-control py-2 border-right-0 border" type="search"
-                          name="currency_product_originDestination"
-                          placeholder="Search by Currency Type, Product Information or Origin/Destination" />
-      
-                  </div>
-              </div> -->
   
         <div class="col-md-3">
           <label for="date_minimum">Calender Date Minimum</label>
@@ -140,6 +131,10 @@
           * {{data_len}} records found.
         </span>
         <div class="d-flex align-items-center py-2">
+          <button type="button" class="btn border p-2 styled-link hover-shadow" onclick="updateSelected()">
+            <i class="fa-solid fa-file-pen"></i>
+            <span>Update Selected</span>
+          </button>
           <button type="button" class="btn border p-2 styled-link mx-3 hover-shadow" onclick="confirmDeleteAll()">
             <i class="fa-regular fa-trash-can" style="color: #ff0000"></i>
               <span class="fw-normal">Delete Selected</span>
@@ -229,7 +224,84 @@
         </tbody>
       </table>
     </div>
-    </div>
+    <div class="pagination m-3 d-flex justify-content-center">
+      <span class="step-links bg-light rounded-1 d-flex justify-content-center gap-3 p-3">
+          {% if page.has_previous %}
+              <a href="?page=1
+              {% if request.GET.country %}
+                  &country={{ request.GET.country }}
+              {% endif %}
+              {% if request.GET.year_min %}
+                  &year_min={{ request.GET.year_min }}
+              {% endif %}
+              {% if request.GET.year_max %}
+                  &year_max={{ request.GET.year_max }}
+              {% endif %}
+              {% if request.GET.land_code %}
+                  &land_code={{ request.GET.land_code }}
+              {% endif %}
+              ">
+                  &laquo; First
+              </a>
+              <a href="?page={{page.previous_page_number}}
+              {% if request.GET.country %}
+                  &country={{ request.GET.country }}
+              {% endif %}
+              {% if request.GET.year_min %}
+                  &year_min={{ request.GET.year_min }}
+              {% endif %}
+              {% if request.GET.year_max %}
+                  &year_max={{ request.GET.year_max }}
+              {% endif %}
+              {% if request.GET.land_code %}
+                  &land_code={{ request.GET.land_code }}
+              {% endif %}
+              ">
+                  Previous
+              </a>
+          {% endif %}
+  
+          <span class="current-page">
+              Page {{ page.number }} of {{ page.paginator.num_pages }}.
+          </span>
+  
+          {% if page.has_next %}
+              <a href="?page={{page.next_page_number}}
+              {% if request.GET.country %}
+                  &country={{ request.GET.country }}
+              {% endif %}
+              {% if request.GET.year_min %}
+                  &year_min={{ request.GET.year_min }}
+              {% endif %}
+              {% if request.GET.year_max %}
+                  &year_max={{ request.GET.year_max }}
+              {% endif %}
+              {% if request.GET.land_code %}
+                  &land_code={{ request.GET.land_code }}
+              {% endif %}
+              ">
+                  Next
+              </a>
+              <a href="?page={{ page.paginator.num_pages }}
+              {% if request.GET.country %}
+                  &country={{ request.GET.country }}
+              {% endif %}
+              {% if request.GET.year_min %}
+                  &year_min={{ request.GET.year_min }}
+              {% endif %}
+              {% if request.GET.year_max %}
+                  &year_max={{ request.GET.year_max }}
+              {% endif %}
+              {% if request.GET.land_code %}
+                  &land_code={{ request.GET.land_code }}
+              {% endif %}
+              ">
+                  Last &raquo;
+              </a>
+          {% endif %}
+      </span>
+  </div>
+  
   </form>
 </div>
 
@@ -249,6 +321,11 @@
           alert("Delete canceled!");
       }
   }
+
+  function updateSelected(itemId) {
+        document.getElementById("delete-form-land").action = "{% url 'update_selected_land' %}";
+        document.getElementById("delete-form-land").submit();
+    }
 
   function confirmDeleteAll() {
         var confirmDelete = confirm(

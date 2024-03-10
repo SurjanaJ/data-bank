@@ -12,6 +12,9 @@ from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
 from django.views.decorators.http import require_POST
+from django.db.models import F
+from io import BytesIO
+from django.http import HttpResponse
 
 from trade_data import views
 
@@ -128,49 +131,75 @@ def upload_land_excel(request):
         
         if form.is_valid():
             excel_data = request.FILES['Land_data_file']
-            df = pd.read_excel(excel_data)
-
-            if 'id' in df.columns or 'ID' in df.columns:
+            df = pd.read_excel(excel_data,dtype={'Land_Code':str})
+            land_unit_options = [option[0] for option in Land.Land_Unit_Options]
+            if 'id' in df.columns:
+                cols = df.columns.to_list()
                 for index,row in df.iterrows():
-                    id_value = row['ID']
+                    id_value = row['id']
 
                     try:
                         land_instance = Land.objects.get(id = id_value)
-                    except:
-                        land_instance=Land()
-
-                        
-                    Year = row['Year']
-                    Country = row['Country']
-                    Land_Code = row['Land_Code']
-
+                    except Exception as e:
+                        data = {col: row[col] for col in cols}
+                        errors.append({
+                            'row_index':index,
+                            'data':data,
+                            'reason':f'Error inserting row {index}:{e}'
+                        })
+                        continue
+                    land_data={
+                        'Year': row['Year'].date().strftime('%Y-%m-%d'),
+                        'Country': row['Country'],
+                        'Land_Code': row['Land_Code'],
+                        'Unit': row['Unit'],
+                        'Area': row['Area']
+                    }   
                     try:
+                        Year = row['Year']
+                        Country = row['Country']
+                        
                         calender_year = pd.to_datetime(Year).date()
                     except ValueError as e:
-                        print(f"Error converting date in row {index}: {e}")
-                        print(f"Problematic row data: {row}")
+                        errors.append({'row_index': index, 'data': land_data, 'reason': str(e)})
                         continue
                     try:
-                        Year = calender_year
-                        country = Country_meta.objects.get(Country_Name = Country)
-                        Land_Code = Land_Code_Meta.objects.get(Code = Land_Code)
-                        
-                    except DataError as e:
-                        print(f"error handling the row at {index}:{e}")
+                        if land_data['Unit'] not in land_unit_options:
+                            land_data={
+                                'Year': row['Year'].date().strftime('%Y-%m-%d'),
+                                'Country': row['Country'],
+                                'Land_Code': row['Land_Code'],
+                                'Unit': row['Unit'],
+                                'Area': row['Area']
+                            }
+                            errors.append({'row_index': index, 'data': land_data, 'reason': f'Error inserting row {index}: Invalid unit value'})
+
+                        else:
+                            Land_Code = row['Land_Code']
+                            Year = calender_year
+                            country = Country_meta.objects.get(Country_Name = Country)
+                            Land_Code = Land_Code_Meta.objects.get(Code = Land_Code)
+                                
+                            land_instance.Year = Year
+                            land_instance.Country = country
+                            land_instance.Land_Code = Land_Code
+                            land_instance.Unit = row['Unit']
+                            land_instance.Area = row['Area']
+                            land_instance.save()
+
+                            updated_count +=1
+                    except Exception as e:
+                        land_data={
+                            'Year': row['Year'].date().strftime('%Y-%m-%d'),
+                            'Country': row['Country'],
+                            'Land_Code': row['Land_Code'],
+                            'Unit': row['Unit'],
+                            'Area': row['Area']
+                        }
+                        errors.append({'row_index': index, 'data': land_data, 'reason': str(e)})
                         continue
 
-                    land_instance.Year = Year
-                    land_instance.Country = country
-                    land_instance.Land_Code = Land_Code
-                    land_instance.Unit = row['Unit']
-                    land_instance.Area = row['Area']
-                    land_instance.save()
-
-                    updated_count +=1
             else:
-
-                land_unit_options = [option[0] for option in Land.Land_Unit_Options]
-
                 for index,row in df.iterrows():
                     land_data={
                         'Year': row['Year'].date().strftime('%Y-%m-%d'),
@@ -203,8 +232,8 @@ def upload_land_excel(request):
                             
                             land_data={
                                 'Year': Year,
-                                'Country': Country.Country_Name,
-                                'Land_Code':Land_Code.Code,
+                                'Country': Country,
+                                'Land_Code':Land_Code,
                                 'Unit': row['Unit'],
                                 'Area': row['Area']
                             }                           
@@ -263,3 +292,32 @@ def display_land_meta(request):
 
     context = {'data': data, 'total_data':total_data, 'meta_tables':views.meta_tables, 'tables':tables, 'column_names':column_names}
     return render(request, 'general_data/display_meta.html', context)
+
+def update_selected_land(request):
+    selected_ids = request.POST.getlist('selected_items')
+    if not selected_ids:
+        messages.error(request, 'No items selected.')
+        return redirect('land_table')
+
+    else:
+        queryset = Land.objects.filter(id__in=selected_ids)
+        queryset = queryset.annotate(
+        country = F('Country__Country_Name'),
+        land_code=F('Land_Code__Code'),
+        land_type=F('Land_Code__Land_Type'),
+        )
+
+        df = pd.DataFrame(list(queryset.values('id','Year','country','land_code','land_type','Unit','Area')))
+        df.rename(columns={'country': 'Country', 'land_code':'Land_Code','land_type':'Land_Type'}, inplace=True)
+        df = df[['id','Year','Country','Land_Code','Land_Type','Unit','Area']]
+        output = BytesIO()
+        writer = pd.ExcelWriter(output, engine='xlsxwriter')  
+        df.to_excel(writer, sheet_name='Sheet1', index=False)
+        writer.close()  
+        output.seek(0)
+
+        response = HttpResponse(
+            output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
+        return response

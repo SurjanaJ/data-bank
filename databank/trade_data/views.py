@@ -76,12 +76,47 @@ tables =[
     {
         "name": "Exchange Data",
         "url": "exchange_table"
-    }
-    ,
+    },
     {
         "name": "Energy Data",
         "url": "energy_table"
-    }
+    },
+    {
+        "name": "Disaster Data",
+        "url": "disaster_table"
+    },
+    {
+        "name": "Health Disease Data",
+        "url": "health_disease_table"
+    },
+    {
+        "name": "Public Unitillity Data",
+        "url": "public_unitillity_table"
+    },
+    {
+        "name": "Housing Data",
+        "url": "housing_table"
+    },
+    {
+        "name": "Mining Data",
+        "url": "mining_table"
+    },
+    {
+        "name": "Political Data",
+        "url": "political_table"
+    },
+    {
+        "name": "Population Data",
+        "url": "population_table"
+    },
+    {
+        "name": "Road Data",
+        "url": "road_table"
+    },
+    {
+        "name": "Water Data",
+        "url": "water_table"
+    },
     ]
 
 
@@ -161,6 +196,31 @@ meta_tables =[
         "name":"Energy Meta",
         "url":"energy_meta",
         "upload_url":"upload_energy_meta_excel"
+    },
+    {
+        "name":"Mining Meta",
+        "url":"mine_meta",
+        "upload_url":"upload_mining_meta_excel"
+    },
+    {
+        "name":"Road Meta",
+        "url":"road_meta",
+        "upload_url":"upload_road_meta_excel"
+    },
+    {
+        "name":"Housing Meta",
+        "url":"housing_meta",
+        "upload_url":"upload_housing_meta_excel"
+    },
+    {
+        "name":"Health Disease Meta",
+        "url":"health_disease_meta",
+        "upload_url":"upload_health_disease_meta_excel"
+    },
+    {
+        "name":"Disaster Meta",
+        "url":"disaster_data_meta",
+        "upload_url":"upload_disaster_data_meta_excel",
     },
     ]
 

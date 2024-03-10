@@ -1,6 +1,5 @@
 from datetime import datetime
 from django.db import DataError
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render,redirect
 from django.core.paginator import Paginator
 from django.urls import reverse
@@ -12,6 +11,9 @@ from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
 from django.views.decorators.http import require_POST
+from django.db.models import F
+from io import BytesIO
+from django.http import HttpResponse
 
 from trade_data import views
 
@@ -98,7 +100,7 @@ def delete_transport_record(request,item_id):
         messages.success(request, 'Deleted successfully')
         return redirect('transport_table')
     except Exception as e:
-        return HttpResponse(f"An error occurred: {str(e)}")
+       messages.error(request, f'Error deleting item: {e}')
     
 
 
@@ -127,49 +129,78 @@ def upload_transport_excel(request):
         form = UploadTransportDataForm(request.POST,request.FILES)
         if form.is_valid():
             excel_data = request.FILES['Transport_data_file']
-            df = pd.read_excel(excel_data)
-
-            if 'id' in df.columns or 'ID' in df.columns:
+            df = pd.read_excel(excel_data,dtype={'Transport_Classification_Code':str})
+            unit_options = [option[0] for option in Transport.Unit_Options]
+            if 'id' in df.columns:
                 for index,row in df.iterrows():
-                    id_value = row['ID']
+                    cols = df.columns.to_list()
+                    id_value = row['id']
 
                     try:
                         transport_instance = Transport.objects.get(id = id_value)
-                    except:
-                        transport_instance = Transport()
+                    except Exception as e:
+                        data = {col: row[col] for col in cols}
+                        errors.append({
+                            'row_index':index,
+                            'data':data,
+                            'reason':f'Error inserting row {index}:{e}'
+                        })
+                        continue
+                    transport_data = {
+                            'Year': row['Year'].date().strftime('%Y-%m-%d'),
+                            'Country': row['Country'],
+                            'Transport_Classification_Code': row['Transport_Classification_Code'],
+                            'Unit': row['Unit'],
+                            'Quantity': row['Quantity']
+                        }
 
-
-                    Year = row['Year']
-                    Country = row['Country']
-                    Transport_Classification_Code = row['Transport_Classification_Code']
 
                     try:
+                        Year = row['Year']
+                        Country = row['Country']
+                        Transport_Classification_Code = row['Transport_Classification_Code']
                         calender_year = pd.to_datetime(Year).date()
-                    except ValueError as e:
-                        print(f"Error converting date in row {index}: {e}")
-                        print(f"Problematic row data: {row}")
+                    except Exception as e:
+                        errors.append({'row_index': index, 'data': transport_data, 'reason': str(e)})
+                        continue
                     # Handle the date conversion error, such as logging a message or skipping the row
-                        continue
                     try:
-                        Year = calender_year
-                        Country = Country_meta.objects.get(Country_Name = Country )
-                        Transport_Classification_Code = Transport_Meta.objects.get(Code = Transport_Classification_Code)
 
-                    except DataError as e:
-                        print(f'error handling the row at {index}:{e}')
+                        if transport_data['Unit'] not in unit_options:
+                            transport_data = {
+                                'Year': row['Year'].date().strftime('%Y-%m-%d'),
+                                'Country': row['Country'],
+                                'Transport_Classification_Code': row['Transport_Classification_Code'],
+                                'Unit': row['Unit'],
+                                'Quantity': row['Quantity']
+                            }
+                            errors.append({'row_index': index, 'data': transport_data, 'reason': f'Error inserting row {index}: Invalid unit value'})
+                        else:
+                            Year = calender_year
+                            Country = Country_meta.objects.get(Country_Name = Country )
+                            Transport_Classification_Code = Transport_Meta.objects.get(Code = Transport_Classification_Code)
+
+
+                            transport_instance.Year = Year
+                            transport_instance.Country = Country
+                            transport_instance.Transport_Classification_Code = Transport_Classification_Code
+                            transport_instance.Unit = row['Unit']
+                            transport_instance.Quantity = row['Quantity']
+                            transport_instance.save()
+
+                            updated_count += 1 
+                    except Exception as e:
+                        transport_data = {
+                            'Year': row['Year'].date().strftime('%Y-%m-%d'),
+                            'Country': row['Country'],
+                            'Transport_Classification_Code': row['Transport_Classification_Code'],
+                            'Unit': row['Unit'],
+                            'Quantity': row['Quantity']
+                        
+                        }
+                        errors.append({'row_index': index, 'data': transport_data, 'reason': str(e)})
                         continue
-
-                    transport_instance.Year = Year
-                    transport_instance.Country = Country
-                    transport_instance.Transport_Classification_Code = Transport_Classification_Code
-                    transport_instance.Unit = row['Unit']
-                    transport_instance.Quantity = row['Quantity']
-                    transport_instance.save()
-
-                    updated_count += 1 
-
             else:
-                unit_options = [option[0] for option in Transport.Unit_Options]
                 for index, row in df.iterrows():
                     transport_data = {
                         'Year': row['Year'].date().strftime('%Y-%m-%d'),
@@ -264,11 +295,36 @@ def display_transport_meta(request):
     total_data = data.count()
 
     column_names = Transport_Meta._meta.fields
-
-    for item in data:
-        for field in item._meta.fields: 
-            print(field.name)
-            print()
     context = {'data': data, 'total_data':total_data, 'meta_tables':views.meta_tables, 'tables':tables, 'column_names':column_names}
     
     return render(request, 'general_data/display_meta.html', context)
+
+
+def update_selected_transport(request):
+    selected_ids = request.POST.getlist('selected_items')
+    if not selected_ids:
+        messages.error(request, 'No items selected.')
+        return redirect('transport_table')
+
+    else:
+        queryset = Transport.objects.filter(id__in=selected_ids)
+        queryset = queryset.annotate(
+        country = F('Country__Country_Name'),
+        transport_classification_code = F('Transport_Classification_Code__Code'),
+ 
+        )
+
+        df = pd.DataFrame(list(queryset.values('id','Year','country','transport_classification_code','Unit','Quantity')))
+        df.rename(columns={'country': 'Country','transport_classification_code':'Transport_Classification_Code'}, inplace=True)
+        df = df[['id','Year','Country','Transport_Classification_Code','Unit','Quantity']]
+        output = BytesIO()
+        writer = pd.ExcelWriter(output, engine='xlsxwriter')  
+        df.to_excel(writer, sheet_name='Sheet1', index=False)
+        writer.close()  
+        output.seek(0)
+
+        response = HttpResponse(
+            output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
+        return response
