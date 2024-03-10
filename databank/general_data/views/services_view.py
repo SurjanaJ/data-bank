@@ -15,7 +15,10 @@ from trade_data import views
 from trade_data.views import is_valid_queryparam, tables
 from django.core.paginator import Paginator, Page
 
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import allowed_users
 
+@login_required(login_url = 'login')
 def display_services_meta(request):
     data = Services_Meta.objects.all()
     total_data = data.count()
@@ -26,7 +29,7 @@ def display_services_meta(request):
     
     return render(request, 'general_data/display_meta.html', context)
 
-
+@login_required(login_url = 'login')
 def display_services_table(request):
     data = Services.objects.all()
     column_names = Services._meta.fields
@@ -79,7 +82,8 @@ def display_services_table(request):
 
     return render(request, 'general_data/services_templates/services_table.html', context)
 
-
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_services_excel(request):
     errors = []
     duplicate_data = []
