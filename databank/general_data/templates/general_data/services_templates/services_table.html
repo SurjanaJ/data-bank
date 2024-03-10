@@ -81,7 +81,12 @@
         </div>
     </div>
 </div>
-<div class="fs-4 fw-bold text-center mt-4">Services Data</div>
+
+<div class="d-flex justify-content-center">
+    <a class="fs-4 fw-bold mt-4 link-secondary  link-offset-2 link-underline-opacity-0 link-underline-opacity-25-hover"
+        href="{% url 'services_table' %}">Services Data</a>
+</div>
+
 {% if query_len == 0 %}
 <div class="bg-light p-4 text-center fw-normal mt-4 text-danger">
     No Records
