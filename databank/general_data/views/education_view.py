@@ -13,8 +13,10 @@ from trade_data.views import is_valid_queryparam, tables
 from django.http import HttpResponse
 from django.db.models import F, Q
 
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import allowed_users
 
-
+@login_required(login_url = 'login')
 def display_education_level_meta(request):
     data = Education_Level_Meta.objects.all()
     total_data = data.count()
@@ -25,6 +27,7 @@ def display_education_level_meta(request):
     
     return render(request, 'general_data/display_meta.html', context)
 
+@login_required(login_url = 'login')
 def display_education_degree_meta(request):
     data = Education_Degree_Meta.objects.all()
     total_data = data.count()
@@ -35,6 +38,8 @@ def display_education_degree_meta(request):
 
     return render(request, 'general_data/display_meta.html', context)
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_education_excel(request):
     errors = []
     duplicate_data = []
@@ -123,6 +128,7 @@ def upload_education_excel(request):
 
     return render(request,'general_data/transport_templates/upload_transport_form.html',{'form':form})
 
+@login_required(login_url = 'login')
 def display_education_table(request):
     data = Education.objects.all()
 
@@ -145,6 +151,8 @@ def display_education_table(request):
     context ={'data_len':len(data),'level_categories':level_categories, 'degree_categories':degree_categories, 'page':page, 'query_len':len(page), 'tables': tables, 'meta_tables': views.meta_tables}
     return render(request, 'general_data/education_templates/education_table.html', context)
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def export_education_excel(request):
     education_level = request.GET.get('education_level')
     education_degree = request.GET.get('education_degree')
