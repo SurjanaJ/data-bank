@@ -17,6 +17,12 @@ from trade_data.views import is_valid_queryparam, tables
 from django.http import HttpResponse
 from django.db.models import F, Q
 
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import allowed_users
+
+
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_climate_place_meta_excel(request):
     errors = []
     duplicate_data = []
@@ -110,6 +116,7 @@ def upload_climate_place_meta_excel(request):
 
     return render(request,'general_data/transport_templates/upload_transport_form.html',{'form':form})
 
+@login_required(login_url = 'login')
 def display_climate_place_meta(request):
     data = Climate_Place_Meta.objects.all()
     total_data = data.count()
@@ -120,7 +127,8 @@ def display_climate_place_meta(request):
 
     return render(request, 'general_data/display_meta.html', context)
 
-
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_climate_excel(request):
     errors = []
     duplicate_data = []
@@ -287,6 +295,7 @@ def upload_climate_excel(request):
     
     return render(request,'general_data/transport_templates/upload_transport_form.html',{'form':form})
 
+@login_required(login_url = 'login')
 def display_climate_table(request):
     data = Climate_Data.objects.all()
 
@@ -339,7 +348,7 @@ def display_climate_table(request):
                       }
     return render(request, 'general_data/climate_templates/climate_table.html', context)
 
-
+@login_required(login_url = 'login')
 def export_climate_excel(request):
     date_minimum = request.GET.get('date_minimum')
     date_maximum = request.GET.get('date_maximum')
@@ -400,7 +409,8 @@ def export_climate_excel(request):
     response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
     return response
 
-
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def update_selected_climate(request):
     selected_ids = request.POST.getlist('selected_items')
     if not selected_ids:
