@@ -318,6 +318,8 @@ def upload_country_meta_excel(request):
 
     return render(request, 'trade_data/upload_form.html', {'form': form, 'tables': tables, 'meta_tables':meta_tables})
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_unit_meta_excel(request):
     errors = [] 
     added_count = 0
@@ -357,6 +359,8 @@ def upload_unit_meta_excel(request):
         form = UploadUnitMetaForm()
     return render(request, 'trade_data/upload_form.html', {'form': form, 'tables':tables, 'meta_tables':meta_tables})
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_hs_code_meta_excel(request):
     errors = []
     duplicate_data = []
@@ -415,6 +419,8 @@ def upload_hs_code_meta_excel(request):
 
     return render(request, 'trade_data/upload_form.html', {'form': form, 'meta_tables':meta_tables})
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_trade_excel(request):
     errors = []
     success_messages = []
@@ -577,6 +583,8 @@ def upload_trade_excel(request):
 
     return render(request, 'trade_data/upload_form.html', {'form': form, 'tables':tables, 'meta_tables':meta_tables})
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_trade_record(request):
     trade_type_categories = [choice[1] for choice in TradeData.TRADE_OPTIONS]
 
@@ -593,6 +601,8 @@ def upload_trade_record(request):
     context={'form': form,'trade_type_categories': trade_type_categories, 'meta_tables':meta_tables}
     return render(request, 'trade_data/upload_form.html', context)
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def update_trade_record(request,pk):
     trade_record = TradeData.objects.get(id=pk)
     form = UploadTradeData(instance=trade_record)
@@ -726,6 +736,8 @@ def time_series_analysis(request):
 
     return render(request, 'trade_data/time_series.html', context)
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 @require_POST
 def delete_selected_trade(request):
     selected_ids = request.POST.getlist('selected_items')
@@ -740,6 +752,8 @@ def delete_selected_trade(request):
 
     return redirect('display_trade_table')
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def delete_trade_record(request, item_id):
     try:
         item_to_delete = get_object_or_404(TradeData, id=item_id)
@@ -749,7 +763,7 @@ def delete_trade_record(request, item_id):
     except Exception as e:
         return HttpResponse(f"An error occurred: {str(e)}")
     
-
+@login_required(login_url = 'login')
 def display_country_meta(request):
     data = Country_meta.objects.all().order_by('Country_Name')
     total_data = data.count()
@@ -764,6 +778,7 @@ def display_country_meta(request):
     context = {'page': page, 'total_data':total_data, 'meta_tables':meta_tables, 'tables':tables, 'column_names':column_names}
     return render(request, 'trade_data/display_country_meta.html', context)
 
+@login_required(login_url = 'login')
 def display_hs_code_meta(request):
     data = HS_Code_meta.objects.all().order_by('HS_Code')
     total_data = data.count()
@@ -777,6 +792,7 @@ def display_hs_code_meta(request):
     context = {'page': page, 'total_data':total_data, 'meta_tables':meta_tables, 'tables':tables, 'column_names':column_names}
     return render(request, 'trade_data/display_hs_code_meta.html', context)
 
+@login_required(login_url = 'login')
 def display_unit_meta(request):
     data = Unit_meta.objects.all().order_by('Unit_Name')
     total_data = data.count()
