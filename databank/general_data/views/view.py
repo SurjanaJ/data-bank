@@ -6,8 +6,8 @@ from django.urls import resolve, reverse
 from django.db.models import Q
 import pandas as pd
 from trade_data import views
-from ..models import Mine_Meta,Road_Meta,Housing_Meta,Health_disease_Meta,Disaster_Data_Meta,Climate_Data, Crime, Crime_Meta, Disaster_Data, Exchange, Health_disease,Road,Mining,Housing,Political_Data, Education, Education_Degree_Meta, Education_Level_Meta, Energy, Energy_Meta, ForestData, Country_meta, Land_Code_Meta, Occupation, Occupation_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta,Activity_Meta,ActivityData
-from ..forms import UpdateActivity,UploadActivityMetaForm ,UpdateClimate, UpdateCrime, UpdateDisaster,UpdateExchange, UpdateHealthDisease,UpdateHousing,UpdateMining,UpdatePolitical,UpdateRoad, UpdateEducation, UpdateEnergy, UpdateOccupation, UpdateServices, UploadCrimeMetaForm,  UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadEnergyMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadOccupationMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm,UploadMiningMetaForm,UploadHousingMetaForm,UploadHealthDiseaseMetaForm,UploadRoadMetaForm,UploadDisasterMetaForm
+from ..models import Mine_Meta,Road_Meta,Housing_Meta,Health_disease_Meta,Disaster_Data_Meta,Budgetary_Data, Production, Production_Meta,Publication,Index,Climate_Data, Crime, Crime_Meta, Disaster_Data, Exchange, Health_disease,Road,Mining,Housing,Political_Data, Education, Education_Degree_Meta, Education_Level_Meta, Energy, Energy_Meta, ForestData, Country_meta, Land_Code_Meta, Occupation, Occupation_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta,Activity_Meta,ActivityData
+from ..forms import UpdateActivity,UploadActivityMetaForm ,UpdateBudget, UpdateProduction, UpdatePublication,UpdateClimate, UpdateCrime, UpdateDisaster,UpdateExchange, UpdateHealthDisease,UpdateHousing, UpdateIndex,UpdateMining,UpdatePolitical,UpdateRoad, UpdateEducation, UpdateEnergy, UpdateOccupation, UpdateServices, UploadCrimeMetaForm,  UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadEnergyMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadOccupationMetaForm, UploadProductionMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm,UploadMiningMetaForm,UploadHousingMetaForm,UploadHealthDiseaseMetaForm,UploadRoadMetaForm,UploadDisasterMetaForm
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -371,6 +371,7 @@ def upload_meta_excel(request):
         '/others/upload_activity_meta_excel':UploadActivityMetaForm,
         '/others/upload_water_meta_excel':UploadWaterMetaForm,
         
+        '/others/upload_production_meta_excel':UploadProductionMetaForm,
     }
 
     form_class = form_mapping.get(request.path)
@@ -393,6 +394,7 @@ def upload_meta_excel(request):
         UploadDisasterMetaForm:Disaster_Data_Meta,
         UploadActivityMetaForm:Activity_Meta,
         UploadWaterMetaForm:Water_Meta,
+        UploadProductionMetaForm: Production_Meta,
     }
     model_class = model_mapping.get(form_class)
 
@@ -414,6 +416,7 @@ def upload_meta_excel(request):
     Disaster_Data_Meta:'disaster_data_meta',
     Activity_Meta:'activity_meta',
     Water_Meta:'water_meta',
+    Production_Meta : 'production_meta'
 }
     model_view = view_mapping.get(model_class)            
 
@@ -495,6 +498,10 @@ def update_record(request,pk):
         'update_exchange_record':Exchange,
         'update_energy_record':Energy,
         'update_activity_record':ActivityData,
+        'update_index_record':Index,
+        'update_publication_record':Publication,
+        'update_budget_record':Budgetary_Data,
+        'update_production_record': Production,
     }
 
     form_mapping = {
@@ -512,6 +519,10 @@ def update_record(request,pk):
         Exchange: UpdateExchange,
         Energy: UpdateEnergy,
         ActivityData:UpdateActivity,
+        Index: UpdateIndex,
+        Publication: UpdatePublication,
+        Budgetary_Data:UpdateBudget,
+        Production: UpdateProduction,
     }
     view_mapping = {
         Services: 'services_table',
@@ -527,7 +538,11 @@ def update_record(request,pk):
         Climate_Data:'climate_table',
         Exchange: 'exchange_table',
         Energy: 'energy_table',
-        ActivityData:'activity_table',
+        ActivityData:'activity_table',,
+        Index: 'index_table',
+        Publication: 'publication_table',
+        Budgetary_Data:'budget_table',
+        Production: 'production_table'
     }
 
     model_class = model_mapping.get(view_name)
@@ -564,6 +579,10 @@ def delete_record(request,pk):
         'delete_climate_record': Climate_Data,
         'delete_exchange_record': Exchange,
         'delete_energy_record':Energy,
+        'delete_index_record': Index,
+        'delete_publication_record': Publication,
+        'delete_budget_record': Budgetary_Data,
+        'delete_production_record':Production,
     }
 
     view_mapping = {
@@ -581,6 +600,10 @@ def delete_record(request,pk):
         Exchange: 'exchange_table',
         Energy:'energy_table',
         ActivityData:'activity_table'
+        Index : 'index_table',
+        Publication: 'publication_table',
+        Budgetary_Data:'budget_table',
+        Production:'production_table'
     }
 
     model_class = model_mapping.get(view_name)
@@ -611,6 +634,10 @@ def delete_selected(request):
         'delete_selected_climate':Climate_Data,
         'delete_selected_exchange':Exchange,
         'delete_selected_energy':Energy,
+        'delete_selected_index': Index,
+        'delete_selected_publication':Publication,
+        'delete_selected_budget':Budgetary_Data,
+        'delete_selected_production':Production
     }
 
     view_mapping = {
@@ -627,6 +654,10 @@ def delete_selected(request):
         Climate_Data: 'climate_table',
         Exchange:'exchange_table',
         Energy:'energy_table',
+        Index:'index_table',
+        Publication:'publication_table',
+        Budgetary_Data: 'budget_table',
+        Production: 'production_table'
     }
     model_class = model_mapping.get(view_name)
     model_view = view_mapping.get(model_class)

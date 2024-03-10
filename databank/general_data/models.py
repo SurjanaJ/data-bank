@@ -234,15 +234,6 @@ class Health_disease(models.Model):
     Disease_Code = models.ForeignKey( Health_disease_Meta, on_delete = models.CASCADE )
     Unit = models.CharField(max_length = 20 , choices = Unit_Options , blank = True , null= True)
     Number_Of_Case = models.IntegerField(default = 0 , null = True , blank = True)
-
-
-
-class Budgetary_Data(models.Model):
-    id = models.AutoField(primary_key=True)
-    Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
-    Fiscal_Year = models.CharField(max_length=10, null=True, blank=True)
-    Amount_In_USD = models.IntegerField(default = 0 , null = True ,blank = True)
-    Prefered_Denomination = models.CharField(max_length = 30 , null = True , blank = True)
  
 
 class Political_Data(models.Model):
@@ -475,4 +466,65 @@ class ActivityData(models.Model):
     Text_Documents_Upload = models.CharField(max_length=300, null=True, blank=True)
     created_date = models.DateTimeField(auto_now=True)
     modified_date = models.DateTimeField(auto_now=True)
+    
+
+
+class Index(models.Model):
+    id = models.AutoField(primary_key=True)
+    Year=models.IntegerField()
+    Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    Index_Name = models.CharField(max_length = 300)
+    Score = models.FloatField(default = 0.0)
+    Rank = models.IntegerField(default=0)
+    No_Of_Countries = models.IntegerField(default = 0)
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
+
+
+class Publication(models.Model):
+    id = models.AutoField(primary_key=True)
+    Year=models.IntegerField()
+    Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    Book_Name = models.CharField(max_length = 300)
+    Writer_Name = models.CharField(max_length = 300)
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return (self.Book_Name)
+    
+
+class Budgetary_Data(models.Model):
+    id = models.AutoField(primary_key=True)
+    Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
+    Fiscal_Year = models.CharField(max_length=30)
+    Amount_In_USD = models.FloatField(default = 0.0)
+    Prefered_Denomination = models.CharField(max_length = 100)
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.id)
+
+class Production_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    Code = Code=models.CharField(max_length=100)
+    Description = models.TextField()
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return (f'{self.Code} - {self.Description}')
+
+class Production(models.Model):
+    id = models.AutoField(primary_key=True)
+    Code = models.ForeignKey(Production_Meta, on_delete=models.CASCADE)
+    Producer_Name = models.CharField(max_length = 200)
+    Province = models.CharField(max_length = 100)
+    District = models.CharField(max_length = 100)
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return (f'{self.Code} - {self.Producer_Name}')
     

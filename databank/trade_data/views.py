@@ -117,6 +117,23 @@ tables =[
         "name": "Water Data",
         "url": "water_table"
     },
+    ,
+    {
+        "name": "Index Data",
+        "url": "index_table"
+    },
+    {
+        "name": "Publication Data",
+        "url": "publication_table"
+    },
+    {
+        "name": "Budgetary Data",
+        "url": "budget_table"
+    },
+    {
+        "name": "Production Data",
+        "url": "production_table"
+    },
     ]
 
 
@@ -221,6 +238,11 @@ meta_tables =[
         "name":"Disaster Meta",
         "url":"disaster_data_meta",
         "upload_url":"upload_disaster_data_meta_excel",
+    },
+    {
+        "name":"Production Meta",
+        "url":"production_meta",
+        "upload_url":"upload_production_meta_excel"
     },
     ]
 

@@ -5,7 +5,7 @@ from .models import Climate_Data, Crime, Education, ForestData,Hotel, Occupation
 
 
 from django.forms import ModelForm
-from .models import Climate_Data, Crime,ForestData, Disaster_Data, Education, Health_disease,Road,Mining,Housing,Political_Data,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land,Public_Unitillity
+from .models import Production,Budgetary_Data, Publication,Climate_Data,Index, Crime,ForestData, Disaster_Data, Education, Health_disease,Road,Mining,Housing,Political_Data,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land,Public_Unitillity
 from .models import Climate_Data, Crime, Education, Energy, Exchange, ForestData,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land
 
 class UploadForestDataForm(forms.Form):
@@ -382,4 +382,103 @@ class UpdateEnergy(ModelForm):
         self.fields['Generating_Company'].label = 'Generating Company'
 
 
-# ----------------------------
+# INDEX_DATA
+class UploadIndexForm(forms.Form):
+    file = forms.FileField() 
+
+class UpdateIndex(ModelForm):
+    class Meta:
+        model = Index
+        fields='__all__'
+
+        widgets={
+            'Year': forms.NumberInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Index_Name': forms.TextInput(attrs={'class': 'form-control '}),
+            'Score':forms.NumberInput(attrs={'class': 'form-control '}),
+            'Rank':forms.NumberInput(attrs={'class': 'form-control '}),
+            'No_Of_Countries': forms.NumberInput(attrs={'class': 'form-control '}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateIndex, self).__init__(*args, **kwargs)
+
+        # Set the label for 'Selling' field
+        self.fields['Index_Name'].label = 'Index Name'
+        self.fields['No_Of_Countries'].label = 'No Of Countries'
+
+
+# PUBLICATION DATA
+class UploadPublicationForm(forms.Form):
+    file = forms.FileField() 
+
+class UpdatePublication(ModelForm):
+    class Meta:
+        model = Publication
+        fields='__all__'
+
+        widgets={
+            'Year': forms.NumberInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Book_Name': forms.TextInput(attrs={'class': 'form-control '}),
+            'Writer_Name': forms.TextInput(attrs={'class': 'form-control '}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UpdatePublication, self).__init__(*args, **kwargs)
+
+        # Set the labels
+        self.fields['Book_Name'].label = 'Book Name'
+        self.fields['Writer_Name'].label = 'Writer Name'
+
+
+# BUDGETARY DATA
+class UploadBudgetForm(forms.Form):
+    file = forms.FileField() 
+
+class UpdateBudget(ModelForm):
+    class Meta:
+        model = Budgetary_Data
+        fields='__all__'
+
+        widgets={
+            'Fiscal_Year': forms.TextInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Amount_In_USD': forms.NumberInput(attrs={'class': 'form-control '}),
+            'Prefered_Denomination': forms.TextInput(attrs={'class': 'form-control '}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateBudget, self).__init__(*args, **kwargs)
+
+        # Set the labels
+        self.fields['Fiscal_Year'].label = 'Fiscal Year'
+        self.fields['Amount_In_USD'].label = 'Amount In USD'
+        self.fields['Prefered_Denomination'].label = 'Prefered Denomination'
+
+
+
+#PRODUCTION DATA
+class UploadProductionMetaForm(forms.Form):
+    meta_file = forms.FileField()
+
+class UploadProductionForm(forms.Form):
+    file = forms.FileField() 
+
+class UpdateProduction(ModelForm):
+    class Meta:
+        model = Production
+        fields='__all__'
+
+        widgets={
+            'Code': forms.Select(attrs={'class': 'form-control '}),
+            'Producer_Name': forms.TextInput(attrs={'class': 'form-control '}),
+            'Province': forms.TextInput(attrs={'class': 'form-control '}),
+            'District': forms.TextInput(attrs={'class': 'form-control '}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateProduction, self).__init__(*args, **kwargs)
+
+        # Set the labels
+        self.fields['Producer_Name'].label = 'Producer Name'
