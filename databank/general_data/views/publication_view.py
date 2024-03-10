@@ -12,10 +12,13 @@ from django.http import HttpResponse
 from django.db.models import F, Q
 from trade_data import views
 
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import allowed_users
+
 from ..models import Publication
 from ..forms import UploadPublicationForm
 
-
+@login_required(login_url = 'login')
 def display_publication_table(request):
     data = Publication.objects.all()
     country_categories = Country_meta.objects.all()
@@ -46,6 +49,8 @@ def display_publication_table(request):
                       }
     return render(request, 'general_data/publication_templates/publication_table.html', context)
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_publication_excel(request):
     errors = []
     duplicate_data = []
@@ -182,7 +187,7 @@ def upload_publication_excel(request):
     
     return render(request,'general_data/transport_templates/upload_transport_form.html',{'form':form, 'tables': tables, 'meta_tables': views.meta_tables,})
 
-
+@login_required(login_url = 'login')
 def export_publication_excel(request):
     country = request.GET.get('country')
 
@@ -219,6 +224,8 @@ def export_publication_excel(request):
     response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
     return response
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def update_selected_publication(request):
     selected_ids = request.POST.getlist('selected_items')
     if not selected_ids:
