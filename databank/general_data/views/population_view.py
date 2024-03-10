@@ -13,11 +13,13 @@ from django.db import IntegrityError, transaction
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import allowed_users
 
 def is_valid_queryparam(param):
     return param !='' and param is not None
 
-
+@login_required(login_url = 'login')
 def display_population_table(request):
     data = PopulationData.objects.all()
     country_categories = Country_meta.objects.all()
@@ -71,6 +73,8 @@ def display_population_table(request):
     }
     return render(request, 'general_data/population_templates/population_table.html',context)
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 @require_POST
 def delete_selected_population(request):
     selected_ids = request.POST.getlist('selected_items')
@@ -85,7 +89,8 @@ def delete_selected_population(request):
 
     return redirect('population_table')
 
-
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def delete_population_record(request,item_id):
     try:
         item_to_delete = get_object_or_404(PopulationData, id=item_id)
@@ -96,7 +101,8 @@ def delete_population_record(request,item_id):
         return HttpResponse(f"An error occurred: {str(e)}")
 
 
-
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def update_population_record(request,pk):
     population_record = PopulationData.objects.get(id=pk)
     form = UploadPopulationData(instance=population_record)
@@ -111,7 +117,8 @@ def update_population_record(request,pk):
     return render(request,'general_data/population_templates/update_population_record.html',context)
 
 
-
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_population_excel(request):
     errors = []
     duplicate_data = []
