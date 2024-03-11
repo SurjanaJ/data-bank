@@ -308,8 +308,8 @@ def update_selected_land(request):
         )
 
         df = pd.DataFrame(list(queryset.values('id','Year','country','land_code','land_type','Unit','Area')))
-        df.rename(columns={'country': 'Country', 'land_code':'Land_Code','land_type':'Land_Type'}, inplace=True)
-        df = df[['id','Year','Country','Land_Code','Land_Type','Unit','Area']]
+        df.rename(columns={'country': 'Country', 'land_code':'Land Code','land_type':'Land Type'}, inplace=True)
+        df = df[['id','Year','Country','Land Code','Land Type','Unit','Area']]
         output = BytesIO()
         writer = pd.ExcelWriter(output, engine='xlsxwriter')  
         df.to_excel(writer, sheet_name='Sheet1', index=False)

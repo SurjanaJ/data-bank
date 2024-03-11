@@ -121,10 +121,10 @@ def export_land_table_to_excel(request):
     df = pd.DataFrame(data.values('Year','country_name','land_code','land_type','Unit','Area'))
 
 
-    df.rename(columns={'country_name':'Country','land_code':'Land_Code','land_type':'Land_Type'},inplace=True)
+    df.rename(columns={'country_name':'Country','land_code':'Land Code','land_type':'Land Type'},inplace=True)
 
 
-    df= df[['Year','Country','Land_Code','Land_Type','Unit','Area']]
+    df= df[['Year','Country','Land Code','Land Type','Unit','Area']]
 
     output=BytesIO()
     writer = pd.ExcelWriter(output,engine='xlsxwriter')
