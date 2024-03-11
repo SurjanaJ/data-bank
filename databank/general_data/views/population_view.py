@@ -103,20 +103,20 @@ def delete_population_record(request,item_id):
         messages.error(request, f'Error deleting item: {e}')
 
 
-@login_required(login_url = 'login')
-@allowed_users(allowed_roles=['admin'])
-def update_population_record(request,pk):
-    population_record = PopulationData.objects.get(id=pk)
-    form = UploadPopulationData(instance=population_record)
+# @login_required(login_url = 'login')
+# @allowed_users(allowed_roles=['admin'])
+# def update_population_record(request,pk):
+#     population_record = PopulationData.objects.get(id=pk)
+#     form = UploadPopulationData(instance=population_record)
 
-    if request.method == 'POST':
-        form = UploadPopulationData(request.POST, instance=population_record)
-        if form.is_valid():
-            form.save()
-            return redirect('population_table')
+#     if request.method == 'POST':
+#         form = UploadPopulationData(request.POST, instance=population_record)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('population_table')
         
-    context={'form':form,}
-    return render(request,'general_data/population_templates/update_population_record.html',context)
+#     context={'form':form,}
+#     return render(request,'general_data/population_templates/update_population_record.html',context)
 
 
 @login_required(login_url = 'login')
@@ -314,8 +314,8 @@ def update_selected_population(request):
         )
 
         df = pd.DataFrame(list(queryset.values('id','Year','country','Gender','Age_Group','Population')))
-        df.rename(columns={'country': 'Country'}, inplace=True)
-        df = df[['id','Year','Country','Gender','Age_Group','Population']]
+        df.rename(columns={'country': 'Country','Age_Group':'Age Group' }, inplace=True)
+        df = df[['id','Year','Country','Gender','Age Group','Population']]
         output = BytesIO()
         writer = pd.ExcelWriter(output, engine='xlsxwriter')  
         df.to_excel(writer, sheet_name='Sheet1', index=False)

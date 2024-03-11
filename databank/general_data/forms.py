@@ -58,8 +58,6 @@ class UpdateForest(ModelForm):
         self.fields['Area_Covered'].label = 'Area Covered'
 
 
-
-
 # Hotel Data
 
 class UploadHotelDataForm(forms.Form):
@@ -94,6 +92,26 @@ class UploadPopulationData(ModelForm):
     class Meta:
         model = PopulationData
         fields='__all__'
+
+
+class UpdatePopulation(ModelForm):
+    class Meta:
+        model = PopulationData
+        fields='__all__'
+
+        widgets={
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Year': forms.DateInput(attrs={'class': 'form-control '}),
+            'Gender': forms.Select(attrs={'class': 'form-control  '}),
+            'Age_Group': forms.Select(attrs={'class': 'form-control  '}),
+            'Population': forms.NumberInput(attrs={'class': 'form-control  '}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UpdatePopulation, self).__init__(*args, **kwargs)
+
+        # Set the labels
+        self.fields['Age_Group'].label = 'Age Group'
 
 
 # water

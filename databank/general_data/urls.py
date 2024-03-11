@@ -22,7 +22,7 @@ urlpatterns = [
     path('delete_selected_population/', population_view.delete_selected_population, name='delete_selected_population'),
     path('delete_population_record/<int:item_id>/', population_view.delete_population_record, name='delete_population_record'),
     path('export_population_table_to_excel/', export_views.export_population_table_to_excel, name='export_population_table_to_excel'),
-    path('update_population_record/<int:pk>/',population_view.update_population_record,name='update_population_record'),
+    path('update_population_record/<int:pk>/',view.update_record,name='update_population_record'),
     path('upload_population_excel', population_view.upload_population_excel, name='upload_population_excel'),
     path('update_selected_population/', population_view.update_selected_population, name='update_selected_population'),
 
