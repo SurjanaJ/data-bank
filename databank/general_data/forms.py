@@ -28,6 +28,38 @@ class UploadForestData(ModelForm):
             'Area_Covered': forms.NumberInput(attrs={'class': 'form-control  '}),
         }
 
+class UpdateForest(ModelForm):
+    class Meta:
+        model = ForestData
+        fields='__all__'
+
+        widgets={
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Year': forms.DateInput(attrs={'class': 'form-control '}),
+            'Name_Of_The_Plant': forms.TextInput(attrs={'class': 'form-control '}),
+            'Scientific_Name': forms.TextInput(attrs={'class': 'form-control '}),
+            'Local_Name': forms.TextInput(attrs={'class': 'form-control '}),
+            'Stock_Unit': forms.Select(attrs={'class': 'form-control  '}),
+            'Stock_Available': forms.NumberInput(attrs={'class': 'form-control  '}),
+            'Area_Unit': forms.TextInput(attrs={'class': 'form-control '}),
+            'Area_Covered': forms.NumberInput(attrs={'class': 'form-control '}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateForest, self).__init__(*args, **kwargs)
+
+        # Set the labels
+        self.fields['Name_Of_The_Plant'].label = 'Name Of The Plant'
+        self.fields['Scientific_Name'].label = 'Scientific Name'
+        self.fields['Local_Name'].label = 'Local Name'
+        self.fields['Stock_Unit'].label = 'Stock Unit'
+        self.fields['Stock_Available'].label = 'Stock Available'
+        self.fields['Area_Unit'].label = 'Area Unit'
+        self.fields['Area_Covered'].label = 'Area Covered'
+
+
+
+
 # Hotel Data
 
 class UploadHotelDataForm(forms.Form):

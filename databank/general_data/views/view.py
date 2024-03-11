@@ -7,7 +7,7 @@ from django.db.models import Q
 import pandas as pd
 from trade_data import views
 from ..models import Mine_Meta,Road_Meta,Housing_Meta,Health_disease_Meta,Disaster_Data_Meta,Budgetary_Data, Production, Production_Meta,Publication,Index,Climate_Data, Crime, Crime_Meta, Disaster_Data, Exchange, Health_disease,Road,Mining,Housing,Political_Data, Education, Education_Degree_Meta, Education_Level_Meta, Energy, Energy_Meta, ForestData, Country_meta, Land_Code_Meta, Occupation, Occupation_Meta, Services, Services_Meta, Tourism_Meta, Transport_Meta, Water_Meta,Activity_Meta,ActivityData
-from ..forms import UpdateActivity,UploadActivityMetaForm ,UpdateBudget, UpdateProduction, UpdatePublication,UpdateClimate, UpdateCrime, UpdateDisaster,UpdateExchange, UpdateHealthDisease,UpdateHousing, UpdateIndex,UpdateMining,UpdatePolitical,UpdateRoad, UpdateEducation, UpdateEnergy, UpdateOccupation, UpdateServices, UploadCrimeMetaForm,  UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadEnergyMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadOccupationMetaForm, UploadProductionMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm,UploadMiningMetaForm,UploadHousingMetaForm,UploadHealthDiseaseMetaForm,UploadRoadMetaForm,UploadDisasterMetaForm
+from ..forms import UpdateActivity, UpdateForest,UploadActivityMetaForm ,UpdateBudget, UpdateProduction, UpdatePublication,UpdateClimate, UpdateCrime, UpdateDisaster,UpdateExchange, UpdateHealthDisease,UpdateHousing, UpdateIndex,UpdateMining,UpdatePolitical,UpdateRoad, UpdateEducation, UpdateEnergy, UpdateOccupation, UpdateServices, UploadCrimeMetaForm,  UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadEnergyMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadOccupationMetaForm, UploadProductionMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm,UploadMiningMetaForm,UploadHousingMetaForm,UploadHealthDiseaseMetaForm,UploadRoadMetaForm,UploadDisasterMetaForm
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -506,6 +506,7 @@ def update_record(request,pk):
     resolved =  resolve(request.path_info)
     view_name = resolved.url_name
     model_mapping = {
+        'update_forest_record':ForestData,
         'update_services_record': Services,
         'update_crime_record': Crime,
         'update_education_record': Education,
@@ -527,6 +528,7 @@ def update_record(request,pk):
     }
 
     form_mapping = {
+        ForestData: UpdateForest,
         Services : UpdateServices,
         Crime: UpdateCrime,
         Education: UpdateEducation,
@@ -564,7 +566,8 @@ def update_record(request,pk):
         Index: 'index_table',
         Publication: 'publication_table',
         Budgetary_Data:'budget_table',
-        Production: 'production_table'
+        Production: 'production_table',
+        ForestData: 'forest_table'
     }
 
     model_class = model_mapping.get(view_name)
