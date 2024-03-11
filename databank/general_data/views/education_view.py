@@ -192,3 +192,39 @@ def export_education_excel(request):
     )
     response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
     return response
+
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
+def update_selected_education(request):
+    selected_ids = request.POST.getlist('selected_items')
+    if not selected_ids:
+            messages.error(request, 'No items selected.')
+            return redirect('education_table')
+    else:
+        queryset = Education.objects.filter(id__in=selected_ids)
+        queryset = queryset.annotate(
+        education_level = F('Level_Code__Code'),
+        level_name = F('Level_Code__Level'),
+        education_degree = F('Degree_Code__Code'),
+        degree_name = F('Degree_Code__Degree'),
+    )
+        
+    data = pd.DataFrame(list(queryset.values('id','education_level','level_name', 'education_degree','degree_name','Male', 'Female')))
+
+    data.rename(columns={'education_degree':'Degree Code','education_level': 'Level Code', 'level_name':'Level Code Name', 'degree_name':'Degree Code Name'}, inplace=True)
+
+    column_order = ['id','Level Code', 'Level Code Name', 'Degree Code', 'Degree Code Name', 'Male', 'Female']
+
+    data = data[column_order]
+    output = BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')  
+    data.to_excel(writer, sheet_name='Sheet1', index=False)
+
+    writer.close()  
+    output.seek(0)
+
+    response = HttpResponse(
+        output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+    response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
+    return response
