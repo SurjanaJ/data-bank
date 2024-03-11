@@ -67,6 +67,18 @@
         </div>
 
         <div class="form-group col-md-3">
+          <label for="hs_code">HS Code</label>
+          <select id="hs_code" class="form-control col-12" name="hs_code" style="white-space: wrap; overflow-x: auto;">
+            <option selected>--</option>
+            {% for hs_code in hs_codes %}
+            <option value="{{hs_code.id }}">
+              {{hs_code}} - {{hs_code.Product_Information}}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group col-md-3">
           <label for="trade_type">Trade Type</label>
           <select id="trade_type" class="form-control" name="trade_type">
             <option selected>--</option>
@@ -100,17 +112,7 @@
           </select>
         </div>
 
-        <div class="form-group col-md-3">
-          <label for="hs_code">HS Code</label>
-          <select id="hs_code" class="form-control" name="hs_code">
-            <option selected>--</option>
-            {% for hs_code in hs_codes %}
-            <option value="{{hs_code.id }}">
-              {{hs_code}} - {{hs_code.Product_Information}}
-            </option>
-            {% endfor %}
-          </select>
-        </div>
+
 
         <div class="col-md-3 d-flex align-items-end">
           <button type="submit" class="btn btn-primary">

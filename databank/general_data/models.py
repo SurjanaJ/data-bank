@@ -174,7 +174,7 @@ class Road_Meta(models.Model):
     Road_Type = models.TextField(null=True,blank=True)
 
     def __str__(self):
-        return self.Code
+        return self.Code 
 
 class Road(models.Model):
 
@@ -442,6 +442,32 @@ class Energy(models.Model):
 
     def __str__(self):
         return (str(self.id))
+    
+
+class Activity_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    Code=models.CharField(max_length=100)
+    Description = models.TextField(null=True,blank=True)
+    created_date = models.DateTimeField(auto_now=True)
+    modified_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.Code
+
+
+
+class ActivityData(models.Model):
+    id = models.AutoField(primary_key=True)
+    Year = models.IntegerField()
+    Country = models.ForeignKey(Country_meta,on_delete = models.CASCADE)
+    Activity_Code = models.ForeignKey(Activity_Meta,on_delete = models.CASCADE)
+    Person = models.IntegerField()
+    Districts = models.CharField(max_length= 50, null=True, blank=True ) 
+    Text_Documents_Upload = models.CharField(max_length=300, null=True, blank=True)
+    created_date = models.DateTimeField(auto_now=True)
+    modified_date = models.DateTimeField(auto_now=True)
+    
+
 
 class Index(models.Model):
     id = models.AutoField(primary_key=True)

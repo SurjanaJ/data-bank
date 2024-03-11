@@ -165,6 +165,10 @@
           * {{data_len}} records found.
         </span>
         <div class="d-flex align-items-center py-2">
+          <button type="button" class="btn border p-2 styled-link hover-shadow" onclick="updateSelected()">
+            <i class="fa-solid fa-file-pen"></i>
+            <span>Update Selected</span>
+          </button>
           <button type="button" class="btn border p-2 styled-link mx-3 hover-shadow" onclick="confirmDeleteAll()">
             <i class="fa-regular fa-trash-can" style="color: #ff0000"></i>
               <span class="fw-normal">Delete Selected</span>
@@ -262,7 +266,132 @@
         </tbody>
       </table>
     </div>
-    </div>
+    <div class="pagination m-3 d-flex justify-content-center">
+      <span class="step-links bg-light rounded-1 d-flex justify-content-center gap-3 p-3">
+          {% if page.has_previous %}
+              <a href="?page=1
+              {% if request.GET.country %}
+                  &country={{ request.GET.country }}
+              {% endif %}
+              {% if request.GET.year_min %}
+                  &year_min={{ request.GET.year_min }}
+              {% endif %}
+              {% if request.GET.year_max %}
+                  &year_max={{ request.GET.year_max }}
+              {% endif %}
+              {% if request.GET.party_name %}
+                  &party_name={{ request.GET.party_name }}
+              {% endif %}
+              {% if request.GET.province %}
+                  &province={{ request.GET.province }}
+              {% endif %}
+              {% if request.GET.district %}
+                  &district={{ request.GET.district }}
+              {% endif %}
+              {% if request.GET.municipality %}
+                  &municipality={{ request.GET.municipality }}
+              {% endif %}
+              {% if request.GET.wards %}
+                  &wards={{ request.GET.wards }}
+              {% endif %}
+              ">
+                  &laquo; First
+              </a>
+              <a href="?page={{page.previous_page_number}}
+              {% if request.GET.country %}
+                  &country={{ request.GET.country }}
+              {% endif %}
+              {% if request.GET.year_min %}
+                  &year_min={{ request.GET.year_min }}
+              {% endif %}
+              {% if request.GET.year_max %}
+                  &year_max={{ request.GET.year_max }}
+              {% endif %}
+              {% if request.GET.party_name %}
+                  &party_name={{ request.GET.party_name }}
+              {% endif %}
+              {% if request.GET.province %}
+                  &province={{ request.GET.province }}
+              {% endif %}
+              {% if request.GET.district %}
+                  &district={{ request.GET.district }}
+              {% endif %}
+              {% if request.GET.municipality %}
+                  &municipality={{ request.GET.municipality }}
+              {% endif %}
+              {% if request.GET.wards %}
+                  &wards={{ request.GET.wards }}
+              {% endif %}
+              ">
+                  Previous
+              </a>
+          {% endif %}
+  
+          <span class="current-page">
+              Page {{ page.number }} of {{ page.paginator.num_pages }}.
+          </span>
+  
+          {% if page.has_next %}
+              <a href="?page={{page.next_page_number}}
+              {% if request.GET.country %}
+                  &country={{ request.GET.country }}
+              {% endif %}
+              {% if request.GET.year_min %}
+                  &year_min={{ request.GET.year_min }}
+              {% endif %}
+              {% if request.GET.year_max %}
+                  &year_max={{ request.GET.year_max }}
+              {% endif %}
+              {% if request.GET.party_name %}
+                  &party_name={{ request.GET.party_name }}
+              {% endif %}
+              {% if request.GET.province %}
+                  &province={{ request.GET.province }}
+              {% endif %}
+              {% if request.GET.district %}
+                  &district={{ request.GET.district }}
+              {% endif %}
+              {% if request.GET.municipality %}
+                  &municipality={{ request.GET.municipality }}
+              {% endif %}
+              {% if request.GET.wards %}
+                  &wards={{ request.GET.wards }}
+              {% endif %}
+              ">
+                  Next
+              </a>
+              <a href="?page={{ page.paginator.num_pages }}
+              {% if request.GET.country %}
+                  &country={{ request.GET.country }}
+              {% endif %}
+              {% if request.GET.year_min %}
+                  &year_min={{ request.GET.year_min }}
+              {% endif %}
+              {% if request.GET.year_max %}
+                  &year_max={{ request.GET.year_max }}
+              {% endif %}
+              {% if request.GET.party_name %}
+                  &party_name={{ request.GET.party_name }}
+              {% endif %}
+              {% if request.GET.province %}
+                  &province={{ request.GET.province }}
+              {% endif %}
+              {% if request.GET.district %}
+                  &district={{ request.GET.district }}
+              {% endif %}
+              {% if request.GET.municipality %}
+                  &municipality={{ request.GET.municipality }}
+              {% endif %}
+              {% if request.GET.wards %}
+                  &wards={{ request.GET.wards }}
+              {% endif %}
+              ">
+                  Last &raquo;
+              </a>
+          {% endif %}
+      </span>
+  </div>
+  
   </form>
 </div>
 
@@ -275,6 +404,11 @@
         alert("Delete canceled!");
     }
 }
+
+function updateSelected(itemId) {
+        document.getElementById("delete-form-political").action = "{% url 'update_selected_political' %}";
+        document.getElementById("delete-form-political").submit();
+    }
 
 function confirmDeleteAll() {
       var confirmDelete = confirm(

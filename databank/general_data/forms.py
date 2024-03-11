@@ -1,5 +1,10 @@
 from django import forms
 from django.forms import ModelForm
+from .models import ActivityData,Climate_Data, Crime, Exchange,ForestData, Disaster_Data, Education, Health_disease,Road,Mining,Housing,Political_Data,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land,Public_Unitillity
+from .models import Climate_Data, Crime, Education, ForestData,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land
+
+
+from django.forms import ModelForm
 from .models import Production,Budgetary_Data, Publication,Climate_Data,Index, Crime,ForestData, Disaster_Data, Education, Health_disease,Road,Mining,Housing,Political_Data,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land,Public_Unitillity
 from .models import Climate_Data, Crime, Education, Energy, Exchange, ForestData,Hotel, Occupation, Services,Tourism,Transport,PopulationData,Water,Land
 
@@ -24,6 +29,7 @@ class UploadForestData(ModelForm):
         }
 
 # Hotel Data
+
 class UploadHotelDataForm(forms.Form):
     Hotel_data_file = forms.FileField()
 
@@ -165,7 +171,7 @@ class UpdateEducation(ModelForm):
 
         widgets={
             'Level_Code': forms.Select(attrs={'class': 'form-control '}),
-            'Degree_Code': forms.Select(attrs={'class': 'form-control  '}),
+            'Degree_Code': forms.Select(attrs={'class': 'form-control '}),
             'Male': forms.NumberInput(attrs={'class': 'form-control  '}),
             'Female': forms.NumberInput(attrs={'class': 'form-control  '}),
             'District': forms.TextInput(attrs={'class': 'form-control '}),
@@ -192,6 +198,9 @@ class UpdateOccupation(ModelForm):
 
 
 #disaster data
+class UploadDisasterMetaForm(forms.Form):
+    meta_file = forms.FileField()        
+
 
 class UpdateDisaster(ModelForm):
     class Meta:
@@ -203,6 +212,10 @@ class UploadDisasterForm(forms.Form):
 
 #health disease 
 
+class UploadHealthDiseaseMetaForm(forms.Form):
+    meta_file = forms.FileField()        
+
+
 class UpdateHealthDisease(ModelForm):
     class Meta:
         model = Health_disease
@@ -212,6 +225,10 @@ class UploadHealthDiseaseForm(forms.Form):
     file = forms.FileField()
 
 #Mining 
+class UploadMiningMetaForm(forms.Form):
+    meta_file = forms.FileField()        
+
+
 class UpdateMining(ModelForm):
     class Meta:
         model = Mining
@@ -221,6 +238,10 @@ class UploadMiningForm(forms.Form):
     file = forms.FileField()
 
 #Housing
+    
+class UploadHousingMetaForm(forms.Form):
+    meta_file = forms.FileField()        
+
 
 class UpdateHousing(ModelForm):
     class Meta:
@@ -240,8 +261,22 @@ class UpdatePolitical(ModelForm):
 class UploadPoliticalForm(forms.Form):
     file = forms.FileField()
 
+#activity
+class UpdateActivity(ModelForm):
+    class Meta:
+        model = ActivityData
+        fields='__all__'
 
+class UploadActivityDataForm(forms.Form):
+    file = forms.FileField()
+
+class UploadActivityMetaForm(forms.Form):
+    meta_file = forms.FileField() 
 #Road
+
+class UploadRoadMetaForm(forms.Form):
+    meta_file = forms.FileField()        
+
 
 class UpdateRoad(ModelForm):
     class Meta:

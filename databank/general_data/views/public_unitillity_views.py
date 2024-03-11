@@ -12,6 +12,9 @@ from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
 from django.views.decorators.http import require_POST
+from django.db.models import F
+from io import BytesIO
+from django.http import HttpResponse
 
 
 
@@ -132,53 +135,68 @@ def upload_public_unitillity_excel(request):
     if request.method == 'POST':
         form = UploadPublicUnitillityDataForm(request.POST, request.FILES)
         if form.is_valid():
-            excel_data = request.FILES['public_unitillity_data_file']
+            excel_data = request.FILES['Public_Unitillity_data_file']
             df = pd.read_excel(excel_data)
-            if 'id' in df.columns or 'ID' in df.columns:
-                for index,row in df.iterows():
-                    id_value = row['ID']
+            if 'id' in df.columns:
+                for index,row in df.iterrows():
+                    cols = df.columns.to_list()
+                    id_value = row['id']
 
                     try:
-                        public_unitillity_instance = Public_Unitillity.objects.get(id = id_value)
+                        public_utillity_instance = Public_Unitillity.objects.get(id = id_value)
                     except:
-                        public_unitillity_instance =Public_Unitillity()
-
-                    Year = row['Year']
-                    Country = row['Country']
-
+                        data = {col: row[col] for col in cols}
+                        errors.append({
+                            'row_index':index,
+                            'data':data,
+                            'reason':f'Error inserting row {index}:{e}'
+                        })
+                        continue
+                    public_utillity_data = {
+                        'Year': row['Year'].date().strftime('%Y-%m-%d'),
+                        'Country': row['Country'],
+                        'Type_Of_Public_Utility': row['Type_Of_Public_Utility'],
+                        'Number' : row['Number'],
+                    }
                     try:
+                        Year = row['Year']
+                        Country = row['Country']
                         calender_year = pd.to_datetime(Year).date()
 
                     except ValueError as e:
-                        print(f'Error converting date in row {index}:{e}')
-                        print(f"Problematic row data:{row}")
+                        errors.append({'row_index': index, 'data': public_utillity_data, 'reason': str(e)})
                         continue
 
                     try:
                         Year = calender_year
-                        Country = Country_meta.objects.get(Country_name = Country)
+                        Country = Country_meta.objects.get(Country_Name = Country)
 
-                    except DataError as e:
-                        print(f"Error handling the row at {index}:{e}")
+                        public_utillity_instance.Year = Year
+                        public_utillity_instance.Country = Country
+                        public_utillity_instance.Type_Of_Public_Utility=row['Type_Of_Public_Utility']
+                        public_utillity_instance.Number=row['Number']
+                        public_utillity_instance.save()
 
-                    public_unitillity_instance.Year = Year
-                    public_unitillity_instance.Country = Country
-                    public_unitillity_instance.Type_Of_Public_Utility=row['Type_Of_Public_Utility']
-                    public_unitillity_instance.Number=row['Number']
-                    public_unitillity_instance.save()
+                        updated_count +=1
+                    except Exception as e:
+                        public_utillity_data = {
+                            'Year': row['Year'].date().strftime('%Y-%m-%d'),
+                            'Country': row['Country'],
+                            'Type_Of_Public_Utility': row['Type_Of_Public_Utility'],
+                            'Number' : row['Number'],
+                        }
+                        errors.append({'row_index': index, 'data': public_utillity_data, 'reason': str(e)})
+                        continue
 
-                    updated_count +=1
-                
             else:
 
                 for index, row in df.iterrows():
-                    public_unitillity_data = {
-                        'Year': row['Year'],
+                    public_utillity_data = {
+                        'Year': row['Year'].date().strftime('%Y-%m-%d'),
                         'Country': row['Country'],
-                        'Name_of_the_plant': row['Type_Of_Public_Utility'],
+                        'Type_Of_Public_Utility': row['Type_Of_Public_Utility'],
                         'Number' : row['Number'],
                     }
-
 
                     try:
                         calender_date = datetime.strptime(str(row['Year'].date().strftime('%Y-%m-%d')), '%Y-%m-%d').date()
@@ -190,41 +208,42 @@ def upload_public_unitillity_excel(request):
                     try:
                         Year = calender_date.strftime('%Y-%m-%d')
                         Country = Country_meta.objects.get(Country_Name=row['Country'])
-                        public_unitillity_data = {
+                        public_utillity_data = {
                             'Year': Year,
                             'Country': Country,
-                            'Type_Of_Public_Unitillity': row['Type_Of_Public_Unitillity'],
+                            'Type_Of_Public_Utility': row['Type_Of_Public_Utility'],
                             'Number' : row['Number'],
                             }
                     except Exception as e:
+                            
                             errors.append({
                                 'row_index': index,
-                                'data': public_unitillity_data,
+                                'data': public_utillity_data,
                                 'reason': f'Error inserting row {index}: {e}'
                             })
                             continue
 
                     existing_record = Public_Unitillity.objects.filter(
-                        Q(Year=Year) & Q(Country=Country) & Q(Type_Of_Public_Unitillity = public_unitillity_data['Type_Of_Public_Unitillity']) & Q(Number = public_unitillity_data['Number']) ).first()        
+                        Q(Year=Year) & Q(Country=Country) & Q(Type_Of_Public_Utility = public_utillity_data['Type_Of_Public_Utility']) & Q(Number = public_utillity_data['Number']) ).first()        
 
                     if existing_record:
                         duplicate_data.append({
                             'row_index':index,
-                            'data': public_unitillity_data,
+                            'data': public_utillity_data,
                             'reason': 'Duplicate data found'
                         })
 
 
                     else:
                         try:
-                            public_unitillity =Public_Unitillity(**public_unitillity_data)
-                            public_unitillity.save()
+                            public_utillity =Public_Unitillity(**public_utillity_data)
+                            public_utillity.save()
                             added_count +=1
 
                         except Exception as e:
                             errors.append({
                                 'row_index': index,
-                                'data': public_unitillity_data,
+                                'data': public_utillity_data,
                                 'reason': f"Error inserting row {index}: {e}"
                             })
 
@@ -245,3 +264,31 @@ def upload_public_unitillity_excel(request):
         form = UploadPublicUnitillityDataForm()
 
     return render(request, 'general_data/upload_form.html', {'form': form, 'tables':tables})
+
+
+def update_selected_public_unitillity(request):
+    selected_ids = request.POST.getlist('selected_items')
+    if not selected_ids:
+        messages.error(request, 'No items selected.')
+        return redirect('public_unitillity_table')
+
+    else:
+        queryset = Public_Unitillity.objects.filter(id__in=selected_ids)
+        queryset = queryset.annotate(
+        country = F('Country__Country_Name'),
+        )
+
+        df = pd.DataFrame(list(queryset.values('id','Year','country','Type_Of_Public_Utility','Number')))
+        df.rename(columns={'country': 'Country'}, inplace=True)
+        df = df[['id','Year','Country','Type_Of_Public_Utility','Number']]
+        output = BytesIO()
+        writer = pd.ExcelWriter(output, engine='xlsxwriter')  
+        df.to_excel(writer, sheet_name='Sheet1', index=False)
+        writer.close()  
+        output.seek(0)
+
+        response = HttpResponse(
+            output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
+        return response
