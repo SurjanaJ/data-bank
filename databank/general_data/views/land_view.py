@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.db.models import Q
 import pandas as pd
 from ..models import Land, Country_meta,Land_Code_Meta
-from ..forms import UploadLandData,UploadLandDataForm, UploadLandMetaForm
+from ..forms import UploadLandDataForm, UploadLandMetaForm
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -106,18 +106,18 @@ def delete_land_record(request,item_id):
         return HttpResponse(f"An error occurred: {str(e)}")
 
     
-def update_land_record(request,pk):
-    land_record = Land.objects.get(id=pk)
-    form = UploadLandData(instance=land_record)
+# def update_land_record(request,pk):
+#     land_record = Land.objects.get(id=pk)
+#     form = UploadLandData(instance=land_record)
 
-    if request.method == 'POST':
-        form = UploadLandData(request.POST, instance=land_record)
-        if form.is_valid():
-            form.save()
-            return redirect('land_table')
+#     if request.method == 'POST':
+#         form = UploadLandData(request.POST, instance=land_record)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('land_table')
         
-    context={'form':form,}
-    return render(request,'general_data/update_record.html',context)
+#     context={'form':form,}
+#     return render(request,'general_data/update_record.html',context)
 
 
 def upload_land_excel(request):

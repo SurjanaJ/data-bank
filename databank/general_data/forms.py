@@ -74,7 +74,6 @@ class UploadHotelData(ModelForm):
 class UploadLandDataForm(forms.Form):
     Land_data_file = forms.FileField()
 
-
 class UploadLandData(ModelForm):
     class Meta:
         model = Land
@@ -82,6 +81,23 @@ class UploadLandData(ModelForm):
 
 class UploadLandMetaForm(forms.Form):
     meta_file = forms.FileField()
+
+class UpdateLand(ModelForm):
+    class Meta:
+        model = Land
+        fields='__all__'
+
+        widgets={
+            'Year': forms.DateInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Land_Code': forms.Select(attrs={'class': 'form-control '}),
+            'Unit': forms.Select(attrs={'class': 'form-control '}),
+            'Area': forms.NumberInput(attrs={'class': 'form-control '}),
+
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateLand, self).__init__(*args, **kwargs)
 
 # Population Data
 class UploadPopulationDataForm(forms.Form):
