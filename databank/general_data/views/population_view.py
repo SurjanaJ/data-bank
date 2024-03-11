@@ -300,7 +300,8 @@ def upload_population_excel(request):
 
     return render(request,'general_data/population_templates/upload_population_form.html',{'form':form})
 
-
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def update_selected_population(request):
     selected_ids = request.POST.getlist('selected_items')
     if not selected_ids:

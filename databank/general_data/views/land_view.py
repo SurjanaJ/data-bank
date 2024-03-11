@@ -16,12 +16,15 @@ from django.db.models import F
 from io import BytesIO
 from django.http import HttpResponse
 
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import allowed_users
+
 from trade_data import views
 
 def is_valid_queryparam(param):
     return param !='' and param is not None
 
-
+@login_required(login_url = 'login')
 def display_land_table(request):
 
     data = Land.objects.all()
@@ -81,6 +84,8 @@ def display_land_table(request):
     }
     return render(request, 'general_data/land_templates/land_table.html',context)
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 @require_POST
 def delete_selected_land(request):
     selected_ids = request.POST.getlist('selected_items')
@@ -95,7 +100,8 @@ def delete_selected_land(request):
 
     return redirect('land_table')
 
-
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def delete_land_record(request,item_id):
     try:
         item_to_delete = get_object_or_404(Land, id=item_id)
@@ -119,7 +125,8 @@ def delete_land_record(request,item_id):
 #     context={'form':form,}
 #     return render(request,'general_data/update_record.html',context)
 
-
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_land_excel(request):
     errors = []
     duplicate_data = []
@@ -283,7 +290,8 @@ def upload_land_excel(request):
     else:
         form = UploadLandDataForm()
     return render(request,'general_data/land_templates/upload_land_form.html',{'form':form})
-        
+
+@login_required(login_url = 'login')
 def display_land_meta(request):
     data = Land_Code_Meta.objects.all()
     total_data = data.count()
@@ -293,6 +301,8 @@ def display_land_meta(request):
     context = {'data': data, 'total_data':total_data, 'meta_tables':views.meta_tables, 'tables':tables, 'column_names':column_names}
     return render(request, 'general_data/display_meta.html', context)
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def update_selected_land(request):
     selected_ids = request.POST.getlist('selected_items')
     if not selected_ids:

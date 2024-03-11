@@ -7,6 +7,8 @@ from django.db.models import F
 import pandas as pd
 from django.shortcuts import HttpResponse
 
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import allowed_users
 
 def filter(request):
     data =ForestData.objects.all()
@@ -38,6 +40,7 @@ def filter(request):
 
     return data
 
+@login_required(login_url = 'login')
 def export_forest_table_to_excel(request):
     data=filter(request)
 
@@ -108,7 +111,7 @@ def filter_land(request):
 
 
 
-
+@login_required(login_url = 'login')
 def export_land_table_to_excel(request):
     data=filter_land(request)
 
@@ -169,7 +172,7 @@ def filter_activity_data(request):
 
     return data
 
-
+@login_required(login_url = 'login')
 def export_activity_data_to_excel(request):
     data = filter_activity_data(request)
 
@@ -233,6 +236,7 @@ def filter_hotel(request):
 
     return data
 
+@login_required(login_url = 'login')
 def export_hotel_table_to_excel(request):
     data=filter_hotel(request)
 
@@ -297,6 +301,7 @@ def filter_population(request):
 
     return data
 
+@login_required(login_url = 'login')
 def export_population_table_to_excel(request):
     data = filter_population(request)
 
@@ -361,7 +366,7 @@ def filter_tourism(request):
     return data
 
 
-
+@login_required(login_url = 'login')
 def export_tourism_table_to_excel(request):
     data = filter_tourism(request)
     data = data.annotate(
@@ -432,7 +437,7 @@ def filter_water(request):
 
     return data
 
-
+@login_required(login_url = 'login')
 def export_water_table_to_excel(request):
     data=filter_water(request)
 
@@ -497,6 +502,7 @@ def filter_transport(request):
 
     return data
 
+@login_required(login_url = 'login')
 def export_transport_table_to_excel(request):
     data = filter_transport(request)
     
@@ -555,6 +561,7 @@ def filter_public_unitillity(request):
 
     return data
 
+@login_required(login_url = 'login')
 def export_public_unitillity_table_to_excel(request):
     data = filter_public_unitillity(request)
 
@@ -615,6 +622,8 @@ def filter_road(request):
 
 
     return data
+
+@login_required(login_url = 'login')
 def export_road_table_to_excel(request):
     data = filter_road(request)
 
@@ -690,6 +699,7 @@ def filter_political(request):
 
     return data
 
+@login_required(login_url = 'login')
 def export_political_table_to_excel(request):
     data = filter_political(request)
 
@@ -745,6 +755,7 @@ def filter_health_diseases(request):
 
     return data
 
+@login_required(login_url = 'login')
 def export_health_diseases_table_to_excel(request):
     data = filter_health_diseases(request)
 
@@ -807,6 +818,7 @@ def filter_housing(request):
 
     return data
 
+@login_required(login_url = 'login')
 def export_housing_table_to_excel(request):
     data = filter_housing(request)
 
@@ -881,6 +893,7 @@ def filter_mining(request):
 
     return data
 
+@login_required(login_url = 'login')
 def export_mining_table_to_excel(request):
     data = filter_mining(request)
 
@@ -954,6 +967,7 @@ def filter_disaster(request):
 
     return data
 
+@login_required(login_url = 'login')
 def export_disaster_table_to_excel(request):
     data = filter_disaster(request)
 
