@@ -103,6 +103,10 @@ tables =[
         "name": "Production Data",
         "url": "production_table"
     },
+    {
+        "name": "Population Data",
+        "url": "population_table"
+    },
     ]
 
 
