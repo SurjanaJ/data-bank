@@ -258,3 +258,41 @@ def export_services_excel(request):
     )
     response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
     return response
+
+
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
+def update_selected_services(request):
+    selected_ids = request.POST.getlist('selected_items')
+    if not selected_ids:
+        messages.error(request, 'No items selected.')
+        return redirect('services_table')
+    else:
+        queryset = Services.objects.filter(id__in=selected_ids)
+        queryset = queryset.annotate(
+        country = F('Country__Country_Name'),
+        code = F('Code__Code'),
+        services_type = F('Code__Services_Type'),
+        origin_destination = F('Origin_Destination__Country_Name')
+    )
+        
+    data = pd.DataFrame(list(queryset.values('id','country','code','services_type','origin_destination', 'Direction','Year','Value')))
+
+    data.rename(columns={'country': 'Country', 'code': 'Code', 'services_type':'Services Type','origin_destination':'Origin Destination'}, inplace=True)
+
+    column_order = ['id','Country','Year','Direction','Code','Services Type','Value','Origin Destination']
+
+    data = data[column_order]
+    output = BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')  
+    data.to_excel(writer, sheet_name='Sheet1', index=False)
+
+    writer.close()  
+    output.seek(0)
+
+    response = HttpResponse(
+        output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+    response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
+    return response
+    

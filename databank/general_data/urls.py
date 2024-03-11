@@ -134,6 +134,7 @@ urlpatterns = [
     path('delete_services_record/<int:pk>/', view.delete_record, name ='delete_services_record' ),
     path('delete_selected_services/', view.delete_selected, name='delete_selected_services'),
     path('export_services_excel', services_view.export_services_excel, name='export_services_excel'),
+    path('update_selected_services/', services_view.update_selected_services, name='update_selected_services'),
 
     
     path('upload_crime_meta_excel', view.upload_meta_excel, name='upload_crime_meta_excel'),

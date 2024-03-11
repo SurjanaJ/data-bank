@@ -94,7 +94,7 @@
 {% else %}
 
 
-<form action="{% url 'delete_selected_services' %}" method="post" id="delete-form-services">
+<form action="{% url 'delete_selected_services' %}" method="post" id="delete-form">
     {% csrf_token %}
     <div class="table-responsive mt-4 bg-light p-3">
         <div class="d-flex align-items-center justify-content-between px-2">
@@ -267,7 +267,7 @@
   }
 
   function updateSelected(itemId) {
-        document.getElementById("delete-form").action = "{% url 'update_selected_production' %}";
+        document.getElementById("delete-form").action = "{% url 'update_selected_services' %}";
         document.getElementById("delete-form").submit();
     }
 
