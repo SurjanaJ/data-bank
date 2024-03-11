@@ -159,7 +159,6 @@ class UploadTourismMetaForm(forms.Form):
 class UploadTransportDataForm(forms.Form):
     Transport_data_file = forms.FileField()
 
-
 class UploadTransportData(ModelForm):
     class Meta:
         model = Transport
@@ -167,6 +166,26 @@ class UploadTransportData(ModelForm):
 
 class UploadTransportMetaForm(forms.Form):
     meta_file = forms.FileField()
+
+class UpdateTransport(ModelForm):
+    class Meta:
+        model = Transport
+        fields='__all__'
+
+        widgets={
+            'Year': forms.DateInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Transport_Classification_Code': forms.Select(attrs={'class': 'form-control '}),
+            'Unit': forms.Select(attrs={'class': 'form-control '}),
+            'Quantity': forms.NumberInput(attrs={'class': 'form-control '}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateTransport, self).__init__(*args, **kwargs)
+
+        # Set the labels
+        self.fields['Transport_Classification_Code'].label = 'Transport Classification Code'
+
 
 # public unitillity data
 class UploadPublicUnitillityDataForm(forms.Form):
