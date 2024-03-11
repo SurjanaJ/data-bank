@@ -103,11 +103,15 @@
             </span>
 
             <div class="d-flex align-items-center py-2">
+                <button type="button" class="btn border p-2 styled-link hover-shadow" onclick="updateSelected()">
+                    <i class="fa-solid fa-file-pen"></i>
+                    <span>Update Selected</span>
+                </button>
                 <button type="button" class="btn border p-2 styled-link mx-3 hover-shadow" onclick="confirmDeleteAll()">
                     <i class="fa-regular fa-trash-can" style="color: #ff0000"></i>
                     <span>Delete Selected</span>
                 </button>
-                <a href="{% url 'export_to_excel' %}?{{ request.GET.urlencode }}" class="border p-2 styled-link">
+                <a href="{% url 'export_services_excel' %}?{{ request.GET.urlencode }}" class="border p-2 styled-link">
                     <i class="fa-solid fa-table"></i>
                     <span class="fw-normal">Export to Excel</span>
                 </a>
@@ -261,6 +265,11 @@
           alert("Delete canceled!");
       }
   }
+
+  function updateSelected(itemId) {
+        document.getElementById("delete-form").action = "{% url 'update_selected_production' %}";
+        document.getElementById("delete-form").submit();
+    }
 
   function confirmDeleteAll() {
         var confirmDelete = confirm(
