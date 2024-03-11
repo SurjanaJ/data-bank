@@ -22,7 +22,6 @@ def is_valid_queryparam(param):
 
 
 def display_transport_table(request):
-
     url = reverse('transport_table')
     data = Transport.objects.all()
     country_categories = Country_meta.objects.all()

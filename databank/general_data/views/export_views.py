@@ -509,13 +509,15 @@ def export_transport_table_to_excel(request):
     data = data.annotate(
         country_name=F('Country__Country_Name'),
         transport_classification_code = F('Transport_Classification_Code__Code'),
+        transport_type = F('Transport_Classification_Code__Transport_Type'),
+
     )
 
-    df=pd.DataFrame(data.values('Year','country_name','transport_classification_code','Unit','Quantity'))
+    df=pd.DataFrame(data.values('Year','country_name','transport_classification_code','transport_type','Unit','Quantity'))
 
-    df.rename(columns={'country_name':'Country','transport_classification_code':'Transport_Classification_Code'},inplace=True)
+    df.rename(columns={'country_name':'Country','transport_classification_code':'Transport Classification Code','transport_type':'Transport Type'},inplace=True)
 
-    df = df[['Year','Country','Transport_Classification_Code','Unit','Quantity']]
+    df = df[['Year','Country','Transport Classification Code','Unit','Quantity','Transport Type']]
 
     output=BytesIO()
     writer=pd.ExcelWriter(output,engine='xlsxwriter')
