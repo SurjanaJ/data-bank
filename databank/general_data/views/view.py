@@ -702,6 +702,8 @@ def delete_selected(request):
 
     return redirect(model_view)
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])   
 def update_selected_forest(request):
     selected_ids = request.POST.getlist('selected_items')
     if not selected_ids:
@@ -709,15 +711,14 @@ def update_selected_forest(request):
         return redirect('forest_table')
 
     else:
-        queryset = ActivityData.objects.filter(id__in=selected_ids)
+        queryset = ForestData.objects.filter(id__in=selected_ids)
         queryset = queryset.annotate(
         country = F('Country__Country_Name'),
-        activity_code=F('Activity_Code__Code'),
         )
 
         df = pd.DataFrame(list(queryset.values('id','Year','country','Name_Of_The_Plant','Scientific_Name','Local_Name','Stock_Unit','Stock_Available','Area_Unit','Area_Covered')))
-        df.rename(columns={'country': 'Country'}, inplace=True)
-        df = df[['id','Year', 'Country','Year','Country','Name_Of_The_Plant','Scientific_Name','Local_Name','Stock_Unit','Stock_Available','Area_Unit','Area_Covered']]
+        df.rename(columns={'country': 'Country','Name_Of_The_Plant':'Name Of The Plant','Scientific_Name':'Scientific Name','Local_Name':'Local Name', 'Stock_Unit':'Stock Unit','Stock_Available':'Stock Available','Area_Unit':'Area Unit','Area_Covered':'Area Covered'}, inplace=True)
+        df = df[['id','Year', 'Country','Year','Country','Name Of The Plant','Scientific Name','Local Name','Stock Unit','Stock Available','Area Unit','Area Covered']]
         output = BytesIO()
         writer = pd.ExcelWriter(output, engine='xlsxwriter')  
         df.to_excel(writer, sheet_name='Sheet1', index=False)
