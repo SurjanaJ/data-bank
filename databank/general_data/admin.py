@@ -133,7 +133,7 @@ class Health_Disease_Admin(admin.ModelAdmin ):
 
 admin.site.register(Health_disease,Health_Disease_Admin)
 
-admin.site.register(Budgetary_Data)
+# admin.site.register(Budgetary_Data)
 
 
 

@@ -560,7 +560,7 @@ def update_record(request,pk):
         Climate_Data:'climate_table',
         Exchange: 'exchange_table',
         Energy: 'energy_table',
-        ActivityData:'activity_table',,
+        ActivityData:'activity_table',
         Index: 'index_table',
         Publication: 'publication_table',
         Budgetary_Data:'budget_table',
@@ -623,7 +623,7 @@ def delete_record(request,pk):
         Climate_Data:'climate_table',
         Exchange: 'exchange_table',
         Energy:'energy_table',
-        ActivityData:'activity_table'
+        ActivityData:'activity_table',
         Index : 'index_table',
         Publication: 'publication_table',
         Budgetary_Data:'budget_table',

@@ -121,7 +121,7 @@ tables =[
         "name": "Water Data",
         "url": "water_table"
     },
-    ,
+    
     {
         "name": "Index Data",
         "url": "index_table"
