@@ -122,9 +122,9 @@ class UpdateServices(ModelForm):
             'Country': forms.Select(attrs={'class': 'form-control '}),
             'Year': forms.DateInput(attrs={'class': 'form-control '}),
             'Direction': forms.Select(attrs={'class': 'form-control  '}),
-            'Code': forms.Select(attrs={'class': 'form-control  '}),
-            'Value': forms.NumberInput(attrs={'class': 'form-control  '}),
-            'Origin Destination': forms.Select(attrs={'class': 'form-control '}),
+            'Code': forms.Select(attrs={'class': 'form-control'}),
+            'Value': forms.NumberInput(attrs={'class': 'form-control'}),
+            'Origin_Destination': forms.Select(attrs={'class': 'form-control'}),
         }
 
 # CRIME DATA
