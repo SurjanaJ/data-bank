@@ -159,6 +159,9 @@
                 Transport Classification Code
             </th>
             <th class=" text-white fst-normal  " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;">
+              Transport Type
+          </th>
+            <th class=" text-white fst-normal  " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;">
                 Quantity In Metric Ton
             </th>
             <th class=" text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;">
@@ -184,6 +187,7 @@
             <td >{{ record.Year }}</td>
             <td>{{ record.Country }}</td>
             <td>{{ record.Transport_Classification_Code.Code }}</td>
+            <td>{{ record.Transport_Classification_Code.Transport_Type }}</td>
             <td>{{ record.Unit }}</td>
             <td>{{ record.Quantity }}</td>
  

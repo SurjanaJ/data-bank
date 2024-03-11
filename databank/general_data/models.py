@@ -70,6 +70,9 @@ class Transport_Meta(models.Model):
     Code=models.CharField(max_length=100)
     Transport_Type=models.TextField(null=True,blank=True)
 
+    def __str__(self):
+        return (f'{self.Code} - {self.Transport_Type}')
+
 class Transport(models.Model):
 
     Unit_Options=(
