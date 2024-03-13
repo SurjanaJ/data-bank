@@ -310,6 +310,45 @@
 </div>
 
 <script>
+    // Function to store the state of checkboxes in localStorage for the current page
+  function storeCheckboxState() {
+    const checkboxes = document.querySelectorAll('.item-checkbox');
+    const selectedItems = [];
+    checkboxes.forEach((checkbox) => {
+      if (checkbox.checked) {
+        selectedItems.push(checkbox.value);
+      }
+    });
+    localStorage.setItem('selectedItemsPage{{ page.number }}', JSON.stringify(selectedItems));
+  }
+
+  // Function to restore the state of checkboxes from localStorage for the current page
+  function restoreCheckboxState() {
+    const selectedItemsKey = 'selectedItemsPage{{ page.number }}';
+    const selectedItems = JSON.parse(localStorage.getItem(selectedItemsKey));
+    if (selectedItems) {
+      const checkboxes = document.querySelectorAll('.item-checkbox');
+      checkboxes.forEach((checkbox) => {
+        if (selectedItems.includes(checkbox.value)) {
+          checkbox.checked = true;
+        }
+      });
+    }
+  }
+
+  // Restore checkbox state when the page loads
+  window.addEventListener('load', restoreCheckboxState);
+
+  // Store checkbox state when a checkbox is clicked
+  document.querySelectorAll('.item-checkbox').forEach((checkbox) => {
+    checkbox.addEventListener('change', storeCheckboxState);
+  });
+
+  // Clear checkbox state for the current page when the form is submitted
+  document.getElementById('delete-form').addEventListener('submit', () => {
+    localStorage.removeItem('selectedItemsPage{{ page.number }}');
+  });
+
   function updateSelected(itemId) {
         document.getElementById("delete-form").action = "{% url 'update_selected_trade' %}";
         document.getElementById("delete-form").submit();
