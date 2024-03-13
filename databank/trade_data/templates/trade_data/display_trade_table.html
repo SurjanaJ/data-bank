@@ -135,7 +135,7 @@
 </div>
 {% else %}
 <div>
-  <form method="post" action="{% url 'delete_selected_trade' %}" id="delete-form">
+  <form method="post" action="{% url 'delete_selected_trade' %}" id="delete-form-trade">
     {% csrf_token %}
     <div class="table-responsive mt-4 bg-light p-3">
       <div class="d-flex align-items-center justify-content-between px-2">
@@ -345,13 +345,13 @@
   });
 
   // Clear checkbox state for the current page when the form is submitted
-  document.getElementById('delete-form').addEventListener('submit', () => {
+  document.getElementById('delete-form-trade').addEventListener('submit', () => {
     localStorage.removeItem('selectedItemsPage{{ page.number }}');
   });
 
   function updateSelected(itemId) {
-        document.getElementById("delete-form").action = "{% url 'update_selected_trade' %}";
-        document.getElementById("delete-form").submit();
+        document.getElementById("delete-form-trade").action = "{% url 'update_selected_trade' %}";
+        document.getElementById("delete-form-trade").submit();
     }
     function confirmDelete(itemId) {
       var result = confirm("Are you sure you want to delete this record?");
