@@ -1,5 +1,6 @@
 from datetime import date
 from io import BytesIO
+from django.db.models import F, Q
 import json
 from math import isnan
 from django.db import IntegrityError
@@ -679,6 +680,54 @@ def update_trade_record(request,pk):
         
     context={'form':form, 'meta_tables':meta_tables}
     return render(request,'trade_data/update_trade_record.html',context)
+
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
+def update_selected_trade(request):
+    selected_ids = request.POST.getlist('selected_items')
+    if not selected_ids:
+        messages.error(request, 'No items selected.')
+        return redirect('display_trade_table')
+    else:
+        queryset = TradeData.objects.filter(id__in=selected_ids)
+        queryset = queryset.annotate(
+        country = F('Country__Country_Name'),
+        hs_code = F('HS_Code__HS_Code'),
+        Product_Information = F('HS_Code__Product_Information'),
+        unit = F('Unit__Unit_Code'),
+        origin_destination = F('Origin_Destination__Country_Name')
+    )
+
+    data = pd.DataFrame(list(queryset.values('id','Trade_Type','Calender','Fiscal_Year','Duration','country','hs_code','Product_Information', 'unit','Quantity','Currency_Type','Amount','Tarrif','origin_destination','TradersName_ExporterImporter','DocumentsLegalProcedural')))
+
+    data.rename(columns={
+                        'Trade_Type':'Trade Type',
+                        'Fiscal_Year':'Fiscal Year',
+                         'country':'Country',
+                         'hs_code': 'HS Code',
+                         'Product_Information':'Product Information',
+                         'unit':'Unit',
+                         'Currency_Type':'Currency Type',
+                         'origin_destination':'Origin Destination',
+                         'TradersName_ExporterImporter':'TradersName ExporterImporter',
+                         'DocumentsLegalProcedural':'Documents Legal Procedural'
+                         }, inplace=True)
+    column_order = ['id','Trade Type','Calender','Fiscal Year','Duration','Country','HS Code', 'Product Information','Unit','Quantity','Currency Type','Amount','Tarrif','Origin Destination','TradersName ExporterImporter','Documents Legal Procedural']
+
+    data = data[column_order]
+    output = BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')  
+    data.to_excel(writer, sheet_name='Sheet1', index=False)
+
+    writer.close()  
+    output.seek(0)
+
+    response = HttpResponse(
+            output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
+    return response
+
 
 def find_country_name(country_category):
     if country_category == '--':

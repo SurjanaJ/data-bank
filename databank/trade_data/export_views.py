@@ -59,8 +59,6 @@ def filter(request):
 @login_required(login_url = 'login')
 def export_to_excel(request):
     data = filter(request)
-    
-    
     # getting the foreign key values
     data = data.annotate(
         country_name=F('Country__Country_Name'),  

@@ -17,6 +17,7 @@ urlpatterns = [
     path('upload_trade_record',views.upload_trade_record, name='upload_trade_record'),
     path('delete_trade_record/<int:item_id>/', views.delete_trade_record ,name='delete_trade_trade'),
     path('update_trade_record/<int:pk>/',views.update_trade_record, name='update_trade_record'),
+    path('update_selected_trade/', views.update_selected_trade, name='update_selected_trade'),
 
     path('country',views.display_country_meta, name='country'),
     path('unit',views.display_unit_meta, name='unit'),
