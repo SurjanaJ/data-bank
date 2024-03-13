@@ -255,6 +255,11 @@ meta_tables =[
     },
     ]
 
+def strip_spaces(value):
+    if isinstance(value, str):
+        return value.strip()
+    return value
+
 def is_valid_queryparam(param):
     return param !='' and param is not None
 
@@ -488,9 +493,7 @@ def upload_hs_code_meta_excel(request):
 @allowed_users(allowed_roles=['admin'])
 def upload_trade_excel(request):
     errors = []
-    success_messages = []
     duplicate_data = []
-
     added_count = 0
     updated_count = 0
 
@@ -499,133 +502,169 @@ def upload_trade_excel(request):
 
         if form.is_valid():
             excel_data = request.FILES['trade_data_file']
-            df = pd.read_excel(excel_data,dtype={'HS_Code': str})
+            df = pd.read_excel(excel_data, dtype={'HS Code': str})
             df.fillna('', inplace=True)
             df['Calender'] = pd.to_datetime(df['Calender']).dt.date
-
-            total_rows = len(df)
-            rows_processed = 0
-
-            for index, row in df.iterrows():
-                trade_data = {
-                    'Trade_Type':row['Trade_Type'],
-                    'Calender': row['Calender'],
-                    'Fiscal_Year':row['Fiscal_Year'],
+            df = df.map(strip_spaces)
+            
+            #update existing data
+            if 'id' in df.columns:
+                for index, row in df.iterrows():
+                    id = row.get('id')
+                    data = {
+                    'Trade Type':row['Trade Type'],
+                    'Calender': row['Calender'].isoformat(),
+                    'Fiscal Year':row['Fiscal Year'],
                     'Duration':row['Duration'],
                     'Country' : row['Country'],
-                    'HS_Code' : row['HS_Code'],
-                    'Product_Information': row['Product_Information'],
+                    'HS Code' : row['HS Code'],
+                    'Product Information': row['Product Information'],
                     'Unit' : row['Unit'],
                     'Quantity':row['Quantity'],
-                    'Currency_Type':row['Currency_Type'],
+                    'Currency Type':row['Currency Type'],
                     'Amount':row['Amount'],
                     'Tarrif' : 0.0 if row['Tarrif'] == 'nan' or (row['Tarrif']== '') else row['Tarrif'],
-                    'Origin_Destination' : row['Origin_Destination'],
-                    'TradersName_ExporterImporter':row['TradersName_ExporterImporter'],
-                    'DocumentsLegalProcedural':row['DocumentsLegalProcedural']
-                }
-                try:
-                    
-                    Calender = row['Calender']
-                    Country = Country_meta.objects.get(Country_Name=row['Country'])
-                    HS_Code = HS_Code_meta.objects.get(HS_Code=row['HS_Code'])
-                    Unit = Unit_meta.objects.get(Unit_Code=row['Unit'])
-                    Origin_Destination = Country_meta.objects.get(
-                        Country_Name=row['Origin_Destination'])
-                    
-                    if HS_Code:
-                        trade_data['Product_Information'] = HS_Code.Product_Information
-                    else:
-                        trade_data['Product_Information'] = row['Product_Information']
-                    
-                    trade_type = row['Trade_Type']
-                    if trade_type not in ['Import', 'Export']:
-                        raise ValueError(f"Invalid Trade_Type at row {index}: {trade_type}")
-                    trade_data = {
-                        'Trade_Type': row['Trade_Type'],
-                        'Calender': Calender,
-                        'Fiscal_Year':row['Fiscal_Year'],
-                        'Duration':row['Duration'],
-                        'Country' : Country,
-                        'HS_Code' : HS_Code,
-                        'Unit' : Unit,
-                        'Quantity':row['Quantity'],
-                        'Currency_Type' :row['Currency_Type'],
-                        'Amount':row['Amount'],
-                        'Tarrif' : 0.0 if row['Tarrif'] == 'nan' or (row['Tarrif']== '') else row['Tarrif'],
-                        'Origin_Destination' : Origin_Destination,
-                        'TradersName_ExporterImporter':row['TradersName_ExporterImporter'],
-                        'DocumentsLegalProcedural':row['DocumentsLegalProcedural']
+                    'Origin Destination' : row['Origin Destination'],
+                    'TradersName ExporterImporter':row['TradersName ExporterImporter'],
+                    'Documents Legal Procedural':row['Documents Legal Procedural']
                     }
-                
-                except Exception as e:
-                    # Convert datetime.date objects to strings before appending to errors
-                    trade_data['Calender'] = Calender.isoformat()
-                    errors.append({'row_index': index, 'data': trade_data, 'reason': str(e)})
-                    rows_processed +=1
-                    print(f'{str(total_rows - rows_processed)} left')
-                    continue
-                    
-                existing_record = TradeData.objects.filter(
-                        Q(Calender=Calender) & Q(Country=Country) & Q(HS_Code=HS_Code) & Q(Unit=Unit) & Q(Origin_Destination=Origin_Destination) & Q(Trade_Type = trade_data['Trade_Type'])
+
+                    #get existing data
+                    try:
+                        trade_instance = TradeData.objects.get(id = id)
+                        trade_data = data
+
+                        # check if all meta values exist
+                        try:
+                            Calender = row['Calender']
+                            Country = Country_meta.objects.get(Country_Name=row['Country'])
+                            HS_Code = HS_Code_meta.objects.get(HS_Code=row['HS Code'])
+                            Unit = Unit_meta.objects.get(Unit_Code=row['Unit'])
+                            Origin_Destination = Country_meta.objects.get(
+                                Country_Name=row['Origin Destination'])
+                            
+                            trade_instance.Country = Country
+                            trade_instance.HS_Code = HS_Code
+                            trade_instance.Unit = Unit
+                            trade_instance.Origin_Destination = Origin_Destination
+                            trade_instance.Trade_Type =row ['Trade Type']
+                            trade_instance.Calender= row['Calender']
+                            trade_instance.Fiscal_Year= row['Fiscal Year']
+                            trade_instance.Duration= row['Duration']
+                            trade_instance.Quantity= row['Quantity']
+                            trade_instance.Currency_Type= row['Currency Type']
+                            trade_instance.Amount= row['Amount']
+                            trade_instance.Tarrif= row['Tarrif']
+                            trade_instance.TradersName_ExporterImporter= row['TradersName ExporterImporter']
+                            trade_instance.DocumentsLegalProcedural= row['Documents Legal Procedural']
+
+                            
+                            trade_instance.save()
+                            updated_count += 1
+
+                        #meta data does not exist
+                        except Exception as e:
+                            trade_data = data
+                            errors.append({'row_index': index, 'data': trade_data, 'reason': str(e)})
+                            continue
+
+                    #existing data not found
+                    except Exception as e:
+                        trade_data = data
+                        errors.append({
+                                        'row_index': index,
+                                        'data': trade_data,
+                                        'reason': f'Error inserting row {index}: {e}'
+                                    })
+                        continue
+            else:
+            # add new data
+                for index, row in df.iterrows():
+                    data = {
+                    'Trade Type':row['Trade Type'],
+                    'Calender': row['Calender'].isoformat(),
+                    'Fiscal Year':row['Fiscal Year'],
+                    'Duration':row['Duration'],
+                    'Country' : row['Country'],
+                    'HS Code' : row['HS Code'],
+                    'Product Information': row['Product Information'],
+                    'Unit' : row['Unit'],
+                    'Quantity':row['Quantity'],
+                    'Currency Type':row['Currency Type'],
+                    'Amount':row['Amount'],
+                    'Tarrif' : 0.0 if row['Tarrif'] == 'nan' or (row['Tarrif']== '') else row['Tarrif'],
+                    'Origin Destination' : row['Origin Destination'],
+                    'TradersName ExporterImporter':row['TradersName ExporterImporter'],
+                    'Documents Legal Procedural':row['Documents Legal Procedural']
+                    }    
+
+                    # Check if meta values exist
+                    try:
+                        Calender = row['Calender']
+                        Country = Country_meta.objects.get(Country_Name=row['Country'])
+                        HS_Code = HS_Code_meta.objects.get(HS_Code=row['HS Code'])
+                        Unit = Unit_meta.objects.get(Unit_Code=row['Unit'])
+                        Origin_Destination = Country_meta.objects.get(
+                                Country_Name=row['Origin Destination'])
+                            
+                        trade_data = {
+                            'Trade_Type': row['Trade Type'],
+                            'Calender': row['Calender'],
+                            'Fiscal_Year':row['Fiscal Year'],
+                            'Duration': row['Duration'],
+                            'Country': Country,
+                            'HS_Code':HS_Code,
+                            'Unit':Unit,
+                            'Quantity':row['Quantity'],
+                            'Currency_Type':row['Currency Type'],
+                            'Amount': row['Amount'],
+                            'Tarrif':row['Tarrif'],
+                            'Origin_Destination':Origin_Destination,
+                            'TradersName_ExporterImporter': row['TradersName ExporterImporter'],
+                            'DocumentsLegalProcedural':row['Documents Legal Procedural']
+                        }
+
+                        existing_record = TradeData.objects.filter(
+                            Q(Trade_Type = row['Trade Type'])
+                            & Q(Calender = row['Calender'])
+                            & Q(Fiscal_Year = row['Fiscal Year'])
+                            & Q(Duration = row['Duration'])
+                            & Q(Country = Country)
+                            & Q(HS_Code = HS_Code)
+                            & Q(Unit = Unit)
+                            & Q(Quantity = row['Quantity'])
+                            & Q(Currency_Type = row['Currency Type'])
+                            & Q(Amount = row['Amount'])
+                            & Q(Tarrif = row['Tarrif'])
+                            & Q(Origin_Destination = Origin_Destination)
+                            & Q(TradersName_ExporterImporter = row['TradersName ExporterImporter'])
+                            & Q(DocumentsLegalProcedural = row['Documents Legal Procedural'])
                         ).first()
 
-                if existing_record:
-                    existing_dict = model_to_dict(existing_record)
-                    trade_data_dict = model_to_dict(TradeData(**trade_data))
 
-                # Check for equality, handling NaN values
-                    
-                    if all(existing_dict[key] == trade_data_dict[key] or (pd.isna(existing_dict[key]) and pd.isna(trade_data_dict[key])) for key in trade_data_dict if key != 'id'):
-                        trade_data = {
-                        'Trade_Type': row['Trade_Type'],
-                        'Calender': Calender.isoformat(),
-                        'Fiscal_Year':row['Fiscal_Year'],
-                        'Duration':row['Duration'],
-                        'Country' : Country.Country_Name,
-                        'HS_Code' : HS_Code.HS_Code,
-                        'Unit' : Unit.Unit_Code,
-                        'Quantity':row['Quantity'],
-                        'Currency_Type' :row['Currency_Type'],
-                        'Amount':row['Amount'],
-                        'Tarrif' : 0.0 if row['Tarrif'] == 'nan' or (row['Tarrif']== '') else row['Tarrif'],
-                        'Origin_Destination' : Origin_Destination.Country_Name,
-                        'TradersName_ExporterImporter':row['TradersName_ExporterImporter'],
-                        'DocumentsLegalProcedural':row['DocumentsLegalProcedural']
-                    }
-                        duplicate_data.append({
-                            
-                            'row_index': index,
-                            'data': {key: str(trade_data[key]) if isinstance(trade_data[key], date) else trade_data[key] for key in trade_data}
-                        })
-                        rows_processed +=1
-                        print(f'{str(total_rows - rows_processed)} left')
-                        
-                    else:
-                        # Update the row with non-duplicate data
-                        for key, value in trade_data.items():
-                            setattr(existing_record, key, value)
-                        try:
-                            existing_record.save()
-                            updated_count += 1
-                            rows_processed +=1
-                            print(f'{str(total_rows - rows_processed)} left')
-                        except IntegrityError as e:
-                            errors.append(f"Error updating row {index}: {e}")
-                            rows_processed +=1
-                        print(f'{str(total_rows - rows_processed)} left')        
+                        # show duplicate data
+                        if existing_record:
+                            trade_data = data
+                            duplicate_data.append({
+                                'row_index': index,
+                                    'data': {key: str(value) for key, value in trade_data.items()}
+                            })
+                            continue
+                        else:
+                            #add new record
+                            try:
+                                tradeData = TradeData(**trade_data)
+                                tradeData.save()
+                                added_count += 1
+                            except Exception as e:
+                                errors.append(f"Error inserting row {index}: {e}")
 
-                else:
-                    try:
-                        tradeData = TradeData(**trade_data)
-                        tradeData.save()
-                        added_count += 1
-                        rows_processed +=1
-                        print(f'{str(total_rows - rows_processed)} left')
+                    #meta values does not exist
                     except Exception as e:
-                        errors.append(f"Error inserting row {index}: {e}")
-                        rows_processed +=1
-                        print(f'{str(total_rows - rows_processed)} left')
+                        trade_data = data
+                        errors.append({'row_index': index, 'data': trade_data, 'reason': str(e)})
+                        continue
+
 
             if added_count > 0:
                 messages.success(request, str(added_count) + ' records added.')
