@@ -118,7 +118,7 @@ class Water_Meta(models.Model):
     Water_Type=models.TextField(null=True,blank=True)
 
     def __str__(self):
-        return self.Code
+        return (f'{self.Code} - {self.Water_Type}')
 
 
 class Water(models.Model):
