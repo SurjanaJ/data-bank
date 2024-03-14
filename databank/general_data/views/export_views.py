@@ -246,9 +246,8 @@ def export_hotel_table_to_excel(request):
 
     df = pd.DataFrame(data.values('Year','country_name','Name_Of_The_Hotel','Capacity_Room','Occupancy_In_Year','City'))
 
-    df.rename(columns={'country_name':'Country'},inplace=True)
-
-    df = df[['Year','Country','Name_Of_The_Hotel','Capacity_Room','Occupancy_In_Year','City']]
+    df.rename(columns={'country_name': 'Country','Name_Of_The_Hotel':'Name Of The Hotel','Capacity_Room':'Capacity Room','Occupancy_In_Year':'Occupancy In Year'}, inplace=True)
+    df = df[['Year','Country','Name Of The Hotel','Capacity Room','Occupancy In Year','City']]
 
     output=BytesIO()
     writer = pd.ExcelWriter(output,engine='xlsxwriter')
