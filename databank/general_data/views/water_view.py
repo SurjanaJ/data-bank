@@ -334,11 +334,12 @@ def update_selected_water(request):
         queryset = queryset.annotate(
         country = F('Country__Country_Name'),
         water_code = F('Water_Type_Code__Code'),
+        water_type = F('Water_Type_Code__Water_Type'),
         )
 
-        df = pd.DataFrame(list(queryset.values('id','Year','country','water_code','Description','Unit','Volume','Name_Of_The_River')))
-        df.rename(columns={'country': 'Country','water_code':'Water Type Code','Name_Of_The_River':'Name Of The River'}, inplace=True)
-        df = df[['id','Year','Country','Water Type Code','Description','Unit','Volume','Name Of The River']]
+        df = pd.DataFrame(list(queryset.values('id','Year','country','water_code','water_type','Description','Unit','Volume','Name_Of_The_River')))
+        df.rename(columns={'country': 'Country','water_code':'Water Type Code','water_type':'Water Type','Name_Of_The_River':'Name Of The River'}, inplace=True)
+        df = df[['id','Year','Country','Water Type Code','Water Type','Description','Unit','Volume','Name Of The River']]
         output = BytesIO()
         writer = pd.ExcelWriter(output, engine='xlsxwriter')  
         df.to_excel(writer, sheet_name='Sheet1', index=False)

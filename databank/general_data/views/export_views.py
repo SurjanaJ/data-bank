@@ -443,12 +443,14 @@ def export_water_table_to_excel(request):
     data=data.annotate(
         country_name=F('Country__Country_Name'),
         water_code = F('Water_Type_Code__Code'),
+        water_type = F('Water_Type_Code__Water_Type'),
+
     )
 
-    df=pd.DataFrame(data.values('Year','country_name','water_code','Description','Unit','Volume','Name_Of_The_River'))
+    df=pd.DataFrame(data.values('Year','country_name','water_code','water_type','Description','Unit','Volume','Name_Of_The_River'))
 
-    df.rename(columns={'country_name': 'Country','water_code':'Water Type Code','Name_Of_The_River':'Name Of The River'}, inplace=True)
-    df = df[['Year','Country','Water Type Code','Description','Unit','Volume','Name Of The River']]
+    df.rename(columns={'country_name': 'Country','water_code':'Water Type Code','water_type':'Water Type','Name_Of_The_River':'Name Of The River'}, inplace=True)
+    df = df[['Year','Country','Water Type Code','Water Type','Description','Unit','Volume','Name Of The River']]
 
     output=BytesIO()
     writer=pd.ExcelWriter(output,engine='xlsxwriter')
