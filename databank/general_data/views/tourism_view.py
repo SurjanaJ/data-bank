@@ -301,16 +301,24 @@ def update_selected_tourism(request):
         queryset = Tourism.objects.filter(id__in=selected_ids)
         queryset = queryset.annotate(
         country = F('Country__Country_Name'),
-        arrival_mode=F('Arrival_code__Code'),
+        arrival_code=F('Arrival_code__Code'),
+        arrival_mode=F('Arrival_code__Arrival_Mode'),
         nationality_of_tourism=F('Nationality_Of_Tourism__Country_Name'),
         )
 
-        df = pd.DataFrame(list(queryset.values('id','Year','country','Number_Of_Tourist','nationality_of_tourism','arrival_mode','Number')))
-        df.rename(columns={'country': 'Country','nationality_of_tourism':'Nationality_Of_Tourism','arrival_mode':'Arrival_Mode'}, inplace=True)
-        df = df[['id','Year','Country','Number_Of_Tourist','Nationality_Of_Tourism','Arrival_Mode','Number']]
+        data = pd.DataFrame(list(queryset.values('id','Year','country','Number_Of_Tourist','nationality_of_tourism','arrival_code','arrival_mode','Number')))
+
+        data.rename(columns={'country': 'Country','nationality_of_tourism':'Nationality Of Tourism','arrival_mode':'Arrival Mode',
+        'arrival_code':'Arrival Code',
+        'Number_Of_Tourist':'Number Of Tourist'}, inplace=True)
+
+        column_order = ['id','Year','Country','Number Of Tourist','Nationality Of Tourism','Arrival Code','Arrival Mode','Number']
+
+        data = data[column_order]
+
         output = BytesIO()
         writer = pd.ExcelWriter(output, engine='xlsxwriter')  
-        df.to_excel(writer, sheet_name='Sheet1', index=False)
+        data.to_excel(writer, sheet_name='Sheet1', index=False)
         writer.close()  
         output.seek(0)
 
