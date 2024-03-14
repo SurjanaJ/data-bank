@@ -125,9 +125,9 @@ def upload_hotel_excel(request):
                     hotel_data = {
                         'Year': row['Year'].date().strftime('%Y-%m-%d'),
                         'Country': row['Country'],
-                        'Name_Of_The_Hotel': row['Name_Of_The_Hotel'],
-                        'Capacity_Room': row['Capacity_Room'],
-                        'Occupancy_In_Year': row['Occupancy_In_Year'],
+                        'Name_Of_The_Hotel': row['Name Of The Hotel'],
+                        'Capacity_Room': row['Capacity Room'],
+                        'Occupancy_In_Year': row['Occupancy In Year'],
                         'City' : row['City'],                        
                     }
 
@@ -146,9 +146,9 @@ def upload_hotel_excel(request):
 
                         hotel_instance.Year = Year
                         hotel_instance.Country = Country
-                        hotel_instance.Name_Of_The_Hotel = row['Name_Of_The_Hotel']
-                        hotel_instance.Capacity_Room = row['Capacity_Room']
-                        hotel_instance.Occupancy_In_Year = row['Occupancy_In_Year']
+                        hotel_instance.Name_Of_The_Hotel = row['Name Of The Hotel']
+                        hotel_instance.Capacity_Room = row['Capacity Room']
+                        hotel_instance.Occupancy_In_Year = row['Occupancy In Year']
                         hotel_instance.City = row['City']
 
                         hotel_instance.save()
@@ -158,9 +158,9 @@ def upload_hotel_excel(request):
                         hotel_data = {
                             'Year': row['Year'].date().strftime('%Y-%m-%d'),
                             'Country': row['Country'],
-                            'Name_Of_The_Hotel': row['Name_Of_The_Hotel'],
-                            'Capacity_Room': row['Capacity_Room'],
-                            'Occupancy_In_Year': row['Occupancy_In_Year'],
+                            'Name_Of_The_Hotel': row['Name Of The Hotel'],
+                            'Capacity_Room': row['Capacity Room'],
+                            'Occupancy_In_Year': row['Occupancy In Year'],
                             'City' : row['City'],                        
                         }
 
@@ -173,9 +173,9 @@ def upload_hotel_excel(request):
                     hotel_data = {
                         'Year': row['Year'].date().strftime('%Y-%m-%d'),
                         'Country': row['Country'],
-                        'Name_Of_The_Hotel': row['Name_Of_The_Hotel'],
-                        'Capacity_Room': row['Capacity_Room'],
-                        'Occupancy_In_Year': row['Occupancy_In_Year'],
+                        'Name_Of_The_Hotel': row['Name Of The Hotel'],
+                        'Capacity_Room': row['Capacity Room'],
+                        'Occupancy_In_Year': row['Occupancy In Year'],
                         'City' : row['City'],                        
                     }
 
@@ -192,9 +192,9 @@ def upload_hotel_excel(request):
                         hotel_data = {
                             'Year':Year,
                             'Country':Country,
-                            'Name_Of_The_Hotel': row['Name_Of_The_Hotel'],
-                            'Capacity_Room': row['Capacity_Room'],
-                            'Occupancy_In_Year': row['Occupancy_In_Year'],
+                            'Name_Of_The_Hotel': row['Name Of The Hotel'],
+                            'Capacity_Room': row['Capacity Room'],
+                            'Occupancy_In_Year': row['Occupancy In Year'],
                             'City' : row['City'],
                         }
 
@@ -206,7 +206,7 @@ def upload_hotel_excel(request):
                         })
                         continue
 
-                    existing_record = Hotel.objects.filter(Q(Year = Year) & Q(Country = Country) & Q(Name_Of_The_Hotel = hotel_data['Name_Of_The_Hotel'])& Q(Capacity_Room = hotel_data['Capacity_Room']) & Q(City = hotel_data['City']) & Q(Occupancy_In_Year = hotel_data['Occupancy_In_Year'])).first()
+                    existing_record = Hotel.objects.filter(Q(Year = Year) & Q(Country = Country) & Q(Name_Of_The_Hotel = row['Name Of The Hotel'])& Q(Capacity_Room = row['Capacity Room']) & Q(City = row['City']) & Q(Occupancy_In_Year = row['Occupancy In Year'])).first()
 
                     if existing_record:
                         duplicate_data.append({
@@ -240,8 +240,12 @@ def upload_hotel_excel(request):
                 return render(request, 'general_data/error_template.html', {'errors': errors})
             
 
-            if duplicate_data:
+            elif duplicate_data:
                 return  render (request,'general_data/duplicate_template.html',{'duplicate_data':duplicate_data})
+            
+            else:
+                return redirect('hotel_table')
+
 
     else:
         form = UploadHotelDataForm()
