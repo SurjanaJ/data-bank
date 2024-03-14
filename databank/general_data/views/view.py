@@ -6,8 +6,8 @@ from django.urls import resolve, reverse
 from django.db.models import Q
 import pandas as pd
 from trade_data import views
-from ..models import Hotel, Land, Mine_Meta, PopulationData,Road_Meta,Housing_Meta,Health_disease_Meta,Disaster_Data_Meta,Budgetary_Data, Production, Production_Meta,Publication,Index,Climate_Data, Crime, Crime_Meta, Disaster_Data, Exchange, Health_disease,Road,Mining,Housing,Political_Data, Education, Education_Degree_Meta, Education_Level_Meta, Energy, Energy_Meta, ForestData, Country_meta, Land_Code_Meta, Occupation, Occupation_Meta, Services, Services_Meta, Tourism_Meta, Transport, Transport_Meta, Water_Meta,Activity_Meta,ActivityData
-from ..forms import UpdateActivity, UpdateForest, UpdateHotel, UpdateLand, UpdatePopulation, UpdateTransport,UploadActivityMetaForm ,UpdateBudget, UpdateProduction, UpdatePublication,UpdateClimate, UpdateCrime, UpdateDisaster,UpdateExchange, UpdateHealthDisease,UpdateHousing, UpdateIndex,UpdateMining,UpdatePolitical,UpdateRoad, UpdateEducation, UpdateEnergy, UpdateOccupation, UpdateServices, UploadCrimeMetaForm,  UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadEnergyMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadOccupationMetaForm, UploadProductionMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm,UploadMiningMetaForm,UploadHousingMetaForm,UploadHealthDiseaseMetaForm,UploadRoadMetaForm,UploadDisasterMetaForm
+from ..models import Hotel, Land, Mine_Meta, PopulationData,Road_Meta,Housing_Meta,Health_disease_Meta,Disaster_Data_Meta,Budgetary_Data, Production, Production_Meta,Publication,Index,Climate_Data, Crime, Crime_Meta, Disaster_Data, Exchange, Health_disease,Road,Mining,Housing,Political_Data, Education, Education_Degree_Meta, Education_Level_Meta, Energy, Energy_Meta, ForestData, Country_meta, Land_Code_Meta, Occupation, Occupation_Meta, Services, Services_Meta, Tourism_Meta, Transport, Transport_Meta, Water, Water_Meta,Activity_Meta,ActivityData
+from ..forms import UpdateActivity, UpdateForest, UpdateHotel, UpdateLand, UpdatePopulation, UpdateTransport, UpdateWater,UploadActivityMetaForm ,UpdateBudget, UpdateProduction, UpdatePublication,UpdateClimate, UpdateCrime, UpdateDisaster,UpdateExchange, UpdateHealthDisease,UpdateHousing, UpdateIndex,UpdateMining,UpdatePolitical,UpdateRoad, UpdateEducation, UpdateEnergy, UpdateOccupation, UpdateServices, UploadCrimeMetaForm,  UploadEducationDegreeMetaForm, UploadEducationLevelMetaForm, UploadEnergyMetaForm, UploadForestDataForm,UploadForestData, UploadLandMetaForm, UploadOccupationMetaForm, UploadProductionMetaForm, UploadServicesMetaForm, UploadTourismMetaForm, UploadTransportMetaForm, UploadWaterMetaForm,UploadMiningMetaForm,UploadHousingMetaForm,UploadHealthDiseaseMetaForm,UploadRoadMetaForm,UploadDisasterMetaForm
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -529,6 +529,7 @@ def update_record(request,pk):
         'update_land_record':Land,
         'update_transport_record':Transport,
         'update_hotel_record':Hotel,
+        'update_water_record':Water,
     }
 
     form_mapping = {
@@ -555,6 +556,7 @@ def update_record(request,pk):
         Land:UpdateLand,
         Transport:UpdateTransport,
         Hotel: UpdateHotel,
+        Water:UpdateWater,
     }
     view_mapping = {
         Services: 'services_table',
@@ -579,7 +581,8 @@ def update_record(request,pk):
         PopulationData:'population_table',
         Land:'land_table',
         Transport:'transport_table',
-        Hotel:'hotel_table'
+        Hotel:'hotel_table',
+        Water:'water_table',
     }
 
     model_class = model_mapping.get(view_name)

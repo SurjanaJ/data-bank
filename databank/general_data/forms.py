@@ -166,6 +166,28 @@ class UploadWaterData(ModelForm):
 class UploadWaterMetaForm(forms.Form):
     meta_file = forms.FileField()
 
+
+class UpdateWater(ModelForm):
+    class Meta:
+        model = Water
+        fields='__all__'
+
+        widgets={
+            'Year': forms.DateInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Water_Type_Code': forms.Select(attrs={'class': 'form-control '}),
+            'Description':forms.TextInput(attrs={'class': 'form-control '}),
+            'Unit':forms.Select(attrs={'class': 'form-control '}),
+            'Volume': forms.NumberInput(attrs={'class': 'form-control '}),
+            'Name_Of_The_River': forms.TextInput(attrs={'class': 'form-control '}),
+            
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateWater, self).__init__(*args, **kwargs)
+
+        self.fields['Name_Of_The_River'].label = 'Name Of The River'
+
 # Tourism data
 class UploadTourismDataForm(forms.Form):
     Tourism_data_file = forms.FileField()

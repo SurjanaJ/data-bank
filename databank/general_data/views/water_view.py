@@ -107,18 +107,18 @@ def delete_water_record(request,item_id):
         messages.error(request, f'Error deleting items: {e}')
 
 
-def update_water_record(request,pk):
-    water_record = Water.objects.get(id=pk)
-    form = UploadWaterData(instance=water_record)
+# def update_water_record(request,pk):
+#     water_record = Water.objects.get(id=pk)
+#     form = UploadWaterData(instance=water_record)
 
-    if request.method == 'POST':
-        form = UploadWaterData(request.POST, instance=water_record)
-        if form.is_valid():
-            form.save()
-            return redirect('water_table')
+#     if request.method == 'POST':
+#         form = UploadWaterData(request.POST, instance=water_record)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('water_table')
         
-    context={'form':form,}
-    return render(request,'general_data/water_templates/update_water_record.html',context)
+#     context={'form':form,}
+#     return render(request,'general_data/water_templates/update_water_record.html',context)
 
 
 
