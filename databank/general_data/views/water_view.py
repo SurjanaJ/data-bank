@@ -337,8 +337,8 @@ def update_selected_water(request):
         )
 
         df = pd.DataFrame(list(queryset.values('id','Year','country','water_code','Description','Unit','Volume','Name_Of_The_River')))
-        df.rename(columns={'country': 'Country','water_code':'Water_Type_Code'}, inplace=True)
-        df = df[['id','Year','Country','Water_Type_Code','Description','Unit','Volume','Name_Of_The_River']]
+        df.rename(columns={'country': 'Country','water_code':'Water Type Code','Name_Of_The_River':'Name Of The River'}, inplace=True)
+        df = df[['id','Year','Country','Water Type Code','Description','Unit','Volume','Name Of The River']]
         output = BytesIO()
         writer = pd.ExcelWriter(output, engine='xlsxwriter')  
         df.to_excel(writer, sheet_name='Sheet1', index=False)

@@ -447,9 +447,8 @@ def export_water_table_to_excel(request):
 
     df=pd.DataFrame(data.values('Year','country_name','water_code','Description','Unit','Volume','Name_Of_The_River'))
 
-    df.rename(columns={'country_name':'Country','water_code':'Water_Type_Code'},inplace=True)
-
-    df=df[['Year','Country','Water_Type_Code','Description','Unit','Volume','Name_Of_The_River']]
+    df.rename(columns={'country_name': 'Country','water_code':'Water Type Code','Name_Of_The_River':'Name Of The River'}, inplace=True)
+    df = df[['Year','Country','Water Type Code','Description','Unit','Volume','Name Of The River']]
 
     output=BytesIO()
     writer=pd.ExcelWriter(output,engine='xlsxwriter')
