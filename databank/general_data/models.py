@@ -92,7 +92,7 @@ class Tourism_Meta(models.Model):
     Arrival_Mode=models.TextField(null=True,blank=True)
 
     def __str__(self):
-        return self.Code
+        return (f'{self.Code} - {self.Arrival_Mode}')
 
 class Tourism(models.Model):
     id=models.AutoField(primary_key=True)

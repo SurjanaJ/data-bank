@@ -97,18 +97,18 @@ def delete_tourism_record(request,item_id):
     except Exception as e:
         messages.error(request, f'Error deleting item: {e}')
  
-def update_tourism_record(request,pk):
-    tourism_record = Tourism.objects.get(id=pk)
-    form = UploadTourismData(instance=tourism_record)
+# def update_tourism_record(request,pk):
+#     tourism_record = Tourism.objects.get(id=pk)
+#     form = UploadTourismData(instance=tourism_record)
 
-    if request.method == 'POST':
-        form = UploadTourismData(request.POST, instance=tourism_record)
-        if form.is_valid():
-            form.save()
-            return redirect('tourism_table')
+#     if request.method == 'POST':
+#         form = UploadTourismData(request.POST, instance=tourism_record)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('tourism_table')
         
-    context={'form':form,}
-    return render(request,'general_data/tourism_templates/update_tourism_record.html',context)
+#     context={'form':form,}
+#     return render(request,'general_data/tourism_templates/update_tourism_record.html',context)
 
 def upload_tourism_excel(request):
     errors = []

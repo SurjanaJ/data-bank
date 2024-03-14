@@ -200,6 +200,29 @@ class UploadTourismData(ModelForm):
 class UploadTourismMetaForm(forms.Form):
     meta_file = forms.FileField()
 
+class UpdateTourism(ModelForm):
+    class Meta:
+        model = Tourism
+        fields='__all__'
+
+        widgets={
+            'Year': forms.DateInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Number_Of_Tourist': forms.NumberInput(attrs={'class': 'form-control '}),
+            'Nationality_Of_Tourism':forms.Select(attrs={'class': 'form-control '}),
+            'Arrival_code':forms.Select(attrs={'class': 'form-control '}),
+            'Number': forms.NumberInput(attrs={'class': 'form-control '}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateTourism, self).__init__(*args, **kwargs)
+
+        self.fields['Number_Of_Tourist'].label = 'Number Of Tourist'
+        self.fields['Nationality_Of_Tourism'].label = 'Nationality Of Tourism'
+        self.fields['Arrival_code'].label = 'Arrival Code'
+
+
+
 # transport data
 class UploadTransportDataForm(forms.Form):
     Transport_data_file = forms.FileField()
