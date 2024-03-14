@@ -70,6 +70,29 @@ class UploadHotelData(ModelForm):
         fields='__all__'
 
 
+class UpdateHotel(ModelForm):
+    class Meta:
+        model = Hotel
+        fields='__all__'
+
+    widgets={
+            'Year': forms.DateInput(attrs={'class': 'form-control'}),
+            'Country': forms.Select(attrs={'class': 'form-control'}),
+            'Name_Of_The_Hotel': forms.TextInput(attrs={'class': 'form-control'}),
+            'Capacity_Room': forms.NumberInput(attrs={'class': 'form-control'}),
+            'Occupancy_In_Year': forms.NumberInput(attrs={'class': 'form-control'}),
+            'City': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateHotel, self).__init__(*args, **kwargs)
+
+        # Set the labels
+        self.fields['Name_Of_The_Hotel'].label = 'Name Of The Hotel'
+        self.fields['Capacity_Room'].label = 'Capacity Room'
+        self.fields['Occupancy_In_Year'].label = 'Occupancy In Year'
+
+
 # Land Data
 class UploadLandDataForm(forms.Form):
     Land_data_file = forms.FileField()

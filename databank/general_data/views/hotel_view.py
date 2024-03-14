@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.db.models import Q
 import pandas as pd
 from ..models import Hotel, Country_meta
-from ..forms import UploadHotelDataForm,UploadHotelData
+from ..forms import UploadHotelDataForm
 from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
@@ -93,19 +93,6 @@ def delete_hotel_record(request,item_id):
     except Exception as e:
         return HttpResponse(f"An error occurred: {str(e)}")
        
-def update_hotel_record(request,pk):
-    hotel_record = Hotel.objects.get(id=pk)
-    form = UploadHotelData(instance=hotel_record)
-
-    if request.method == 'POST':
-        form = UploadHotelData(request.POST, instance=hotel_record)
-        if form.is_valid():
-            form.save()
-            return redirect('hotel_table')
-        
-    context={'form':form,}
-    return render(request,'general_data/update_record.html',context)
-
 def upload_hotel_excel(request):
 
     errors = []
