@@ -271,7 +271,6 @@ class UploadServicesMetaForm(forms.Form):
 class UploadServicesForm(forms.Form):
     file = forms.FileField()
 
-
 class UpdateServices(ModelForm):
     class Meta:
         model = Services
@@ -279,7 +278,7 @@ class UpdateServices(ModelForm):
 
         widgets={
             'Country': forms.Select(attrs={'class': 'form-control '}),
-            'Year': forms.DateInput(attrs={'class': 'form-control '}),
+            'Year': forms.NumberInput(attrs={'class': 'form-control '}),
             'Direction': forms.Select(attrs={'class': 'form-control  '}),
             'Code': forms.Select(attrs={'class': 'form-control'}),
             'Value': forms.NumberInput(attrs={'class': 'form-control'}),

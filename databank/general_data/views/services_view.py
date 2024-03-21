@@ -10,6 +10,8 @@ from datetime import date
 from django.contrib import messages
 from django.db.models import F, Q
 
+from .energy_view import strip_spaces
+
 from ..forms import UploadServicesForm
 
 from trade_data.models import Country_meta
@@ -98,91 +100,69 @@ def upload_services_excel(request):
 
     if request.method == 'POST':
         form = UploadServicesForm(request.POST,request.FILES)
+        
         if form.is_valid():
             excel_data = request.FILES['file']
-            df = pd.read_excel(excel_data)
+            df = pd.read_excel(excel_data, dtype={'Code':str})
             df.fillna('', inplace=True)
-            df['Year'] = pd.to_datetime(df['Year']).dt.date
+            df = df.map(strip_spaces)
+            
+            #Update existing data
+            if 'id' in df.columns:
+                print()
+                print('================================')
+                print('EXISTING DATA')
+                print('================================')
+                print()
 
-            for index, row in df.iterrows():
-                try: 
-                    Year = row['Year']
-                    Country = Country_meta.objects.get(Country_Name = row['Country'])
-                    Origin_Destination = Country_meta.objects.get(
-                        Country_Name=row['Origin_Destination'])
-                    Code = Services_Meta.objects.get(Code = row['Code'])
-                    direction = row['Direction']
-
-                    if direction not in ['Import', 'Export']:
-                        raise ValueError(
-                            f"Invalid Direction at row {index} : {direction}"
-                        )
-                    services_data = {
-                        'Country':Country,
-                        'Year':Year,
-                        'Direction':row['Direction'],
-                        'Code':Code,
+                for index, row in df.iterrows():
+                    id = row.get('id')
+                    data = {
+                        'Country': row['Country'],
+                        'Year':row['Year'],
+                        'Direction': row['Direction'],
+                        'Code': row['Code'],
+                        'Services_Type': row['Services Type'],
                         'Value':row['Value'],
-                        'Origin_Destination': Origin_Destination
+                        'Origin Destination':row['Origin Destination'],
                     }
+                    #get existing data
+                    try: 
+                        services_instance = Services.objects.get(id = id)
+                        services_data = data
 
-                except Exception as e:
-                    services_data['Year']=Year.isoformat()
-                    errors.append({'row_index': index, 'data': services_data, 'reason': str(e)})
-                    
-                    continue
-
-                existing_record = Services.objects.filter(
-                        Q(Country=Country) & 
-                        Q(Year=Year) & 
-                        Q(Direction = services_data['Direction']) &  
-                        Q(Code=Code) & 
-                        Q(Origin_Destination=Origin_Destination)   
-                        ).first()
-                
-                if existing_record:
-                    existing_dict = model_to_dict(existing_record)
-                    services_data_dict = model_to_dict(Services(**services_data))
-
-                    if all(existing_dict[key] == services_data_dict[key] or (pd.isna(existing_dict[key]) and pd.isna(services_data_dict[key])) for key in services_data_dict if key !='id'):
-                        services_data = {
-                            'Country':Country.Country_Name,
-                        'Year':Year.isoformat(),
-                        'Direction':row['Direction'],
-                        'Code':Code.Code,
-                        'Services_Type': row['Services_Type'],
-                        'Value':row['Value'],
-                        'Origin_Destination': Origin_Destination.Country_Name,
-                        }
-
-                        duplicate_data.append({
-                            'row_index': index,
-                            'data': {key: str(services_data[key])if isinstance(services_data[key], date) else services_data[key] for key in services_data}
-                        })
-
-                    
-                    else:
-                        for key, value in services_data.items():
-                            setattr(existing_record, key, value)
-                            
-
+                        #check if meta values exist
                         try:
-                            existing_record.save()
-                            updated_count += 1
-                            
-                        except IntegrityError as e:
-                            errors.append(f"Error updating row {index}: {e}")
-                            
+                            Code = Services_Meta.objects.get(Code = row['Code'])
+                            Country = Country_meta.objects.get(Country_Name = row['Country'])
+                            Origin_Destination = Country_meta.objects.get(
+                            Country_Name=row['Origin Destination'])
 
-                else:
-                    try:
-                        servicesData = Services(**services_data)
-                        servicesData.save()
-                        added_count +=1
-                        
+                            services_instance.Country = Country
+                            services_instance.Year = row['Year']
+                            services_instance.Direction = row['Direction']
+                            services_instance.Code = Code
+                            services_instance.Value = row['Value']
+                            services_instance.Origin_Destination = Origin_Destination
+
+                            services_instance.save()
+                            updated_count += 1
+
+
+                        #meta does not exist
+                        except Exception as e:
+                            services_data = data
+                            errors.append({'row_index': index, 'data': services_data, 'reason': str(e)})
+                            continue            
+
+                    #instance does not exist
                     except Exception as e:
-                        errors.append(f"Error inserting row {index}: {e}")
+                        services_data = data
+                        errors.append({'row_index': index, 'data': services_data, 'reason': str(e)})
                         
+                        continue
+
+                    
             
             if added_count > 0:
                 messages.success(request, str(added_count) + ' records added.')
@@ -200,11 +180,81 @@ def upload_services_excel(request):
                 
             else:
                 return redirect('services_table')  
-            
-    else:
-        form = UploadServicesForm()
+        
 
-    return render(request,'general_data/transport_templates/upload_transport_form.html',{'form':form})
+        else:
+            #add new data
+            for index, row in df.iterrows():
+                    data = {
+                        'Country': row['Country'],
+                        'Year':row['Year'],
+                        'Direction': row['Direction'],
+                        'Code': row['Code'],
+                        'Services_Type': row['Services Type'],
+                        'Value':row['Value'],
+                        'Origin Destination':row['Origin Destination'],
+                    }
+                    #check if the meta values exist
+                    try:
+                        Code = Services_Meta.objects.get(Code = row['Code'])
+                        Country = Country_meta.objects.get(Country_Name = row['Country'])
+                        Origin_Destination = Country_meta.objects.get(
+                        Country_Name=row['Origin Destination'])    
+
+                        existing_record = Services.objects.filter(
+                            Q(Country = Country)
+                            & Q(Year = row['Year'])
+                            & Q(Direction = row['Direction'])
+                            & Q(Code = Code)
+                            & Q(Value = row['Value'])
+                            & Q(Origin_Destination = Origin_Destination)
+
+                        ).first()
+
+                        # show duplicate data
+                        if existing_record:
+                            services_data = data
+                            duplicate_data.append({
+                                'row_index': index,
+                                    'data': {key: str(value) for key, value in services_data.items()}
+                            })
+                            continue
+                        else:
+                            #add new record
+                            try:
+                                servicesData = Services(**services_data)
+                                servicesData.save()
+                                added_count += 1
+                            except Exception as e:
+                                errors.append(f"Error inserting row {index}: {e}")
+
+                    except Exception as e:
+                        services_data = data
+                        errors.append({'row_index': index, 'data': services_data, 'reason': str(e)})
+                        continue
+
+        if added_count > 0:
+            messages.success(request, str(added_count) + ' records added.')
+            
+        if updated_count > 0:
+            messages.info(request, str(updated_count) + ' records updated.')
+
+        if errors:
+            request.session['errors'] = errors
+            return render(request, 'trade_data/error_template.html', {'errors': errors, 'tables': tables, 'meta_tables': views.meta_tables, })
+            
+        elif duplicate_data:
+            request.session['duplicate_data'] = duplicate_data
+            return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data, 'tables': tables, 'meta_tables': views.meta_tables,})
+
+        else:
+           # form is not valid
+            return redirect('services_table') 
+
+    else:
+        form = UploadServicesForm()   
+    
+    return render(request,'general_data/transport_templates/upload_transport_form.html',{'form':form, 'tables': tables, 'meta_tables': views.meta_tables,})
 
 @login_required(login_url = 'login')
 def export_services_excel(request):

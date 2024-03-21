@@ -241,7 +241,7 @@ class Health_disease(models.Model):
 
 class Political_Data(models.Model):
     id = models.AutoField(primary_key=True)
-    Year=models.DateField(null=True, blank=True)
+    Year=models.IntegerField(null=True, blank=True)
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
     Political_Party_Name = models.CharField(max_length = 30,null = True , blank = True)
     Number_Of_Member = models.IntegerField(default = 0,null=True, blank=True)
@@ -283,7 +283,7 @@ class Services(models.Model):
     )
     id = models.AutoField(primary_key=True)
     Country = models.ForeignKey(Country_meta, on_delete=models.CASCADE, related_name='services_country')
-    Year = models.DateField(null=True, blank=True)
+    Year = models.IntegerField(null=True, blank=True)
     Direction = models.CharField(max_length= 10, choices = DIRECTION_OPTIONS, null=True, blank=True )
     Code = models.ForeignKey(Services_Meta, on_delete = models.CASCADE)
     Value = models.FloatField(max_length=100,null=True, blank=True)

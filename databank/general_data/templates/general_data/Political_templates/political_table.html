@@ -1,5 +1,5 @@
 {% extends 'main.html' %} {% block content %}
-<div class="d-flex">
+
   <button
   class="btn btn-sm px-4"
   data-bs-toggle="collapse"
@@ -11,17 +11,6 @@
   >
     Filters
   </button>
-</div>
-<div>
-  {% if messages %}
-    {% for m in messages %}
-      <div class="alert alert-success px-1 py-1 alert-dismissible mt-2 custom-alert" role="alert">
-        {{m}}
-        <button type="button" class="btn-close px-2 py-2 " data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-    {% endfor %}
-  {% endif %}
-</div>
 
 <div class="bg-light mt-3">
 
@@ -199,10 +188,10 @@
               Country
             </th>
             <th class=" text-white fst-normal  " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;">
-                Political_Party_Name
+                Political Party Name
             </th>
             <th class=" text-white fst-normal  " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;">
-                No_Of_Member
+                No Of Member
             </th>
             <th class=" text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;">
                 Province
