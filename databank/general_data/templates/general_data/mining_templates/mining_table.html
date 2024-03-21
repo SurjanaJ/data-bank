@@ -1,5 +1,4 @@
 {% extends 'main.html' %} {% block content %}
-<div class="d-flex">
   <button
   class="btn btn-sm px-4"
   data-bs-toggle="collapse"
@@ -11,17 +10,7 @@
   >
     Filters
   </button>
-</div>
-<div>
-  {% if messages %}
-    {% for m in messages %}
-      <div class="alert alert-success px-1 py-1 alert-dismissible mt-2 custom-alert" role="alert">
-        {{m}}
-        <button type="button" class="btn-close px-2 py-2 " data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-    {% endfor %}
-  {% endif %}
-</div>
+
 
 <div class="bg-light mt-3">
 
@@ -199,19 +188,22 @@
               Country
             </th>
             <th class=" text-white fst-normal  " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;">
-                Name_Of_Mine
+                Code
             </th>
+            <th class=" text-white fst-normal  " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;">
+              Mine Type
+          </th>
             <th class=" text-white fst-normal  " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;">
                 Unit
             </th>
             <th class=" text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;">
-                Current_Production
+                Current Production
             </th>
             <th class=" text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;">
-                Potential_Stock
+                Potential Stock
             </th>
             <th class=" text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;">
-                Mining_Company_Name
+                Mining Company Name
             </th>
             <th class=" text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;">
                 Action
@@ -232,7 +224,8 @@
             </td>
             <td >{{ record.Year }}</td>
             <td>{{ record.Country }}</td>
-            <td>{{ record.Name_Of_Mine.Mine_Type }}</td>
+            <td>{{ record.Code.Code }}</td>
+            <td>{{ record.Code.Mine_Type }}</td>
             <td>{{ record.Unit }}</td>
             <td>{{ record.Current_Production }}</td>
             <td>{{ record.Potential_Stock }}</td>

@@ -151,7 +151,7 @@ class Mine_Meta(models.Model):
     Mine_Type=models.TextField(null=True,blank=True)
 
     def __str__(self):
-        return self.Mine_Type
+        return self.Code
     
 
 class Mining(models.Model):
@@ -161,9 +161,9 @@ class Mining(models.Model):
     )
 
     id = models.AutoField(primary_key=True)
-    Year=models.DateField(null = True , blank =True)
+    Year=models.IntegerField(null = True , blank =True)
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
-    Name_Of_Mine=models.ForeignKey(Mine_Meta,on_delete=models.CASCADE)
+    Code=models.ForeignKey(Mine_Meta,on_delete=models.CASCADE)
     Unit = models.CharField(max_length = 10, choices=Unit_Options , null=True, blank=True)
     Current_Production = models.IntegerField(default=0,null=True,blank=True)
     Potential_Stock = models.IntegerField(default=0,null=True,blank=True)
