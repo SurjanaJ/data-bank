@@ -139,7 +139,7 @@ class Water(models.Model):
 
 class Public_Unitillity(models.Model):
     id = models.AutoField(primary_key=True)
-    Year=models.DateField(null=True , blank = True)
+    Year=models.IntegerField(null=True , blank = True)
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
     Type_Of_Public_Utility = models.CharField(max_length = 100,null= True,blank = True)
     Number = models.IntegerField(default=0,null=True,blank=True)
