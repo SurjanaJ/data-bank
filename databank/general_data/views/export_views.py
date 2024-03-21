@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.db.models import F
 import pandas as pd
 from django.shortcuts import HttpResponse
+from trade_data.views import is_valid_queryparam, tables
 
 from django.contrib.auth.decorators import login_required
 from accounts.decorators import allowed_users
@@ -708,18 +709,36 @@ def filter_political(request):
 
 @login_required(login_url = 'login')
 def export_political_table_to_excel(request):
-    data = filter_political(request)
+    country = request.GET.get('country_category')
+    date_min = request.GET.get('date_min')
+    date_max = request.GET.get('date_max')
 
-    data = data.annotate(
-        country_name = F('Country__Country_Name'),
+    filter_conditions = {}
+    if is_valid_queryparam(country) and country != '--':
+        filter_conditions['Country'] = country
+    if is_valid_queryparam(date_min):
+        filter_conditions['Year__gte'] = date_min
+    if is_valid_queryparam(date_max):
+        filter_conditions['Year__lt'] = date_max
+
+
+    queryset = Political_Data.objects.filter(**filter_conditions)
+    queryset = queryset.annotate(
+        country = F('Country__Country_Name'),
     )
+    data = pd.DataFrame(list(queryset.values('Year','country','Political_Party_Name','Number_Of_Member','Province','District','Municipality','Wards')))
 
-    df = pd.DataFrame(data.values('Year','country_name','Political_Party_Name','Number_Of_Member','Province','District','Municipality','Wards'))
-    df.rename(columns={'country_name':'Country','Number_Of_Member':'No_Of_Member'},inplace=True)
-    df = df[['Year','Country','Political_Party_Name','No_Of_Member','Province','District','Municipality','Wards']]
+    data.rename(columns={
+            'country': 'Country',
+            'Political_Party_Name':'Political Party Name',
+            'Number_Of_Member':'No Of Member'
+            }, inplace=True)
+    column_order = ['Year','Country','Political Party Name','No Of Member','Province','District','Municipality','Wards']
+        
+    data = data[column_order]
     output=BytesIO()
     writer=pd.ExcelWriter(output,engine='xlsxwriter')
-    df.to_excel(writer,sheet_name='sheet1',index=False)
+    data.to_excel(writer,sheet_name='sheet1',index=False)
 
     writer.close()
     output.seek(0)

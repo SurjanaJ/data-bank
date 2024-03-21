@@ -40,8 +40,6 @@ def display_political_table(request):
     municipality = request.GET.get('municipality')
     ward = request.GET.get('ward')  
 
-  
-
     if is_valid_queryparam(date_min):
         data=data.filter(Year__gte=date_min)
 
@@ -245,12 +243,19 @@ def update_selected_political(request):
         country = F('Country__Country_Name'),
         )
 
-        df = pd.DataFrame(list(queryset.values('id','Year','country','Political_Party_Name','Number_Of_Member','Province','District','Municipality','Wards')))
-        df.rename(columns={'country': 'Country','Number_Of_Member':'No_Of_Member'}, inplace=True)
-        df = df[['id','Year','Country','Political_Party_Name','No_Of_Member','Province','District','Municipality','Wards']]
+        data = pd.DataFrame(list(queryset.values('id','Year','country','Political_Party_Name','Number_Of_Member','Province','District','Municipality','Wards')))
+
+        data.rename(columns={
+            'country': 'Country',
+            'Political_Party_Name':'Political Party Name',
+            'Number_Of_Member':'No Of Member'
+            }, inplace=True)
+        column_order = ['id','Year','Country','Political Party Name','No Of Member','Province','District','Municipality','Wards']
+        
+        data = data[column_order]
         output = BytesIO()
         writer = pd.ExcelWriter(output, engine='xlsxwriter')  
-        df.to_excel(writer, sheet_name='Sheet1', index=False)
+        data.to_excel(writer, sheet_name='Sheet1', index=False)
         writer.close()  
         output.seek(0)
 
