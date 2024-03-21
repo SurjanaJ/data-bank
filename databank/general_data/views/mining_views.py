@@ -20,10 +20,13 @@ from io import BytesIO
 from django.http import HttpResponse
 
 from trade_data import views
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import allowed_users
 
 def is_valid_queryparam(param):
     return param !='' and param is not None
 
+@login_required(login_url = 'login')
 def display_mining_table(request):
     data = Mining.objects.all()
 
@@ -90,7 +93,9 @@ def display_mining_table(request):
 
     }
     return render(request, 'general_data/mining_templates/mining_table.html',context)
- 
+
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_mining_excel(request):
     errors = []
     duplicate_data = []
@@ -256,6 +261,7 @@ def upload_mining_excel(request):
 
     return render(request, 'general_data/upload_form.html', {'form': form, 'tables': tables})
 
+@login_required(login_url = 'login')
 def display_mining_meta(request):
     data = Mine_Meta.objects.all()
     total_data = data.count()
@@ -264,7 +270,9 @@ def display_mining_meta(request):
 
     context = {'data': data, 'total_data':total_data, 'meta_tables':views.meta_tables, 'tables':tables, 'column_names':column_names}
     return render(request, 'general_data/display_meta.html', context)
-                
+
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])              
 def update_selected_mining(request):
     selected_ids = request.POST.getlist('selected_items')
     if not selected_ids:
