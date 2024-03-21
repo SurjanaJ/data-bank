@@ -264,6 +264,27 @@ class UploadPublicUnitillityData(ModelForm):
     class Meta:
         model = Public_Unitillity
         fields='__all__'
+
+
+class UpdateUtility(ModelForm):
+    class Meta:
+        model = Public_Unitillity
+        fields='__all__'
+
+        widgets={
+            'Year': forms.NumberInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Type_Of_Public_Utility': forms.TextInput(attrs={'class': 'form-control '}),
+            'Number': forms.NumberInput(attrs={'class': 'form-control '}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateUtility, self).__init__(*args, **kwargs)
+
+        # Set the labels
+        self.fields['Type_Of_Public_Utility'].label = 'Type Of Public Utility'
+
+
 # SERVICE DATA
 class UploadServicesMetaForm(forms.Form):
     meta_file = forms.FileField()

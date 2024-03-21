@@ -80,11 +80,11 @@ urlpatterns = [
     path('upload_transport_meta_excel', view.upload_meta_excel, name="upload_transport_meta_excel"),
     path('update_selected_transport/', transport_view.update_selected_transport, name='update_selected_transport'),
 
-
+# sdasda
     path('public_utillity_table', public_unitillity_views.display_public_unitillity_table, name='public_unitillity_table'),    
     path('delete_selected_public_unitillity/', public_unitillity_views.delete_selected_public_unitillity, name='delete_selected_public_unitillity'),
     path('delete_public_utillity_record/<int:item_id>/', public_unitillity_views.delete_public_unitillity_record, name='delete_public_unitillity_record'),
-    path('update_public_utillity_record/<int:pk>/',public_unitillity_views.update_public_unitillity_record,name='update_public_unitillity_record'),
+    path('update_public_utillity_record/<int:pk>/',view.update_record,name='update_public_unitillity_record'),
     path('export_public_utillity_table_to_excel/', export_views.export_public_unitillity_table_to_excel, name='export_public_unitillity_table_to_excel'),
     path('upload_public_utillity_excel', public_unitillity_views.upload_public_unitillity_excel, name='upload_public_unitillity_excel'),
     path('update_selected_public_utillity/',public_unitillity_views.update_selected_public_unitillity, name='update_selected_public_unitillity'),
