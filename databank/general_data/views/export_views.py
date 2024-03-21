@@ -577,8 +577,8 @@ def export_public_unitillity_table_to_excel(request):
         country_name =F('Country__Country_Name'),
     )
     df=pd.DataFrame(data.values('Year','country_name','Type_Of_Public_Utility','Number'))
-    df.rename(columns={'country_name': 'Country'},inplace=True)
-    df = df[['Year','Country','Type_Of_Public_Utility','Number']]
+    df.rename(columns={'country_name': 'Country','Type_Of_Public_Utility':'Type Of Public Utility'},inplace=True)
+    df = df[['Year','Country','Type Of Public Utility','Number']]
     output=BytesIO()
     writer=pd.ExcelWriter(output,engine='xlsxwriter')
     df.to_excel(writer,sheet_name='sheet1',index=False)

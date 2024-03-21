@@ -152,6 +152,8 @@ def upload_public_unitillity_excel(request):
                         'Type Of Public Utility': row['Type Of Public Utility'],
                         'Number' : row['Number'],
                     }
+                    
+
 
                     #get existing data
                     try:
@@ -160,8 +162,7 @@ def upload_public_unitillity_excel(request):
 
                         #check if meta values exist
                         try:
-                            Country = Country_meta.objects.get(Country_Name = Country)
-
+                            Country = Country_meta.objects.get(Country_Name = row['Country'])
                             public_utillity_instance.Year = row['Year']
                             public_utillity_instance.Country = Country
                             public_utillity_instance.Type_Of_Public_Utility=row['Type Of Public Utility']
@@ -200,7 +201,7 @@ def upload_public_unitillity_excel(request):
 
                     #check if the meta values exist
                     try:
-                        Country = Country_meta.objects.get(Country_Name = Country)
+                        Country = Country_meta.objects.get(Country_Name = row['Country'])
 
                         utility_data = {
                                 'Year': row['Year'],
@@ -230,7 +231,7 @@ def upload_public_unitillity_excel(request):
                             try:
                                 utility_data = {
                                 'Year': row['Year'],
-                                'Country': row['Country'],
+                                'Country':Country,
                                 'Type_Of_Public_Utility': row['Type Of Public Utility'],
                                 'Number' : row['Number'],
                         }
@@ -262,7 +263,7 @@ def upload_public_unitillity_excel(request):
             
             else:
            # form is not valid
-                return redirect('public_utillity_table')
+                return redirect('public_unitillity_table')
             
     else:
         form = UploadPublicUnitillityDataForm()
@@ -283,8 +284,8 @@ def update_selected_public_unitillity(request):
         )
 
         df = pd.DataFrame(list(queryset.values('id','Year','country','Type_Of_Public_Utility','Number')))
-        df.rename(columns={'country': 'Country'}, inplace=True)
-        df = df[['id','Year','Country','Type_Of_Public_Utility','Number']]
+        df.rename(columns={'country': 'Country','Type_Of_Public_Utility':'Type Of Public Utility'}, inplace=True)
+        df = df[['id','Year','Country','Type Of Public Utility','Number']]
         output = BytesIO()
         writer = pd.ExcelWriter(output, engine='xlsxwriter')  
         df.to_excel(writer, sheet_name='Sheet1', index=False)
