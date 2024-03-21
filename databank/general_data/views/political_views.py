@@ -180,7 +180,7 @@ def upload_political_excel(request):
                             Q(Year = row['Year'])
                             & Q(Country = Country)
                             & Q(Political_Party_Name = row['Political Party Name'])
-                            & Q(Number_Of_Member = row['Number Of Member'])
+                            & Q(Number_Of_Member = row['No Of Member'])
                             & Q(Province = row['Province'])
                             & Q(District = row['District'])
                             & Q(Municipality = row['Municipality'])
@@ -197,19 +197,28 @@ def upload_political_excel(request):
                         else:
                             #add new record
                             try:
+                                political_data = {
+                                    'Year':row['Year'],
+                                    'Country':Country,
+                                    'Political_Party_Name': row['Political Party Name'],
+                                    'Number_Of_Member':row['No Of Member'],
+                                    'Province':row['Province'],
+                                    'District':row['District'],
+                                    'Municipality':row['Municipality'],
+                                    'Wards':row['Wards'], 
+                                }
                                 politicalData = Political_Data(**political_data)
                                 politicalData.save()
                                 added_count += 1
                             except Exception as e:
                                 errors.append(f"Error inserting row {index}: {e}")
-                    
 
                     except Exception as e:
                         political_data = data
                         errors.append({
                             'row_index': index, 
                             'data': political_data,
-                            'reason': f'Error inserting row {index}: {e}'
+                            'reason': f'111Error inserting row {index}: {e}'
                         })
                         continue
 
