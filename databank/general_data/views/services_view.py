@@ -109,12 +109,6 @@ def upload_services_excel(request):
             
             #Update existing data
             if 'id' in df.columns:
-                print()
-                print('================================')
-                print('EXISTING DATA')
-                print('================================')
-                print()
-
                 for index, row in df.iterrows():
                     id = row.get('id')
                     data = {
@@ -122,7 +116,7 @@ def upload_services_excel(request):
                         'Year':row['Year'],
                         'Direction': row['Direction'],
                         'Code': row['Code'],
-                        'Services_Type': row['Services Type'],
+                        'Services Type': row['Services Type'],
                         'Value':row['Value'],
                         'Origin Destination':row['Origin Destination'],
                     }
@@ -162,76 +156,68 @@ def upload_services_excel(request):
                         
                         continue
 
-                    
-            
-            if added_count > 0:
-                messages.success(request, str(added_count) + ' records added.')
-            
-            if updated_count > 0:
-                messages.info(request, str(updated_count) + ' records updated.')
 
-            if errors:
-                request.session['errors'] = errors
-                return render(request, 'trade_data/error_template.html', {'errors': errors})
-            
-            elif duplicate_data:
-                request.session['duplicate_data'] = duplicate_data
-                return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data})
-                
             else:
-                return redirect('services_table')  
-        
+                #add new data
+                for index, row in df.iterrows():
+                        data = {
+                            'Country': row['Country'],
+                            'Year':row['Year'],
+                            'Direction': row['Direction'],
+                            'Code': row['Code'],
+                            'Services Type': row['Services Type'],
+                            'Value':row['Value'],
+                            'Origin Destination':row['Origin Destination'],
+                        }
+                        #check if the meta values exist
+                        try:
+                            Code = Services_Meta.objects.get(Code = row['Code'])
+                            Country = Country_meta.objects.get(Country_Name = row['Country'])
+                            Origin_Destination = Country_meta.objects.get(
+                            Country_Name=row['Origin Destination'])    
+                            existing_record = Services.objects.filter(
+                                Q(Country = Country)
+                                & Q(Year = row['Year'])
+                                & Q(Direction = row['Direction'])
+                                & Q(Code = Code)
+                                & Q(Value = row['Value'])
+                                & Q(Origin_Destination = Origin_Destination)
 
-        else:
-            #add new data
-            for index, row in df.iterrows():
-                    data = {
-                        'Country': row['Country'],
-                        'Year':row['Year'],
-                        'Direction': row['Direction'],
-                        'Code': row['Code'],
-                        'Services_Type': row['Services Type'],
-                        'Value':row['Value'],
-                        'Origin Destination':row['Origin Destination'],
-                    }
-                    #check if the meta values exist
-                    try:
-                        Code = Services_Meta.objects.get(Code = row['Code'])
-                        Country = Country_meta.objects.get(Country_Name = row['Country'])
-                        Origin_Destination = Country_meta.objects.get(
-                        Country_Name=row['Origin Destination'])    
+                            ).first()
 
-                        existing_record = Services.objects.filter(
-                            Q(Country = Country)
-                            & Q(Year = row['Year'])
-                            & Q(Direction = row['Direction'])
-                            & Q(Code = Code)
-                            & Q(Value = row['Value'])
-                            & Q(Origin_Destination = Origin_Destination)
+                            # show duplicate data
+                            if existing_record:
+                                services_data = data
+                                duplicate_data.append({
+                                    'row_index': index,
+                                        'data': {key: str(value) for key, value in services_data.items()}
+                                })
+                                continue
+                            else:
+                                #add new record
+                                try:
+                                    services_data = {
+                                    'Country': Country,
+                                    'Year':row['Year'],
+                                    'Direction': row['Direction'],
+                                    'Code': Code,
+                                    'Value':row['Value'],
+                                    'Origin_Destination':Origin_Destination,
+                                }
+                                    
+                                    servicesData = Services(**services_data)
+                                    servicesData.save()
+                                    added_count += 1
+                                except Exception as e:
+                                    print(f"Error inserting row {index}: {e}")
+                                    errors.append(f"Error inserting row {index}: {e}")
 
-                        ).first()
-
-                        # show duplicate data
-                        if existing_record:
+                        except Exception as e:
                             services_data = data
-                            duplicate_data.append({
-                                'row_index': index,
-                                    'data': {key: str(value) for key, value in services_data.items()}
-                            })
-                            continue
-                        else:
-                            #add new record
-                            try:
-                                servicesData = Services(**services_data)
-                                servicesData.save()
-                                added_count += 1
-                            except Exception as e:
-                                errors.append(f"Error inserting row {index}: {e}")
+                            print('services_data!!!!!!!!!!!!!!!!', services_data)
 
-                    except Exception as e:
-                        services_data = data
-                        errors.append({'row_index': index, 'data': services_data, 'reason': str(e)})
-                        continue
+                            errors.append({'row_index': index, 'data': services_data, 'reason': str(e)})
+                            continue
 
         if added_count > 0:
             messages.success(request, str(added_count) + ' records added.')
@@ -242,11 +228,8 @@ def upload_services_excel(request):
         if errors:
             request.session['errors'] = errors
             return render(request, 'trade_data/error_template.html', {'errors': errors, 'tables': tables, 'meta_tables': views.meta_tables, })
-            
         elif duplicate_data:
-            request.session['duplicate_data'] = duplicate_data
             return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data, 'tables': tables, 'meta_tables': views.meta_tables,})
-
         else:
            # form is not valid
             return redirect('services_table') 

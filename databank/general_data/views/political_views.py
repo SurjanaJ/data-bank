@@ -218,7 +218,7 @@ def upload_political_excel(request):
                         errors.append({
                             'row_index': index, 
                             'data': political_data,
-                            'reason': f'111Error inserting row {index}: {e}'
+                            'reason': f'Error inserting row {index}: {e}'
                         })
                         continue
 
