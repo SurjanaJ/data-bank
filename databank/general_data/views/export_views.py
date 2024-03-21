@@ -924,14 +924,15 @@ def export_mining_table_to_excel(request):
     data = filter_mining(request)
 
     data = data.annotate(
-        country_name = F('Country__Country_Name'),
-        name_of_mine = F('Name_Of_Mine__Mine_Type')
+       country = F('Country__Country_Name'),
+        code = F('Code__Code'),
+        Mine_Type = F('Code__Mine_Type')
 
     )
 
-    df=pd.DataFrame(data.values('Year','country_name','name_of_mine','Unit','Current_Production','Potential_Stock','Mining_Company_Name'))
-    df.rename(columns={'country_name':'Country','name_of_mine':'Name_Of_Mine'},inplace=True)
-    df = df[['Year','Country','Name_Of_Mine','Unit','Current_Production','Potential_Stock','Mining_Company_Name']]
+    df=pd.DataFrame(data.values('Year','Year','country','code','Mine_Type','Unit','Current_Production','Potential_Stock','Mining_Company_Name'))
+    df.rename(columns={'country':'Country','code':'Code','Mine_Type': 'Mine Type','Current_Production':'Current Production','Potential_Stock':'Potential Stock', 'Mining_Company_Name':'Mining Company Name'},inplace=True)
+    df = df[['Year','Country','Code','Mine Type','Unit','Current Production','Potential Stock','Mining Company Name']]
     output=BytesIO()
     writer=pd.ExcelWriter(output,engine='xlsxwriter')
     df.to_excel(writer,sheet_name='sheet1',index=False)

@@ -1,4 +1,6 @@
 {% extends 'main.html' %} {% block content %}
+{% load custom_filters %}
+
   <button
   class="btn btn-sm px-4"
   data-bs-toggle="collapse"
@@ -138,8 +140,11 @@
       </div>
     </div>
   </div>
-  <div class="fs-4 fw-bold text-center">Mining Data</div>
 
+  <div class="d-flex justify-content-center">
+    <a class="fs-4 fw-bold mt-4 link-secondary  link-offset-2 link-underline-opacity-0 link-underline-opacity-25-hover"
+        href="{% url 'mining_table' %}">Mining Data</a>
+</div>
 {% if query_len == 0 %}
 <div class="bg-light p-4 text-center fw-normal mt-4 text-danger">
   No Records
