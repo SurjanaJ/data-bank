@@ -59,7 +59,7 @@ class Land(models.Model):
 
 
     id=models.AutoField(primary_key=True)
-    Year=models.DateField(null=True,blank=True)
+    Year=models.IntegerField(null=True,blank=True)
     Country=models.ForeignKey(Country_meta,on_delete=models.CASCADE)
     Land_Code=models.ForeignKey(Land_Code_Meta, on_delete=models.CASCADE)
     Unit=models.CharField(max_length=10, choices=Land_Unit_Options, null=True, blank=True)
