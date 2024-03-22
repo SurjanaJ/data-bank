@@ -80,7 +80,7 @@ urlpatterns = [
     path('upload_transport_meta_excel', view.upload_meta_excel, name="upload_transport_meta_excel"),
     path('update_selected_transport/', transport_view.update_selected_transport, name='update_selected_transport'),
 
-# sdasda
+
     path('public_utillity_table', public_unitillity_views.display_public_unitillity_table, name='public_unitillity_table'),    
     path('delete_selected_public_unitillity/', public_unitillity_views.delete_selected_public_unitillity, name='delete_selected_public_unitillity'),
     path('delete_public_utillity_record/<int:item_id>/', public_unitillity_views.delete_public_unitillity_record, name='delete_public_unitillity_record'),
