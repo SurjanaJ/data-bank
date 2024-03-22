@@ -15,6 +15,10 @@ from django.views.decorators.http import require_POST
 from django.db.models import F
 from io import BytesIO
 from django.http import HttpResponse
+from .energy_view import strip_spaces
+from trade_data import views
+
+
 
 
 def is_valid_queryparam(param):
@@ -105,128 +109,120 @@ def upload_hotel_excel(request):
         if form.is_valid():
             excel_data = request.FILES['Hotel_data_file']
             df = pd.read_excel(excel_data)
+            df.fillna('', inplace=True)
+            df = df.map(strip_spaces)
 
             if 'id' in df.columns:
-                cols = df.columns.to_list()
                 for index,row in df.iterrows():
-                    id_value = row['id']
-
+                    id = row.get('id')
+                    data = {
+                            'Year': row['Year'],
+                            'Country': row['Country'],
+                            'Name Of The Hotel': row['Name Of The Hotel'],
+                            'Capacity Room': row['Capacity Room'],
+                            'Occupancy In Year': row['Occupancy In Year'],
+                            'City' : row['City'],                        
+                        }
+                    #get existing data
                     try:
-                        hotel_instance = Hotel.objects.get(id = id_value)
+                        hotel_instance = Hotel.objects.get(id = id)
+                        hotel_data = data
+
+                        #check if meta values exist
+                        try:
+
+                            Country = Country_meta.objects.get(Country_Name = row['Country'])
+
+                            hotel_instance.Year = row['Year']
+                            hotel_instance.Country = Country
+                            hotel_instance.Name_Of_The_Hotel = row['Name Of The Hotel']
+                            hotel_instance.Capacity_Room = row['Capacity Room']
+                            hotel_instance.Occupancy_In_Year = row['Occupancy In Year']
+                            hotel_instance.City = row['City']
+
+                            hotel_instance.save()
+
+                            updated_count +=1
+
+                        #meta does not exist
+                        except Exception as e:
+                            hotel_data = data
+                            errors.append({'row_index': index, 'data': hotel_data, 'reason': str(e)})
+                            continue
+
+
                     except Exception as e:
-                        data = {col: row[col] for col in cols}
+                        hotel_data = data
                         errors.append({
                             'row index': index,
-                            'data':data,
+                            'data':hotel_data,
                             'reason': f'Error inserting row  {index}: {e}'
                         })
                         continue
 
-                    hotel_data = {
-                        'Year': row['Year'].date().strftime('%Y-%m-%d'),
-                        'Country': row['Country'],
-                        'Name_Of_The_Hotel': row['Name Of The Hotel'],
-                        'Capacity_Room': row['Capacity Room'],
-                        'Occupancy_In_Year': row['Occupancy In Year'],
-                        'City' : row['City'],                        
-                    }
 
-                    try:
-                        Year = row['Year']
-                        Country = row['Country']
-
-                        calender_year = pd.to_datetime(Year).date()
-                    except ValueError as e:
-                        errors.append({'row_index': index, 'data': hotel_data, 'reason': str(e)})
-                        continue    
-
-                    try:               
-                        Year =calender_year
-                        Country = Country_meta.objects.get(Country_Name = Country)
-
-                        hotel_instance.Year = Year
-                        hotel_instance.Country = Country
-                        hotel_instance.Name_Of_The_Hotel = row['Name Of The Hotel']
-                        hotel_instance.Capacity_Room = row['Capacity Room']
-                        hotel_instance.Occupancy_In_Year = row['Occupancy In Year']
-                        hotel_instance.City = row['City']
-
-                        hotel_instance.save()
-
-                        updated_count +=1
-                    except Exception as e:
-                        hotel_data = {
-                            'Year': row['Year'].date().strftime('%Y-%m-%d'),
+            else:
+                for index,row in df.iterrows():
+                    data = {
+                            'Year': row['Year'],
                             'Country': row['Country'],
-                            'Name_Of_The_Hotel': row['Name Of The Hotel'],
-                            'Capacity_Room': row['Capacity Room'],
-                            'Occupancy_In_Year': row['Occupancy In Year'],
+                            'Name Of The Hotel': row['Name Of The Hotel'],
+                            'Capacity Room': row['Capacity Room'],
+                            'Occupancy In Year': row['Occupancy In Year'],
                             'City' : row['City'],                        
                         }
 
-                        errors.append({'row_index': index,'data': hotel_data,'reason':str(e)})
-                        continue
-
-            else:
-
-                for index,row in df.iterrows():
-                    hotel_data = {
-                        'Year': row['Year'].date().strftime('%Y-%m-%d'),
-                        'Country': row['Country'],
-                        'Name_Of_The_Hotel': row['Name Of The Hotel'],
-                        'Capacity_Room': row['Capacity Room'],
-                        'Occupancy_In_Year': row['Occupancy In Year'],
-                        'City' : row['City'],                        
-                    }
-
                     try:
-                        calender_date = datetime.strptime(str(row['Year'].date().strftime('%Y-%m-%d')), '%Y-%m-%d').date()
-                    except:
-                        calender_date = datetime.strptime(f'{str(row["Year"].date().strftime("%Y-%m-%d"))}-01-01', '%Y-%m-%d').date()
-
-                    Country = None
-                    try:
-                        Year = calender_date.strftime('%Y-%m-%d')
                         Country = Country_meta.objects.get(Country_Name=row['Country'])
 
                         hotel_data = {
-                            'Year':Year,
+                            'Year':row['Year'],
                             'Country':Country,
-                            'Name_Of_The_Hotel': row['Name Of The Hotel'],
-                            'Capacity_Room': row['Capacity Room'],
-                            'Occupancy_In_Year': row['Occupancy In Year'],
+                            'Name Of The Hotel': row['Name Of The Hotel'],
+                            'Capacity Room': row['Capacity Room'],
+                            'Occupancy In Year': row['Occupancy In Year'],
                             'City' : row['City'],
                         }
 
-                    except Exception as e:
-                        errors.append({
-                            'row index': index,
-                            'data':hotel_data,
-                            'reason': f'Error inserting row  {index}: {e}'
-                        })
-                        continue
+                    
 
-                    existing_record = Hotel.objects.filter(Q(Year = Year) & Q(Country = Country) & Q(Name_Of_The_Hotel = row['Name Of The Hotel'])& Q(Capacity_Room = row['Capacity Room']) & Q(City = row['City']) & Q(Occupancy_In_Year = row['Occupancy In Year'])).first()
+                        existing_record = Hotel.objects.filter(
+                            Q(Year = row['Year']) 
+                            & Q(Country = Country) 
+                            & Q(Name_Of_The_Hotel = row['Name Of The Hotel'])
+                            & Q(Capacity_Room = row['Capacity Room']) 
+                            & Q(City = row['City']) 
+                            & Q(Occupancy_In_Year = row['Occupancy In Year'])).first()
 
-                    if existing_record:
-                        duplicate_data.append({
-                            'row_index':index,
-                            'data':hotel_data,
-                            'reason': 'Duplicate record found'
-                        })
-
-                    else:
-                        try:
-                            HotelData=Hotel(**hotel_data)
-                            HotelData.save()
-                            added_count +=1
-
-                        except Exception as e:
-                            errors.append({
+                        if existing_record:
+                            hotel_data = data
+                            duplicate_data.append({
                                 'row_index': index,
-                                'data': hotel_data,
-                                'reason': f'Error inserting row  {index}: {e}'
+                                    'data': {key: str(value) for key, value in hotel_data.items()}
                             })
+                            continue
+
+                        else:
+                            try:
+                                hotel_data = {
+                                'Year':row['Year'],
+                                'Country':Country,
+                                'Name_Of_The_Hotel': row['Name Of The Hotel'],
+                                'Capacity_Room': row['Capacity Room'],
+                                'Occupancy_In_Year': row['Occupancy In Year'],
+                                'City' : row['City'],
+                            }
+                                HotelData=Hotel(**hotel_data)
+                                HotelData.save()
+                                added_count +=1
+
+                            except Exception as e:
+                                errors.append(f"Error inserting row {index}: {e}")
+
+                    except Exception as e:
+                        hotel_data = data
+                        errors.append({'row_index': index, 'data': hotel_data, 'reason': str(e)})
+                        continue
 
             if added_count > 0:
                 messages.success(request,str(added_count)+'records added')
@@ -236,12 +232,13 @@ def upload_hotel_excel(request):
                 messages.success(request,str(updated_count)+'records updated')
 
             if errors:
-                request.session['errors']= errors
-                return render(request, 'general_data/error_template.html', {'errors': errors})
+                request.session['errors'] = errors
+                return render(request, 'trade_data/error_template.html', {'errors': errors, 'tables': tables, 'meta_tables': views.meta_tables, })
             
 
             elif duplicate_data:
-                return  render (request,'general_data/duplicate_template.html',{'duplicate_data':duplicate_data})
+                request.session['duplicate_data'] = duplicate_data
+                return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data, 'tables': tables, 'meta_tables': views.meta_tables,})
             
             else:
                 return redirect('hotel_table')
