@@ -310,9 +310,9 @@ def export_population_table_to_excel(request):
     )
 
     df = pd.DataFrame(data.values('Year','country_name','Gender','Age_Group','Population'))
-    df.rename(columns={'country_name':'Country'},inplace=True)
+    df.rename(columns={'country_name':'Country','Age_Group':'Age Group'},inplace=True)
 
-    df = df[['Year','Country','Gender','Age_Group','Population']]
+    df = df[['Year','Country','Gender','Age Group','Population']]
 
     output=BytesIO()
     writer = pd.ExcelWriter(output,engine='xlsxwriter')
