@@ -15,6 +15,7 @@ from django.views.decorators.http import require_POST
 from django.db.models import F
 from io import BytesIO
 from django.http import HttpResponse
+from .energy_view import strip_spaces
 
 from django.contrib.auth.decorators import login_required
 from accounts.decorators import allowed_users
@@ -35,169 +36,143 @@ def upload_forest_excel(request):
         if form.is_valid():
             excel_data = request.FILES['forest_data_file']
             df = pd.read_excel(excel_data)
-
-            Stock_unit_options = [option[0] for option in ForestData.Stock_Unit_Options]
-            Area_unit_options = [option[0] for option in ForestData.Area_Unit_Options]
+            df.fillna('', inplace=True)
+            df = df.map(strip_spaces)
+            
+            #Update existing data
             if 'id' in df.columns:
-                cols = df.columns.tolist()
                 for index, row in df.iterrows():
-                    id_value = row.get('id')
-                    try:
-                        forest_instance = ForestData.objects.get(id=id_value)
-                    except Exception as e:
-                        data = {col: row[col] for col in cols}
-                        data['Year'] = data['Year'].isoformat()
-                        errors.append({
-                                    'row_index': index,
-                                    'data': data,
-                                    'reason': f'Error inserting row {index}: {e}'
-                                })
-                        break
-
-                    forest_data = {
-                        'Year': row['Year'].date().strftime('%Y-%m-%d'),
+                    id = row.get('id')
+                    data = {
+                        'Year': row['Year'],
                         'Country': row['Country'],
-                        'Name_of_the_plant': row['Name_Of_The_Plant'],
-                        'Scientific_Name': row['Scientific_Name'],
-                        'Local_Name': row['Local_Name'],
-                        'Stock_Unit': row['Stock_Unit'],
-                        'Stock_Available': row['Stock_Available'],
-                        'Area_Unit': row['Area_Unit'],
-                        'Area_Covered': row['Area_Covered']
+                        'Name Of The Plant': row['Name Of The Plant'],
+                        'Scientific Name': row['Scientific Name'],
+                        'Local Name': row['Local Name'],
+                        'Stock Unit': row['Stock Unit'],
+                        'Stock Available': row['Stock Available'],
+                        'Area Unit': row['Area Unit'],
+                        'Area Covered': row['Area Covered']
                     }
 
                     try:
-                        Year = row['Year']
-                        Country = row['Country']
-                        calender_year = pd.to_datetime(Year).date()
-                    except ValueError as e:
-                        errors.append({'row_index': index, 'data': forest_data, 'reason': str(e)})
-                        continue
+                        forest_instance = ForestData.objects.get(id=id)
+                        forest_data = data
 
-                    try:
-
-                        if forest_data['Stock_Unit'] not in Stock_unit_options:
-                            errors.append({'row_index': index, 'reason': f'Error inserting row {index}: Invalid Stock unit value'})
-                        elif forest_data['Area_Unit'] not in Area_unit_options:
-                            errors.append({'row_index': index, 'reason': f'Error inserting row {index}: Invalid Area unit value'})
-                        else:    
-                            Year = pd.to_datetime(row['Year']).date()
-                            # Retrieve Country_meta instance or None if not found
-                            country_instance = Country_meta.objects.filter(Country_Name=row['Country']).first()
-                            if country_instance is None:
-                                raise ValueError(f"Country '{row['Country']}' not found")
+                        try:
+                            Country = Country_meta.objects.filter(Country_Name=row['Country']).first()
                             
-                            forest_instance.Year = Year
-                            forest_instance.Country = country_instance
-                            forest_instance.Name_Of_The_Plant = row['Name_Of_The_Plant']
-                            forest_instance.Scientific_Name = row['Scientific_Name']
-                            forest_instance.Local_Name = row['Local_Name']
-                            forest_instance.Stock_Unit = row['Stock_Unit']
-                            forest_instance.Stock_Available = row['Stock_Available']
-                            forest_instance.Area_Unit = row['Area_Unit']
-                            forest_instance.Area_Covered = row['Area_Covered']
+                            forest_instance.Year = row['Year']
+                            forest_instance.Country = Country
+                            forest_instance.Name_Of_The_Plant = row['Name Of The Plant']
+                            forest_instance.Scientific_Name = row['Scientific Name']
+                            forest_instance.Local_Name = row['Local Name']
+                            forest_instance.Stock_Unit = row['Stock Unit']
+                            forest_instance.Stock_Available = row['Stock Available']
+                            forest_instance.Area_Unit = row['Area Unit']
+                            forest_instance.Area_Covered = row['Area Covered']
+
                             forest_instance.save()
                             updated_count += 1
+
+                        except Exception as e:
+                            forest_data = data
+                            errors.append({
+                                            'row_index': index,
+                                            'data': forest_data,
+                                            'reason': f'Error inserting row {index}: {e}'
+                                        })
+                            continue
+
                     except Exception as e:
-                        forest_data = {
-                            'Year': row['Year'],
-                            'Country': row['Country'],
-                            'Name_of_the_plant': row['Name_Of_The_Plant'],
-                            'Scientific_Name' : row['Scientific_Name'],
-                            'Local_Name' : row['Local_Name'],
-                            'Stock_Unit' : row['Stock_Unit'],
-                            'Stock_Available' : row['Stock_Available'],
-                            'Area_Unit' : row['Area_Unit'],
-                            'Area_Covered' : row['Area_Covered']
-                        }
-                        errors.append({'row_index': index, 'data': forest_data, 'reason': str(e)})
+                        forest_data = data
+                        errors.append({
+                                    'row_index': index,
+                                    'data': forest_data,
+                                    'reason': f'Error inserting row {index}: {e}'
+                                })
                         continue
 
             else:
 
-                Stock_unit_options = [option[0] for option in ForestData.Stock_Unit_Options]
-                Area_unit_options = [option[0] for option in ForestData.Area_Unit_Options]
                 for index, row in df.iterrows():
-                    forest_data = {
+                    data = {
                         'Year': row['Year'],
                         'Country': row['Country'],
-                        'Name_of_the_plant': row['Name_Of_The_Plant'],
-                        'Scientific_Name' : row['Scientific_Name'],
-                        'Local_Name' : row['Local_Name'],
-                        'Stock_Unit' : row['Stock_Unit'],
-                        'Stock_Available' : row['Stock_Available'],
-                        'Area_Unit' : row['Area_Unit'],
-                        'Area_Covered' : row['Area_Covered']
+                        'Name Of The Plant': row['Name Of The Plant'],
+                        'Scientific Name': row['Scientific Name'],
+                        'Local Name': row['Local Name'],
+                        'Stock Unit': row['Stock Unit'],
+                        'Stock Available': row['Stock Available'],
+                        'Area Unit': row['Area Unit'],
+                        'Area Covered': row['Area Covered']
                     }
 
-                    if forest_data['Stock_Unit'] not in Stock_unit_options:
+
+                    try:
+                        Country = Country_meta.objects.get(Country_Name=row['Country'])
+
+                        forest_data = {
+                        'Year': row['Year'],
+                        'Country': Country,
+                        'Name Of The Plant': row['Name Of The Plant'],
+                        'Scientific Name': row['Scientific Name'],
+                        'Local Name': row['Local Name'],
+                        'Stock Unit': row['Stock Unit'],
+                        'Stock Available': row['Stock Available'],
+                        'Area Unit': row['Area Unit'],
+                        'Area Covered': row['Area Covered']}
+
+                        existing_record = ForestData.objects.filter(
+                            Q(Year=row['Year']) 
+                            & Q(Country=Country) 
+                            & Q(Name_Of_The_Plant = forest_data['Name Of The Plant']) 
+                            & Q(Stock_Unit = forest_data['Stock Unit']) 
+                            & Q(Area_Unit = forest_data['Area Unit']) 
+                            & Q(Scientific_Name = forest_data['Scientific Name']) 
+                            & Q(Local_Name = forest_data['Local Name']) 
+                            & Q(Stock_Available = forest_data['Stock Available']) 
+                            & Q(Area_Covered = forest_data['Area Covered'])).first()  
+
+                        # show duplicate data
+                        if existing_record:
+                            forest_data = data
+
+                            duplicate_data.append({
+                                'row_index': index,
+                                'data': {key: str(value) for key, value in forest_data.items()}
+                            })
+                            continue
+                        else:
+                            #add new record
+                            try:
+                                forest_data = {
+                                'Year': row['Year'],
+                                'Country': Country,
+                                'Name_Of_The_Plant': row['Name Of The Plant'],
+                                'Scientific_Name': row['Scientific Name'],
+                                'Local_Name': row['Local Name'],
+                                'Stock_Unit': row['Stock Unit'],
+                                'Stock_Available': row['Stock Available'],
+                                'Area_Unit': row['Area Unit'],
+                                'Area_Covered': row['Area Covered']}
+                                forestData = ForestData(**forest_data)
+                                forestData.save()
+                                added_count += 1
+                            
+                            except Exception as e:
+                                errors.append(f"Error inserting row {index}: {e}")
+                          
+                    
+                    except Exception as e:
+                        forest_data = data
                         errors.append({
-                            'row_index': index,
-                            'data': forest_data,
-                            'reason': f'Error inserting row {index}: Invalid Stock unit value'
-                        })
-
-                    elif forest_data['Area_Unit'] not in Area_unit_options:
-                        errors.append({
-                            'row_index': index,
-                            'data': forest_data,
-                            'reason': f'Error inserting row {index}: Invalid Area unit value'
-                        })
-
-                    else:
-
-                        try:
-                            calender_date = datetime.strptime(str(row['Year'].date().strftime('%Y-%m-%d')), '%Y-%m-%d').date()
-                        except:
-                            calender_date = datetime.strptime(f'{str(row["Year"].date().strftime("%Y-%m-%d"))}-01-01', '%Y-%m-%d').date()
-
-                        Country = None
-
-                        try:
-                            Year = calender_date.strftime('%Y-%m-%d')
-                            Country = Country_meta.objects.get(Country_Name=row['Country'])
-
-                            forest_data = {
-                                    'Year': Year,
-                                    'Country': Country,
-                                    'Name_Of_The_Plant': row['Name_Of_The_Plant'],
-                                    'Scientific_Name' : row['Scientific_Name'],
-                                    'Local_Name' : row['Local_Name'],
-                                    'Stock_Unit' : row['Stock_Unit'],
-                                    'Stock_Available' : row['Stock_Available'],
-                                    'Area_Unit' : row['Area_Unit'],
-                                    'Area_Covered' : row['Area_Covered']
-                            }
-                        except Exception as e:
-                                errors.append({
                                     'row_index': index,
                                     'data': forest_data,
                                     'reason': f'Error inserting row {index}: {e}'
                                 })
-                                continue
+                        continue
 
-                        existing_record = ForestData.objects.filter(
-                            Q(Year=Year) & Q(Country=Country) & Q(Name_Of_The_Plant = forest_data['Name_Of_The_Plant']) & Q(Stock_Unit = forest_data['Stock_Unit']) & Q(Area_Unit = forest_data['Area_Unit']) & Q(Scientific_Name = forest_data['Scientific_Name']) & Q(Local_Name = forest_data['Local_Name']) & Q(Stock_Available = forest_data['Stock_Available']) & Q(Area_Covered = forest_data['Area_Covered'])).first()        
-                        if existing_record:
-                            duplicate_data.append({
-                                'row_index':index,
-                                'data': forest_data,
-                                'reason': 'Duplicate data found'
-                            })
-
-
-                        else:
-                            try:
-                                Forestdata = ForestData(**forest_data)
-                                Forestdata.save()
-                                added_count +=1
-
-                            except Exception as e:
-                                errors.append({
-                                    'row_index': index,
-                                    'data': forest_data,
-                                    'reason': f"Error inserting row {index}: {e}"
-                                })
 
             if added_count > 0:
                 messages.success(request, f'{added_count} records added')
@@ -207,10 +182,15 @@ def upload_forest_excel(request):
 
             if errors:
                 request.session['errors'] = errors
-                return render(request, 'general_data/error_template.html', {'errors': errors})
-
+                return render(request, 'trade_data/error_template.html', {'errors': errors, 'tables': tables, 'meta_tables': views.meta_tables, })
+            
             if duplicate_data:
-                return render(request, 'general_data/duplicate_template.html', {'duplicate_data': duplicate_data})
+                request.session['duplicate_data'] = duplicate_data
+                return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data, 'tables': tables, 'meta_tables': views.meta_tables,})
+
+            else:
+           # form is not valid
+                return redirect('forest_table')
 
     else:
         form = UploadForestDataForm()
@@ -277,7 +257,7 @@ def display_forest_table(request):
     
     #get form data for filteration
 
-    paginator = Paginator(data, 10)
+    paginator = Paginator(data, 40)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
     context={
