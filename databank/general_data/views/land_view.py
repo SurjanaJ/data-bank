@@ -1,10 +1,6 @@
-from datetime import datetime
-from django.db import DataError
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render,redirect
 from django.core.paginator import Paginator
-from django.urls import reverse
-from django.db.models import Q
 import pandas as pd
 from ..models import Land, Country_meta,Land_Code_Meta
 from ..forms import UploadLandDataForm, UploadLandMetaForm
@@ -12,9 +8,12 @@ from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
 from django.views.decorators.http import require_POST
-from django.db.models import F
+from django.db.models import F, Q
 from io import BytesIO
 from django.http import HttpResponse
+
+from .energy_view import strip_spaces
+
 
 from django.contrib.auth.decorators import login_required
 from accounts.decorators import allowed_users
@@ -138,154 +137,134 @@ def upload_land_excel(request):
         
         if form.is_valid():
             excel_data = request.FILES['Land_data_file']
-            df = pd.read_excel(excel_data,dtype={'Land_Code':str})
-            land_unit_options = [option[0] for option in Land.Land_Unit_Options]
+            df = pd.read_excel(excel_data,dtype={'Land Code':str})
+            df.fillna('', inplace=True)
+            df = df.map(strip_spaces)
+            
             if 'id' in df.columns:
-                cols = df.columns.to_list()
                 for index,row in df.iterrows():
-                    id_value = row['id']
-
-                    try:
-                        land_instance = Land.objects.get(id = id_value)
-                    except Exception as e:
-                        data = {col: row[col] for col in cols}
-                        errors.append({
-                            'row_index':index,
-                            'data':data,
-                            'reason':f'Error inserting row {index}:{e}'
-                        })
-                        continue
-                    land_data={
-                        'Year': row['Year'].date().strftime('%Y-%m-%d'),
+                    id = row.get('id')
+                    data={
+                        'Year': row['Year'],
                         'Country': row['Country'],
-                        'Land_Code': row['Land_Code'],
+                        'Land Code': row['Land Code'],
                         'Unit': row['Unit'],
                         'Area': row['Area']
                     }   
-                    try:
-                        Year = row['Year']
-                        Country = row['Country']
-                        
-                        calender_year = pd.to_datetime(Year).date()
-                    except ValueError as e:
-                        errors.append({'row_index': index, 'data': land_data, 'reason': str(e)})
-                        continue
-                    try:
-                        if land_data['Unit'] not in land_unit_options:
-                            land_data={
-                                'Year': row['Year'].date().strftime('%Y-%m-%d'),
-                                'Country': row['Country'],
-                                'Land_Code': row['Land_Code'],
-                                'Unit': row['Unit'],
-                                'Area': row['Area']
-                            }
-                            errors.append({'row_index': index, 'data': land_data, 'reason': f'Error inserting row {index}: Invalid unit value'})
 
-                        else:
-                            Land_Code = row['Land_Code']
-                            Year = calender_year
-                            country = Country_meta.objects.get(Country_Name = Country)
-                            Land_Code = Land_Code_Meta.objects.get(Code = Land_Code)
+                    try:
+                        land_instance = Land.objects.get(id = id)
+                        land_data = data
+
+                        #check if meta values exist
+                        try:
+                            Country = Country_meta.objects.get(Country_Name = row['Country'])
+                            Code = Land_Code_Meta.objects.get(Code = row['Land Code'])
                                 
-                            land_instance.Year = Year
-                            land_instance.Country = country
-                            land_instance.Land_Code = Land_Code
+                            land_instance.Year = row['Year']
+                            land_instance.Country = Country
+                            land_instance.Land_Code = Code
                             land_instance.Unit = row['Unit']
                             land_instance.Area = row['Area']
+                            
                             land_instance.save()
-
                             updated_count +=1
+                        #meta does not exist
+                        except Exception as e:
+                            land_data = data
+                            errors.append({'row_index': index, 'data': land_data, 'reason': str(e)})
+                            continue
+
                     except Exception as e:
-                        land_data={
-                            'Year': row['Year'].date().strftime('%Y-%m-%d'),
-                            'Country': row['Country'],
-                            'Land_Code': row['Land_Code'],
-                            'Unit': row['Unit'],
-                            'Area': row['Area']
-                        }
-                        errors.append({'row_index': index, 'data': land_data, 'reason': str(e)})
+                        land_data = data
+                        errors.append({
+                            'row_index':index,
+                            'data':land_data,
+                            'reason':f'Error inserting row {index}:{e}'
+                        })
                         continue
 
             else:
                 for index,row in df.iterrows():
-                    land_data={
-                        'Year': row['Year'].date().strftime('%Y-%m-%d'),
+                    data={
+                        'Year': row['Year'],
                         'Country': row['Country'],
-                        'Land_Code': row['Land_Code'],
+                        'Land Code': row['Land Code'],
                         'Unit': row['Unit'],
                         'Area': row['Area']
-                    }
+                    }  
 
-                    if land_data['Unit'] not in land_unit_options:
-                        errors.append({
-                            'row_index': index,
-                            'data': land_data,
-                            'reason': f'Error inserting row {index}: Invalid unit value'
-                        })
+                    #check if the meta values exist
+                    try:
+                        Country = Country_meta.objects.get(Country_Name=row['Country'])
+                        Code = Land_Code_Meta.objects.get(Code = row['Land Code'])
+                        
 
-                    else:
-                        try:
-                            calender_date = datetime.strptime(str(row['Year'].date().strftime('%Y-%m-%d')), '%Y-%m-%d').date()
-                            
-                        except ValueError:
-                            calender_date = datetime.strptime(f'{str(row["Year"].date().strftime("%Y-%m-%d"))}-01-01', '%Y-%m-%d').date()
-
-                        Country = None
-
-                        try:
-                            Year = calender_date.strftime('%Y-%m-%d')
-                            Country = Country_meta.objects.get(Country_Name=row['Country'])
-                            Land_Code = Land_Code_Meta.objects.get(Code = row['Land_Code'])
-                            
-                            land_data={
-                                'Year': Year,
-                                'Country': Country,
-                                'Land_Code':Land_Code,
+                        land_data={
+                                'Year': row['Year'],
+                                'Country': row['Country'],
+                                'Land Code': row['Land Code'],
                                 'Unit': row['Unit'],
                                 'Area': row['Area']
-                            }                           
-
-                        except Exception as e:
-                            errors.append({
+                            }     
+                        
+                        existing_record = Land.objects.filter(
+                            Q(Year = row['Year'])
+                            & Q(Country = Country)
+                            & Q(Land_Code = Code)
+                            & Q(Unit = row['Unit'])
+                            & Q(Area = row['Area'])
+                        ).first()
+                        
+                        if existing_record:
+                            land_data = data
+                            duplicate_data.append({
+                                'row_index': index,
+                                    'data': {key: str(value) for key, value in land_data.items()}
+                            })
+                            continue
+                        else:
+                            #add new record
+                            try:
+                                land_data={
+                                'Year': row['Year'],
+                                'Country': Country,
+                                'Land_Code': Code,
+                                'Unit': row['Unit'],
+                                'Area': row['Area']
+                            }
+                                landData = Land(**land_data)
+                                landData.save()
+                                added_count += 1
+                            except Exception as e:
+                                errors.append(f"Error inserting row {index}: {e}")
+                    
+                    except Exception as e:
+                        land_data = data
+                        errors.append({
                                 'row_index': index,
                                 'data': land_data, 
                                 'reason': f'Error inserting row  {index}: {e}'
                             })
-                            continue
-
-                        existing_record = Land.objects.filter(Q(Year = Year) & Q(Country = Country) & Q(Land_Code = Land_Code) & Q(Unit = land_data['Unit']) & Q(Area = land_data['Area'])).first()
-
-                        if existing_record:
-                                duplicate_data.append({
-                                    'row_index' :index,
-                                    'data': land_data,
-                                    'reason': 'Duplicate record found'
-                                })       
-                            
-                        else:
-                            try:
-                                LandData = Land(**land_data)
-                                LandData.save()
-                                added_count +=1
-
-                            except Exception as e:
-                                errors.append({
-                                    'row_index': index,
-                                    'data': land_data,
-                                    'reason': f'Error inserting row  {index}: {e}'
-                                })
-            if added_count> 0 :
-                messages.success(request,str(added_count)+ 'records addad')
+                        continue
+            
+        if added_count> 0 :
+            messages.success(request,str(added_count)+ 'records addad')
                                 
-            if updated_count > 0:
-                messages.info(request,str(updated_count)+'records updated') 
+        if updated_count > 0:
+            messages.info(request,str(updated_count)+'records updated') 
 
-            if errors:
-                request.session['errors'] = errors
-                return render(request, 'general_data/error_template.html', {'errors': errors})
+        if errors:
+            request.session['errors'] = errors
+            return render(request, 'trade_data/error_template.html', {'errors': errors, 'tables': tables, 'meta_tables': views.meta_tables, })
 
-            if duplicate_data:
-                return render (request,'general_data/duplicate_template.html',{'duplicate_data':duplicate_data})      
+        if duplicate_data:
+            request.session['duplicate_data'] = duplicate_data
+            return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data, 'tables': tables, 'meta_tables': views.meta_tables,})
+
+        else:
+           # form is not valid
+            return redirect('land_table') 
               
     else:
         form = UploadLandDataForm()
