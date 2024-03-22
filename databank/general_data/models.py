@@ -10,7 +10,7 @@ class ForestData(models.Model):
         ('Hector','Hector'),
     )
     id = models.AutoField(primary_key=True)
-    Year = models.DateField(null=True, blank=True)
+    Year = models.IntegerField(null=True, blank=True)
     Country = models.ForeignKey(Country_meta, on_delete=models.CASCADE)
     Name_Of_The_Plant = models.CharField(max_length= 100)
     Scientific_Name = models.CharField(max_length=100)
