@@ -241,7 +241,7 @@ class UpdateTransport(ModelForm):
         fields='__all__'
 
         widgets={
-            'Year': forms.DateInput(attrs={'class': 'form-control '}),
+            'Year': forms.NumberInput(attrs={'class': 'form-control '}),
             'Country': forms.Select(attrs={'class': 'form-control '}),
             'Transport_Classification_Code': forms.Select(attrs={'class': 'form-control '}),
             'Unit': forms.Select(attrs={'class': 'form-control '}),

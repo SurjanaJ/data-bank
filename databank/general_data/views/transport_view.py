@@ -290,12 +290,12 @@ def update_selected_transport(request):
         queryset = queryset.annotate(
         country = F('Country__Country_Name'),
         transport_classification_code = F('Transport_Classification_Code__Code'),
- 
+        transport_type =  F('Transport_Classification_Code__Transport_Type'),
         )
 
-        df = pd.DataFrame(list(queryset.values('id','Year','country','transport_classification_code','Unit','Quantity')))
-        df.rename(columns={'country': 'Country','transport_classification_code':'Transport_Classification_Code'}, inplace=True)
-        df = df[['id','Year','Country','Transport_Classification_Code','Unit','Quantity']]
+        df = pd.DataFrame(list(queryset.values('id','Year','country','transport_classification_code','transport_type','Unit','Quantity')))
+        df.rename(columns={'country': 'Country','transport_classification_code':'Transport Classification Code','transport_type':'Transport Type'}, inplace=True)
+        df = df[['id','Year','Country','Transport Classification Code','Transport Type','Unit','Quantity']]
         output = BytesIO()
         writer = pd.ExcelWriter(output, engine='xlsxwriter')  
         df.to_excel(writer, sheet_name='Sheet1', index=False)
