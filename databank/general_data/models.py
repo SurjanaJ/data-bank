@@ -128,7 +128,7 @@ class Water(models.Model):
     )
 
     id = models.AutoField(primary_key=True)
-    Year=models.DateField(null=True,blank=True)
+    Year=models.IntegerField(null=True,blank=True)
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
     Water_Type_Code=models.ForeignKey(Water_Meta,on_delete=models.CASCADE)
     Description = models.CharField(null=True, blank=True)
