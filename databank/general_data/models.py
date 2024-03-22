@@ -35,7 +35,7 @@ class PopulationData(models.Model):
     )
 
     id = models.AutoField(primary_key=True)
-    Year=models.DateField(null=True, blank=True)
+    Year=models.IntegerField(null=True, blank=True)
     Country=models.ForeignKey(Country_meta,on_delete=models.CASCADE)
     Gender=models.CharField(max_length=10,choices=Gender_Options, null=True,blank=True)
     Age_Group=models.CharField(max_length=10,choices=Age_Group_Options, null=True, blank=True)
