@@ -96,7 +96,7 @@ class Tourism_Meta(models.Model):
 
 class Tourism(models.Model):
     id=models.AutoField(primary_key=True)
-    Year=models.DateField(null=True,blank=True)
+    Year=models.IntegerField(null=True,blank=True)
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE, related_name='Tourism_Country')
     Number_Of_Tourist = models.IntegerField(null=True,blank=True)
     Nationality_Of_Tourism=models.ForeignKey(Country_meta, on_delete=models.CASCADE, related_name='Tourism_Nationality_Of_Tourism')
