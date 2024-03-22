@@ -105,7 +105,7 @@ class Tourism(models.Model):
 
 class Hotel(models.Model):
     id=models.AutoField(primary_key=True)
-    Year=models.DateField(null=True,blank=True)
+    Year=models.IntegerField(null=True,blank=True)
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
     Name_Of_The_Hotel=models.CharField(null=True,blank=True)
     Capacity_Room=models.IntegerField(default=0,null=True,blank=True)
