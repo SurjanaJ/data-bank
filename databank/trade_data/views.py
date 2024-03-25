@@ -819,19 +819,19 @@ def time_series_analysis(request):
         'Origin_Destination__Country_Name',
         'HS_Code_id__HS_Code',
         'HS_Code_id__Product_Information',
-        'Calender__year',
+        'Calender',
     ).annotate(
         total_amount=Sum('Amount')
     )
 
 # ********************Find total amount of each year*******************
     total_amount_year = data.values(
-        'Calender__year'
+        'Calender'
     ).annotate(
         total_amount = Sum('Amount')
     )
 
-    total_amount_year = total_amount_year.order_by('-Calender__year')
+    total_amount_year = total_amount_year.order_by('-Calender')
 # *******************************************************************
     
     years = set()
@@ -839,14 +839,14 @@ def time_series_analysis(request):
     result_hs_code = {}
 
     for item in total_amount_by_origin_destination:
-        year = item['Calender__year']
+        year = item['Calender']
         years.add(year)
 
     for item in total_amount_by_origin_destination:
         origin_destination = item['Origin_Destination__Country_Name']
         hs_code = item['HS_Code_id__HS_Code']
         product_information = item['HS_Code_id__Product_Information']
-        year = item['Calender__year']
+        year = item['Calender']
         total_amount = item['total_amount']
         
         if origin_destination not in result_country:
@@ -863,7 +863,7 @@ def time_series_analysis(request):
         origin_destination = item['Origin_Destination__Country_Name']
         hs_code = item['HS_Code_id__HS_Code']
         product_information = item['HS_Code_id__Product_Information']
-        year = item['Calender__year']
+        year = item['Calender']
         total_amount = item['total_amount']
         result_country[origin_destination][year] = total_amount
         result_hs_code[hs_code][year] =total_amount
