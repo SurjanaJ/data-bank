@@ -504,7 +504,6 @@ def upload_trade_excel(request):
             excel_data = request.FILES['trade_data_file']
             df = pd.read_excel(excel_data, dtype={'HS Code': str})
             df.fillna('', inplace=True)
-            df['Calender'] = pd.to_datetime(df['Calender']).dt.date
             df = df.map(strip_spaces)
             
             #update existing data
@@ -513,7 +512,7 @@ def upload_trade_excel(request):
                     id = row.get('id')
                     data = {
                     'Trade Type':row['Trade Type'],
-                    'Calender': row['Calender'].isoformat(),
+                    'Calender': row['Calender'],
                     'Fiscal Year':row['Fiscal Year'],
                     'Duration':row['Duration'],
                     'Country' : row['Country'],
@@ -536,7 +535,6 @@ def upload_trade_excel(request):
 
                         # check if all meta values exist
                         try:
-                            Calender = row['Calender']
                             Country = Country_meta.objects.get(Country_Name=row['Country'])
                             HS_Code = HS_Code_meta.objects.get(HS_Code=row['HS Code'])
                             Unit = Unit_meta.objects.get(Unit_Code=row['Unit'])
@@ -582,7 +580,7 @@ def upload_trade_excel(request):
                 for index, row in df.iterrows():
                     data = {
                     'Trade Type':row['Trade Type'],
-                    'Calender': row['Calender'].isoformat(),
+                    'Calender': row['Calender'],
                     'Fiscal Year':row['Fiscal Year'],
                     'Duration':row['Duration'],
                     'Country' : row['Country'],
@@ -600,7 +598,6 @@ def upload_trade_excel(request):
 
                     # Check if meta values exist
                     try:
-                        Calender = row['Calender']
                         Country = Country_meta.objects.get(Country_Name=row['Country'])
                         HS_Code = HS_Code_meta.objects.get(HS_Code=row['HS Code'])
                         Unit = Unit_meta.objects.get(Unit_Code=row['Unit'])
