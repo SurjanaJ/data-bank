@@ -14,8 +14,10 @@ from trade_data.models import Country_meta
 from ..forms import UploadCrimeForm
 from ..models import Crime, Crime_Meta
 
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import allowed_users
 
-
+@login_required(login_url = 'login')
 def display_crime_meta(request):
     data = Crime_Meta.objects.all()
     total_data = data.count()
@@ -25,7 +27,8 @@ def display_crime_meta(request):
     
     return render(request, 'general_data/display_meta.html', context)
 
-
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_crime_excel(request):
     errors = []
     duplicate_data = []
@@ -191,7 +194,7 @@ def upload_crime_excel(request):
 
     return render(request,'general_data/transport_templates/upload_transport_form.html',{'form':form})
 
-
+@login_required(login_url = 'login')
 def display_crime_table(request):
     data = Crime.objects.all()
 
@@ -236,6 +239,8 @@ def display_crime_table(request):
 
     return render(request, 'general_data/crime_templates/crime_table.html', context)
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def export_excel(request):
     year_min = request.GET.get('year_min')
     year_max = request.GET.get('year_max')
@@ -287,6 +292,8 @@ def export_excel(request):
     response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
     return response
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def update_selected_crime(request):
     selected_ids = request.POST.getlist('selected_items')
     if not selected_ids:

@@ -7,6 +7,8 @@ from django.core.paginator import Paginator
 from django.urls import reverse
 from django.db.models import Q
 import pandas as pd
+
+from .energy_view import strip_spaces
 from ..models import Mining, Country_meta,Mine_Meta
 from ..forms import UploadMiningForm
 from trade_data.views import tables
@@ -18,13 +20,16 @@ from io import BytesIO
 from django.http import HttpResponse
 
 from trade_data import views
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import allowed_users
 
 def is_valid_queryparam(param):
     return param !='' and param is not None
 
+@login_required(login_url = 'login')
 def display_mining_table(request):
-
     data = Mining.objects.all()
+
     mine_codes=Mine_Meta.objects.all()
     unit_options = [choice[1] for choice in Mining.Unit_Options ]
 
@@ -76,20 +81,21 @@ def display_mining_table(request):
     paginator = Paginator(data, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-    
 
     context={
         'tables':tables,
         'data_len':len(data),
         'query_len': len(page),
-        'page':page,
+        'page':page, 
         'country_categories':country_categories,
         'unit_options':unit_options,
         'mine_codes':mine_codes,
 
     }
     return render(request, 'general_data/mining_templates/mining_table.html',context)
- 
+
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_mining_excel(request):
     errors = []
     duplicate_data = []
@@ -100,153 +106,139 @@ def upload_mining_excel(request):
         form = UploadMiningForm(request.POST, request.FILES)  
         if form.is_valid():
             excel_data = request.FILES['file']
-            df = pd.read_excel(excel_data)
+            df = pd.read_excel(excel_data, dtype={'Code': str})
+            df.fillna('', inplace=True)
+            df = df.map(strip_spaces)
 
             unit_options = [option[0] for option in Mining.Unit_Options]
 
             if 'id' in df.columns:
-                cols = df.columns.tolist()
                 for index, row in df.iterrows():
-                    id_value = row.get('id')
+                    id = row.get('id')
+                    data = {
+                        'Year': row['Year'],
+                        'Country': row['Country'],
+                        'Code': row['Code'],
+                        'Mine Type': row['Mine Type'],
+                        'Unit': row['Unit'],
+                        'Current Production': row['Current Production'],
+                        'Potential Stock': row['Potential Stock'],
+                        'Mining Company Name': row['Mining Company Name']
+                    }
+
+                    #get existing data
                     try:
-                        mining_instance = Mining.objects.get(id=id_value)
+                        mining_instance = Mining.objects.get(id=id)
+                        mining_data= data
+
+                        #check if meta values exist
+                        try:
+                            Country = Country_meta.objects.get(Country_Name=row['Country'])
+                            Code = Mine_Meta.objects.get(Code=row['Code'])
+
+                            mining_instance.Year = row['Year']
+                            mining_instance.Country = Country
+                            mining_instance.Code = Code
+                            mining_instance.Unit = row['Unit']
+                            mining_instance.Current_Production = row['Current Production']
+                            mining_instance.Potential_Stock = row['Potential Stock']
+                            mining_instance.Mining_Company_Name = row['Mining Company Name']
+
+                            mining_instance.save()
+                            updated_count +=1
+
+                        #meta does not exist
+                        except Exception as e:
+                            mining_data= data
+                            errors.append({'row_index': index, 'data': mining_data, 'reason': str(e)})
+                            continue
+
+
+                    #instance does not exist
                     except Exception as e:
-                        data = {col: row[col] for col in cols}
+                        mining_data= data
                         errors.append({
                             'row_index': index,
-                            'data': data,
+                            'data': mining_data,
                             'reason': f'Error inserting row {index}:{e}'
                         })
                         continue
 
-                    mining_data = {
-                        'Year': row['Year'].date().strftime('%Y-%m-%d'),
-                        'Country': row['Country'],
-                        'Name_Of_Mine': row['Name_Of_Mine'],
-                        'Unit': row['Unit'],
-                        'Current_Production': row['Current_Production'],
-                        'Potential_Stock': row['Potential_Stock'],
-                        'Mining_Company_Name': row['Mining_Company_Name']
-                    }
-
-                    try:
-                        Year = row['Year']
-                        calender_year = pd.to_datetime(Year).date()
-                    except ValueError as e:
-                        mining_data = {
-                            'Year': row['Year'].date().strftime('%Y-%m-%d'),
-                            'Country': row['Country'],
-                            'Name_Of_Mine': row['Name_Of_Mine'],
-                            'Unit': row['Unit'],
-                            'Current_Production': row['Current_Production'],
-                            'Potential_Stock': row['Potential_Stock'],
-                            'Mining_Company_Name': row['Mining_Company_Name']
-                        }
-                        errors.append({'row_index': index, 'data': mining_data, 'reason': str(e)})
-                        continue
-
-                    try:
-                        if mining_data['Unit'] not in unit_options:
-                            mining_data = {
-                                'Year': row['Year'].date().strftime('%Y-%m-%d'),
-                                'Country': row['Country'],
-                                'Name_Of_Mine': row['Name_Of_Mine'],
-                                'Unit': row['Unit'],
-                                'Current_Production': row['Current_Production'],
-                                'Potential_Stock': row['Potential_Stock'],
-                                'Mining_Company_Name': row['Mining_Company_Name']
-                            }
-                            errors.append({'row_index': index,'data': mining_data, 'reason': f'Error inserting row {index}: Invalid unit value'})
-
-                        else:
-                            Year = calender_year
-                            country_instance = Country_meta.objects.get(Country_Name=row['Country'])
-                            mine_type = Mine_Meta.objects.get(Mine_Type=row['Name_Of_Mine'])
-
-                            mining_instance.Year = row['Year']
-                            mining_instance.Country = country_instance
-                            mining_instance.Name_Of_Mine = mine_type
-                            mining_instance.Unit = row['Unit']
-                            mining_instance.Current_Production = row['Current_Production']
-                            mining_instance.Potential_Stock = row['Potential_Stock']
-                            mining_instance.Mining_Company_Name = row['Mining_Company_Name']
-
-                            mining_instance.save()
-                            updated_count += 1
-                    except Exception as e:
-                        mining_data = {
-                            'Year': row['Year'].date().strftime('%Y-%m-%d'),
-                            'Country': row['Country'],
-                            'Name_Of_Mine': row['Name_Of_Mine'],
-                            'Unit': row['Unit'],
-                            'Current_Production': row['Current_Production'],
-                            'Potential_Stock': row['Potential_Stock'],
-                            'Mining_Company_Name': row['Mining_Company_Name']
-                        }
-                        errors.append({'row_index': index, 'data': mining_data, 'reason': str(e)})
-                        continue
-
+            #add new data        
             else:
                 for index, row in df.iterrows():
-                    mining_data = {
-                        'Year': row['Year'].date().strftime('%Y-%m-%d'),
+                    data = {
+                        'Year': row['Year'],
                         'Country': row['Country'],
-                        'Name_Of_Mine': row['Name_Of_Mine'],
+                        'Code': row['Code'],
+                        'Mine Type': row['Mine Type'],
                         'Unit': row['Unit'],
-                        'Current_Production': row['Current_Production'],
-                        'Potential_Stock': row['Potential_Stock'],
-                        'Mining_Company_Name': row['Mining_Company_Name']
+                        'Current Production': row['Current Production'],
+                        'Potential Stock': row['Potential Stock'],
+                        'Mining Company Name': row['Mining Company Name']
                     }
 
-                    if mining_data['Unit'] not in unit_options:
-                        errors.append({'row_index': index,'data': mining_data, 'reason': f'Error inserting row {index}: Invalid unit value'})
-                    else:
-                        try:
-                            calender_date = datetime.strptime(str(row['Year'].date().strftime('%Y-%m-%d')), '%Y-%m-%d').date()
-                        except ValueError:
-                             calender_date = datetime.strptime(f'{str(row["Year"].date().strftime("%Y-%m-%d"))}-01-01', '%Y-%m-%d').date()
+                    # if mining_data['Unit'] not in unit_options:
+                    #     errors.append({'row_index': index,'data': mining_data, 'reason': f'Error inserting row {index}: Invalid unit value'})
+                    
 
-                        country_instance = None
-                        mine_instance = None
+                    #check if the meta values exist
+                    try:
+                        Country = Country_meta.objects.get(Country_Name=row['Country'])
+                        Code = Mine_Meta.objects.get(Code=row['Code'])
 
-                        try:
-                            Year = calender_date.strftime('%Y-%m-%d')
-                            country_instance = Country_meta.objects.get(Country_Name=row['Country'])
-                            mine_instance = Mine_Meta.objects.get(Mine_Type=row['Name_Of_Mine'])
+                        mining_data = {
+                        'Year': row['Year'],
+                        'Country': Country,
+                        'Code': Code,
+                        'Mine Type': row['Mine Type'],
+                        'Unit': row['Unit'],
+                        'Current Production': row['Current Production'],
+                        'Potential Stock': row['Potential Stock'],
+                        'Mining Company Name': row['Mining Company Name']
+                    }
+                        
+                        existing_record = Mining.objects.filter(
+                            Q(Year = row['Year'])
+                            & Q(Country = Country)
+                            & Q(Code = Code)
+                            & Q(Unit = row['Unit'])
+                            & Q(Current_Production = row['Current Production'])
+                            & Q(Potential_Stock = row['Potential Stock'])
+                            & Q(Mining_Company_Name = row['Mining Company Name'])
+                        ).first()
 
-                            mining_data = {
-                                'Year': row['Year'],
-                                'Country': country_instance,
-                                'Name_Of_Mine': mine_instance,
-                                'Unit': row['Unit'],
-                                'Current_Production': row['Current_Production'],
-                                'Potential_Stock': row['Potential_Stock'],
-                                'Mining_Company_Name': row['Mining_Company_Name']
-                            }
-                        except Exception as e:
-                            errors.append({'row_index': index, 'data': mining_data, 'reason': str(e)})
-                            continue
-
-                        existing_record = Mining.objects.filter(Q(Year=Year) & Q(Country=country_instance) & Q(Name_Of_Mine=mine_instance) & Q(Unit=row['Unit']) & Q(Current_Production= row['Current_Production']) & Q(Potential_Stock = row['Potential_Stock']) & Q(Mining_Company_Name = row['Mining_Company_Name'])).first()
+                        # show duplicate data
                         if existing_record:
+                            mining_data = data
                             duplicate_data.append({
                                 'row_index': index,
-                                'data': mining_data,
-                                'reason': 'Duplicate data found'
+                                'data': {key: str(value) for key, value in mining_data.items()}
                             })
+                            continue
                         else:
+                            #add new record
                             try:
-                
-                                Miningdata=Mining(**mining_data)
-                                Miningdata.save()
+                                mining_data = {
+                                    'Year': row['Year'],
+                                    'Country': Country,
+                                    'Code': Code,
+                                    'Unit': row['Unit'],
+                                    'Current_Production': row['Current Production'],
+                                    'Potential_Stock': row['Potential Stock'],
+                                    'Mining_Company_Name': row['Mining Company Name']
+                                }
+                                miningData = Mining(**mining_data)
+                                miningData.save()
                                 added_count += 1
                             except Exception as e:
-                                errors.append({
-                                    'row_index': index,
-                                    'data': mining_data,
-                                    'reason': f"Error inserting row {index}: {e}"
-                                })
-                                errors.append({'row_index': index, 'data': mining_data, 'reason': str(e)})
+                                errors.append(f"Error inserting row {index}: {e}")
+
+                    #meta does not exist
+                    except Exception as e:
+                        mining_data = data
+                        errors.append({'row_index': index, 'data': mining_data, 'reason': str(e)})
+                        continue
 
             if added_count > 0:
                 messages.success(request, f'{added_count} records added')
@@ -260,12 +252,16 @@ def upload_mining_excel(request):
 
             if duplicate_data:
                 return render(request, 'general_data/duplicate_template.html', {'duplicate_data': duplicate_data})
+            
+            else:
+                return redirect('mining_table')
 
     else:
         form = UploadMiningForm()
 
     return render(request, 'general_data/upload_form.html', {'form': form, 'tables': tables})
 
+@login_required(login_url = 'login')
 def display_mining_meta(request):
     data = Mine_Meta.objects.all()
     total_data = data.count()
@@ -274,7 +270,9 @@ def display_mining_meta(request):
 
     context = {'data': data, 'total_data':total_data, 'meta_tables':views.meta_tables, 'tables':tables, 'column_names':column_names}
     return render(request, 'general_data/display_meta.html', context)
-                
+
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])              
 def update_selected_mining(request):
     selected_ids = request.POST.getlist('selected_items')
     if not selected_ids:
@@ -285,12 +283,16 @@ def update_selected_mining(request):
         queryset = Mining.objects.filter(id__in=selected_ids)
         queryset = queryset.annotate(
         country = F('Country__Country_Name'),
-        name_of_mine = F('Name_Of_Mine__Mine_Type'),
+        code = F('Code__Code'),
+        Mine_Type = F('Code__Mine_Type')
         )
 
-        df = pd.DataFrame(list(queryset.values('id','Year','country','name_of_mine','Unit','Current_Production','Potential_Stock','Mining_Company_Name')))
-        df.rename(columns={'country': 'Country','name_of_mine':'Name_Of_Mine'}, inplace=True)
-        df = df[['id','Year','Country','Name_Of_Mine','Unit','Current_Production','Potential_Stock','Mining_Company_Name']]
+        df = pd.DataFrame(list(queryset.values('id','Year','country','code','Mine_Type','Unit','Current_Production','Potential_Stock','Mining_Company_Name')))
+
+        df.rename(columns={'country':'Country','code':'Code','Mine_Type': 'Mine Type','Current_Production':'Current Production','Potential_Stock':'Potential Stock', 'Mining_Company_Name':'Mining Company Name'}, inplace=True)
+        
+        df = df[['id','Year','Country','Code','Mine Type','Unit','Current Production','Potential Stock','Mining Company Name']]
+        
         output = BytesIO()
         writer = pd.ExcelWriter(output, engine='xlsxwriter')  
         df.to_excel(writer, sheet_name='Sheet1', index=False)

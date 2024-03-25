@@ -15,6 +15,11 @@ from trade_data import views
 from ..forms import UploadIndexForm
 from ..models import Index
 
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import allowed_users
+
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_index_excel(request):
     errors = []
     duplicate_data = []
@@ -154,7 +159,8 @@ def upload_index_excel(request):
         form = UploadIndexForm()
 
     return render(request,'general_data/transport_templates/upload_transport_form.html',{'form':form, 'tables': tables, 'meta_tables': views.meta_tables,})
-    
+
+@login_required(login_url = 'login')
 def display_index_table(request):
     data = Index.objects.all()
 
@@ -178,6 +184,7 @@ def display_index_table(request):
             }
     return render(request, 'general_data/index_templates/index_table.html', context)
 
+@login_required(login_url = 'login')
 def export_index_excel(request):
     country = request.GET.get('country')
 
@@ -214,7 +221,8 @@ def export_index_excel(request):
     response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
     return response
 
-
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def update_selected_index(request):
     selected_ids = request.POST.getlist('selected_items')
     if not selected_ids:

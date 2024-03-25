@@ -15,11 +15,15 @@ from trade_data import views
 from ..models import Currency_Meta, Exchange
 from ..forms import UploadCurrencyForm, UploadExchangeForm
 
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import allowed_users
+
 def strip_spaces(value):
     if isinstance(value, str):
         return value.strip()
     return value
 
+@login_required(login_url = 'login')
 def display_currency_meta(request):
     data = Currency_Meta.objects.all()
     total_data = data.count()
@@ -30,6 +34,8 @@ def display_currency_meta(request):
     
     return render(request, 'general_data/display_meta.html', context)
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_currency_meta_excel(request):
     errors = []
     duplicate_data = []
@@ -122,7 +128,8 @@ def upload_currency_meta_excel(request):
 
     return render(request, 'general_data/transport_templates/upload_transport_form.html', {'form':form})
 
-
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_exchange_excel(request):
     errors = []
     duplicate_data = []
@@ -276,7 +283,7 @@ def upload_exchange_excel(request):
 
     return render(request, 'general_data/transport_templates/upload_transport_form.html',{'form': form, 'meta_tables':views.meta_tables, 'tables':tables,})
 
-
+@login_required(login_url = 'login')
 def display_exchange_table(request):
     data = Exchange.objects.all()
 
@@ -317,7 +324,7 @@ def display_exchange_table(request):
                       }
     return render(request, 'general_data/exchange_templates/exchange_table.html', context)
 
-
+@login_required(login_url = 'login')
 def export_exchange_excel(request):
     country = request.GET.get('country')
     min_buying_amt = request.GET.get('min_buying_amt')
@@ -366,6 +373,8 @@ def export_exchange_excel(request):
     response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
     return response
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def update_selected_exchange(request):
     selected_ids = request.POST.getlist('selected_items')
     if not selected_ids:

@@ -6,7 +6,10 @@ from django.db.models import Q
 from django.db.models import F
 import pandas as pd
 from django.shortcuts import HttpResponse
+from trade_data.views import is_valid_queryparam, tables
 
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import allowed_users
 
 def filter(request):
     data =ForestData.objects.all()
@@ -38,6 +41,7 @@ def filter(request):
 
     return data
 
+@login_required(login_url = 'login')
 def export_forest_table_to_excel(request):
     data=filter(request)
 
@@ -108,7 +112,7 @@ def filter_land(request):
 
 
 
-
+@login_required(login_url = 'login')
 def export_land_table_to_excel(request):
     data=filter_land(request)
 
@@ -121,10 +125,10 @@ def export_land_table_to_excel(request):
     df = pd.DataFrame(data.values('Year','country_name','land_code','land_type','Unit','Area'))
 
 
-    df.rename(columns={'country_name':'Country','land_code':'Land_Code','land_type':'Land_Type'},inplace=True)
+    df.rename(columns={'country_name':'Country','land_code':'Land Code','land_type':'Land Type'},inplace=True)
 
 
-    df= df[['Year','Country','Land_Code','Land_Type','Unit','Area']]
+    df= df[['Year','Country','Land Code','Land Type','Unit','Area']]
 
     output=BytesIO()
     writer = pd.ExcelWriter(output,engine='xlsxwriter')
@@ -169,7 +173,7 @@ def filter_activity_data(request):
 
     return data
 
-
+@login_required(login_url = 'login')
 def export_activity_data_to_excel(request):
     data = filter_activity_data(request)
 
@@ -233,6 +237,7 @@ def filter_hotel(request):
 
     return data
 
+@login_required(login_url = 'login')
 def export_hotel_table_to_excel(request):
     data=filter_hotel(request)
 
@@ -242,9 +247,8 @@ def export_hotel_table_to_excel(request):
 
     df = pd.DataFrame(data.values('Year','country_name','Name_Of_The_Hotel','Capacity_Room','Occupancy_In_Year','City'))
 
-    df.rename(columns={'country_name':'Country'},inplace=True)
-
-    df = df[['Year','Country','Name_Of_The_Hotel','Capacity_Room','Occupancy_In_Year','City']]
+    df.rename(columns={'country_name': 'Country','Name_Of_The_Hotel':'Name Of The Hotel','Capacity_Room':'Capacity Room','Occupancy_In_Year':'Occupancy In Year'}, inplace=True)
+    df = df[['Year','Country','Name Of The Hotel','Capacity Room','Occupancy In Year','City']]
 
     output=BytesIO()
     writer = pd.ExcelWriter(output,engine='xlsxwriter')
@@ -297,6 +301,7 @@ def filter_population(request):
 
     return data
 
+@login_required(login_url = 'login')
 def export_population_table_to_excel(request):
     data = filter_population(request)
 
@@ -305,9 +310,9 @@ def export_population_table_to_excel(request):
     )
 
     df = pd.DataFrame(data.values('Year','country_name','Gender','Age_Group','Population'))
-    df.rename(columns={'country_name':'Country'},inplace=True)
+    df.rename(columns={'country_name':'Country','Age_Group':'Age Group'},inplace=True)
 
-    df = df[['Year','Country','Gender','Age_Group','Population']]
+    df = df[['Year','Country','Gender','Age Group','Population']]
 
     output=BytesIO()
     writer = pd.ExcelWriter(output,engine='xlsxwriter')
@@ -361,25 +366,30 @@ def filter_tourism(request):
     return data
 
 
-
+@login_required(login_url = 'login')
 def export_tourism_table_to_excel(request):
-    data = filter_tourism(request)
-    data = data.annotate(
-        country_name=F('Country__Country_Name'),
-        arrival_mode=F('Arrival_code__Code'),
+    queryset = filter_tourism(request)
+    queryset = queryset.annotate(
+        country=F('Country__Country_Name'),
+        arrival_code=F('Arrival_code__Code'),
+        arrival_mode=F('Arrival_code__Arrival_Mode'),
         nationality_of_tourism=F('Nationality_Of_Tourism__Country_Name')
     )
 
-    df = pd.DataFrame(data.values('Year','country_name','Number_Of_Tourist','nationality_of_tourism','arrival_mode','Number'))
+    data = pd.DataFrame(list(queryset.values('Year','country','Number_Of_Tourist','nationality_of_tourism','arrival_code','arrival_mode','Number')))
 
 
-    df.rename(columns={'country_name':'Country','nationality_of_tourism':'Nationality_Of_Tourism','arrival_mode':'Arrival_Mode'},inplace=True)  
+    data.rename(columns={'country': 'Country','nationality_of_tourism':'Nationality Of Tourism','arrival_mode':'Arrival Mode',
+        'arrival_code':'Arrival Code',
+        'Number_Of_Tourist':'Number Of Tourist'}, inplace=True)
 
-    df = df[['Year','Country','Number_Of_Tourist','Nationality_Of_Tourism','Arrival_Mode','Number']]  
+    column_order = ['Year','Country','Number Of Tourist','Nationality Of Tourism','Arrival Code','Arrival Mode','Number']
+
+    data = data[column_order] 
     
     output=BytesIO()
     writer = pd.ExcelWriter(output,engine='xlsxwriter')
-    df.to_excel(writer,sheet_name='Sheet1',index=False)
+    data.to_excel(writer,sheet_name='Sheet1',index=False)
 
     writer.close()
     output.seek(0)
@@ -432,20 +442,21 @@ def filter_water(request):
 
     return data
 
-
+@login_required(login_url = 'login')
 def export_water_table_to_excel(request):
     data=filter_water(request)
 
     data=data.annotate(
         country_name=F('Country__Country_Name'),
         water_code = F('Water_Type_Code__Code'),
+        water_type = F('Water_Type_Code__Water_Type'),
+
     )
 
-    df=pd.DataFrame(data.values('Year','country_name','water_code','Description','Unit','Volume','Name_Of_The_River'))
+    df=pd.DataFrame(data.values('Year','country_name','water_code','water_type','Description','Unit','Volume','Name_Of_The_River'))
 
-    df.rename(columns={'country_name':'Country','water_code':'Water_Type_Code'},inplace=True)
-
-    df=df[['Year','Country','Water_Type_Code','Description','Unit','Volume','Name_Of_The_River']]
+    df.rename(columns={'country_name': 'Country','water_code':'Water Type Code','water_type':'Water Type','Name_Of_The_River':'Name Of The River'}, inplace=True)
+    df = df[['Year','Country','Water Type Code','Water Type','Description','Unit','Volume','Name Of The River']]
 
     output=BytesIO()
     writer=pd.ExcelWriter(output,engine='xlsxwriter')
@@ -497,19 +508,22 @@ def filter_transport(request):
 
     return data
 
+@login_required(login_url = 'login')
 def export_transport_table_to_excel(request):
     data = filter_transport(request)
     
     data = data.annotate(
         country_name=F('Country__Country_Name'),
         transport_classification_code = F('Transport_Classification_Code__Code'),
+        transport_type = F('Transport_Classification_Code__Transport_Type'),
+
     )
 
-    df=pd.DataFrame(data.values('Year','country_name','transport_classification_code','Unit','Quantity'))
+    df=pd.DataFrame(data.values('Year','country_name','transport_classification_code','transport_type','Unit','Quantity'))
 
-    df.rename(columns={'country_name':'Country','transport_classification_code':'Transport_Classification_Code'},inplace=True)
+    df.rename(columns={'country_name':'Country','transport_classification_code':'Transport Classification Code','transport_type':'Transport Type'},inplace=True)
 
-    df = df[['Year','Country','Transport_Classification_Code','Unit','Quantity']]
+    df = df[['Year','Country','Transport Classification Code','Unit','Quantity','Transport Type']]
 
     output=BytesIO()
     writer=pd.ExcelWriter(output,engine='xlsxwriter')
@@ -555,6 +569,7 @@ def filter_public_unitillity(request):
 
     return data
 
+@login_required(login_url = 'login')
 def export_public_unitillity_table_to_excel(request):
     data = filter_public_unitillity(request)
 
@@ -562,8 +577,8 @@ def export_public_unitillity_table_to_excel(request):
         country_name =F('Country__Country_Name'),
     )
     df=pd.DataFrame(data.values('Year','country_name','Type_Of_Public_Utility','Number'))
-    df.rename(columns={'country_name': 'Country'},inplace=True)
-    df = df[['Year','Country','Type_Of_Public_Utility','Number']]
+    df.rename(columns={'country_name': 'Country','Type_Of_Public_Utility':'Type Of Public Utility'},inplace=True)
+    df = df[['Year','Country','Type Of Public Utility','Number']]
     output=BytesIO()
     writer=pd.ExcelWriter(output,engine='xlsxwriter')
     df.to_excel(writer,sheet_name='sheet1',index=False)
@@ -615,6 +630,8 @@ def filter_road(request):
 
 
     return data
+
+@login_required(login_url = 'login')
 def export_road_table_to_excel(request):
     data = filter_road(request)
 
@@ -690,19 +707,38 @@ def filter_political(request):
 
     return data
 
+@login_required(login_url = 'login')
 def export_political_table_to_excel(request):
-    data = filter_political(request)
+    country = request.GET.get('country_category')
+    date_min = request.GET.get('date_min')
+    date_max = request.GET.get('date_max')
 
-    data = data.annotate(
-        country_name = F('Country__Country_Name'),
+    filter_conditions = {}
+    if is_valid_queryparam(country) and country != '--':
+        filter_conditions['Country'] = country
+    if is_valid_queryparam(date_min):
+        filter_conditions['Year__gte'] = date_min
+    if is_valid_queryparam(date_max):
+        filter_conditions['Year__lt'] = date_max
+
+
+    queryset = Political_Data.objects.filter(**filter_conditions)
+    queryset = queryset.annotate(
+        country = F('Country__Country_Name'),
     )
+    data = pd.DataFrame(list(queryset.values('Year','country','Political_Party_Name','Number_Of_Member','Province','District','Municipality','Wards')))
 
-    df = pd.DataFrame(data.values('Year','country_name','Political_Party_Name','Number_Of_Member','Province','District','Municipality','Wards'))
-    df.rename(columns={'country_name':'Country','Number_Of_Member':'No_Of_Member'},inplace=True)
-    df = df[['Year','Country','Political_Party_Name','No_Of_Member','Province','District','Municipality','Wards']]
+    data.rename(columns={
+            'country': 'Country',
+            'Political_Party_Name':'Political Party Name',
+            'Number_Of_Member':'No Of Member'
+            }, inplace=True)
+    column_order = ['Year','Country','Political Party Name','No Of Member','Province','District','Municipality','Wards']
+        
+    data = data[column_order]
     output=BytesIO()
     writer=pd.ExcelWriter(output,engine='xlsxwriter')
-    df.to_excel(writer,sheet_name='sheet1',index=False)
+    data.to_excel(writer,sheet_name='sheet1',index=False)
 
     writer.close()
     output.seek(0)
@@ -745,6 +781,7 @@ def filter_health_diseases(request):
 
     return data
 
+@login_required(login_url = 'login')
 def export_health_diseases_table_to_excel(request):
     data = filter_health_diseases(request)
 
@@ -807,6 +844,7 @@ def filter_housing(request):
 
     return data
 
+@login_required(login_url = 'login')
 def export_housing_table_to_excel(request):
     data = filter_housing(request)
 
@@ -881,18 +919,20 @@ def filter_mining(request):
 
     return data
 
+@login_required(login_url = 'login')
 def export_mining_table_to_excel(request):
     data = filter_mining(request)
 
     data = data.annotate(
-        country_name = F('Country__Country_Name'),
-        name_of_mine = F('Name_Of_Mine__Mine_Type')
+       country = F('Country__Country_Name'),
+        code = F('Code__Code'),
+        Mine_Type = F('Code__Mine_Type')
 
     )
 
-    df=pd.DataFrame(data.values('Year','country_name','name_of_mine','Unit','Current_Production','Potential_Stock','Mining_Company_Name'))
-    df.rename(columns={'country_name':'Country','name_of_mine':'Name_Of_Mine'},inplace=True)
-    df = df[['Year','Country','Name_Of_Mine','Unit','Current_Production','Potential_Stock','Mining_Company_Name']]
+    df=pd.DataFrame(data.values('Year','Year','country','code','Mine_Type','Unit','Current_Production','Potential_Stock','Mining_Company_Name'))
+    df.rename(columns={'country':'Country','code':'Code','Mine_Type': 'Mine Type','Current_Production':'Current Production','Potential_Stock':'Potential Stock', 'Mining_Company_Name':'Mining Company Name'},inplace=True)
+    df = df[['Year','Country','Code','Mine Type','Unit','Current Production','Potential Stock','Mining Company Name']]
     output=BytesIO()
     writer=pd.ExcelWriter(output,engine='xlsxwriter')
     df.to_excel(writer,sheet_name='sheet1',index=False)
@@ -954,6 +994,7 @@ def filter_disaster(request):
 
     return data
 
+@login_required(login_url = 'login')
 def export_disaster_table_to_excel(request):
     data = filter_disaster(request)
 

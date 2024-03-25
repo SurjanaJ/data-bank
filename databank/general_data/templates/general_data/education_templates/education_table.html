@@ -61,6 +61,10 @@
             </span>
 
             <div class="d-flex align-items-center py-2">
+                <button type="button" class="btn border p-2 styled-link hover-shadow" onclick="updateSelected()">
+                    <i class="fa-solid fa-file-pen"></i>
+                    <span>Update Selected</span>
+                </button>
                 <button type="button" class="btn border p-2 styled-link mx-3 hover-shadow" onclick="confirmDeleteAll()">
                     <i class="fa-regular fa-trash-can" style="color: #ff0000"></i>
                     <span>Delete Selected</span>
@@ -200,6 +204,11 @@
           alert("Delete canceled!");
       }
   }
+
+  function updateSelected(itemId) {
+        document.getElementById("delete-form").action = "{% url 'update_selected_education' %}";
+        document.getElementById("delete-form").submit();
+    }
 
   function confirmDeleteAll() {
         var confirmDelete = confirm(

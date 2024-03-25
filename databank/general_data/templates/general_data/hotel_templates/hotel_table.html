@@ -1,23 +1,9 @@
 {% extends 'main.html' %} {% block content %}
-<div class="d-flex">
+{% load custom_filters %}
   <button class="btn btn-sm px-4" data-bs-toggle="collapse" data-bs-target="#collapseFilter" aria-expanded="false"
     aria-controls="collapseFilter" style="background-color: #419197;font-size:14px;font-weight: 500; color: white;">
     Filters
   </button>
-</div>
-
-<div>
-  {% if messages %}
-  {% for m in messages %}
-  <div class="alert alert-success px-1 py-1 alert-dismissible mt-2 custom-alert" role="alert">
-    {{m}}
-    <button type="button" class="btn-close px-2 py-2 " data-bs-dismiss="alert" aria-label="Close"></button>
-  </div>
-  {% endfor %}
-  {% endif %}
-</div>
-
-
 
 <div class="bg-light mt-3">
 
@@ -36,11 +22,11 @@
 
         <div class="col-md-3">
           <label for="date_minimum">Calender Date Minimum</label>
-          <input type="date" class="form-control" id="date_minimum" name="date_min" />
+          <input type="number" class="form-control" id="date_minimum" name="date_min" />
         </div>
         <div class="col-md-3">
           <label for="date_maximum">Calender Date Maximum</label>
-          <input type="date" class="form-control" id="date_maximum" name="date_max" />
+          <input type="number" class="form-control" id="date_maximum" name="date_max" />
         </div>
 
 
@@ -72,8 +58,11 @@
     </div>
   </div>
 </div>
-<div class="fs-4 fw-bold text-center">Hotel Data</div>
 
+<div class="d-flex justify-content-center">
+  <a class="fs-4 fw-bold mt-4 link-secondary  link-offset-2 link-underline-opacity-0 link-underline-opacity-25-hover"
+      href="{% url 'hotel_table' %}">Hotel Data</a>
+</div>
 
 {% if query_len == 0 %}
 <div class="bg-light p-4 text-center fw-normal mt-4 text-danger">
@@ -120,15 +109,15 @@
             </th>
             <th class=" text-white fst-normal  " scope="col"
               style="font-size:14px; font-weight: 500; background: #12486B;">
-              Name_Of_The_Hotel
+              Name Of The Hotel
             </th>
             <th class=" text-white fst-normal  " scope="col"
               style="font-size:14px; font-weight: 500; background: #12486B;">
-              Capacity_room
+              Capacity Room
             </th>
             <th class=" text-white fst-normal " scope="col"
               style="font-size:14px; font-weight: 500; background: #12486B;">
-              Occupancy_In_Year
+              Occupancy In Year
             </th>
             <th class=" text-white fst-normal " scope="col"
               style="font-size:14px; font-weight: 500; background: #12486B;">

@@ -110,7 +110,7 @@ admin.site.register(Public_Unitillity)
 admin.site.register(Mine_Meta)
 
 class Mining_Admin(admin.ModelAdmin ):
-    list_display=('id','Year','Country','Name_Of_Mine','Unit','Current_Production',	'Potential_Stock','Mining_Company_Name')
+    list_display=('id','Year','Country','Code','Unit','Current_Production',	'Potential_Stock','Mining_Company_Name')
 
 admin.site.register(Mining,Mining_Admin)
 
@@ -132,6 +132,8 @@ class Health_Disease_Admin(admin.ModelAdmin ):
     list_display=('id','Year','Country','Disease_Code','Unit','Number_Of_Case')
 
 admin.site.register(Health_disease,Health_Disease_Admin)
+
+# admin.site.register(Budgetary_Data)
 
 
 

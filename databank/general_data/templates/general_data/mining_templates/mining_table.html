@@ -1,5 +1,6 @@
 {% extends 'main.html' %} {% block content %}
-<div class="d-flex">
+{% load custom_filters %}
+
   <button
   class="btn btn-sm px-4"
   data-bs-toggle="collapse"
@@ -11,17 +12,7 @@
   >
     Filters
   </button>
-</div>
-<div>
-  {% if messages %}
-    {% for m in messages %}
-      <div class="alert alert-success px-1 py-1 alert-dismissible mt-2 custom-alert" role="alert">
-        {{m}}
-        <button type="button" class="btn-close px-2 py-2 " data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-    {% endfor %}
-  {% endif %}
-</div>
+
 
 <div class="bg-light mt-3">
 
@@ -66,7 +57,7 @@
             </select>
           </div>
           <div class="form-group col-md-3">
-            <label for="mine_code">Mine Code-Name of the mine </label>
+            <label for="mine_code">Mine Code </label>
             <select id="mine_code" class="form-control" name="mine_code">
               <option selected>--</option>
               {% for mine_code in mine_codes %}
@@ -130,7 +121,7 @@
               name="maximum_potential_stock"
               />
           </div>
-          <div class="col-md-3">
+          <!-- <div class="col-md-3">
             <label for="ViewMiningCompanyName">Mining Company Name</label>
             <input
               type="text"
@@ -139,7 +130,7 @@
               placeholder="e.g. company name"
               name="mining_company_name"
             />
-          </div>
+          </div> -->
           <div class="col-md-3 d-flex align-items-end">
             <button type="submit" class=" btn btn-primary">
               Search
@@ -149,8 +140,11 @@
       </div>
     </div>
   </div>
-  <div class="fs-4 fw-bold text-center">Mining Data</div>
 
+  <div class="d-flex justify-content-center">
+    <a class="fs-4 fw-bold mt-4 link-secondary  link-offset-2 link-underline-opacity-0 link-underline-opacity-25-hover"
+        href="{% url 'mining_table' %}">Mining Data</a>
+</div>
 {% if query_len == 0 %}
 <div class="bg-light p-4 text-center fw-normal mt-4 text-danger">
   No Records
@@ -199,19 +193,22 @@
               Country
             </th>
             <th class=" text-white fst-normal  " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;">
-                Name_Of_Mine
+                Code
             </th>
+            <th class=" text-white fst-normal  " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;">
+              Mine Type
+          </th>
             <th class=" text-white fst-normal  " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;">
                 Unit
             </th>
             <th class=" text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;">
-                Current_Production
+                Current Production
             </th>
             <th class=" text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;">
-                Potential_Stock
+                Potential Stock
             </th>
             <th class=" text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;">
-                Mining_Company_Name
+                Mining Company Name
             </th>
             <th class=" text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;">
                 Action
@@ -232,7 +229,8 @@
             </td>
             <td >{{ record.Year }}</td>
             <td>{{ record.Country }}</td>
-            <td>{{ record.Name_Of_Mine.Mine_Type }}</td>
+            <td>{{ record.Code.Code }}</td>
+            <td>{{ record.Code.Mine_Type }}</td>
             <td>{{ record.Unit }}</td>
             <td>{{ record.Current_Production }}</td>
             <td>{{ record.Potential_Stock }}</td>

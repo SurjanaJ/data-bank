@@ -22,7 +22,6 @@ def is_valid_queryparam(param):
 
 
 def display_transport_table(request):
-
     url = reverse('transport_table')
     data = Transport.objects.all()
     country_categories = Country_meta.objects.all()
@@ -129,59 +128,32 @@ def upload_transport_excel(request):
         form = UploadTransportDataForm(request.POST,request.FILES)
         if form.is_valid():
             excel_data = request.FILES['Transport_data_file']
-            df = pd.read_excel(excel_data,dtype={'Transport_Classification_Code':str})
+            df = pd.read_excel(excel_data,dtype={'Transport Classification Code':str})
             unit_options = [option[0] for option in Transport.Unit_Options]
+            
             if 'id' in df.columns:
                 for index,row in df.iterrows():
-                    cols = df.columns.to_list()
-                    id_value = row['id']
-
-                    try:
-                        transport_instance = Transport.objects.get(id = id_value)
-                    except Exception as e:
-                        data = {col: row[col] for col in cols}
-                        errors.append({
-                            'row_index':index,
-                            'data':data,
-                            'reason':f'Error inserting row {index}:{e}'
-                        })
-                        continue
-                    transport_data = {
-                            'Year': row['Year'].date().strftime('%Y-%m-%d'),
+                    id = row.get('id')
+                    data = {
+                            'Year': row['Year'],
                             'Country': row['Country'],
-                            'Transport_Classification_Code': row['Transport_Classification_Code'],
+                            'Transport Classification Code': row['Transport Classification Code'],
+                            'Transport Type':row['Transport Type'],
                             'Unit': row['Unit'],
                             'Quantity': row['Quantity']
                         }
-
-
+                    
+                    #get existing data
                     try:
-                        Year = row['Year']
-                        Country = row['Country']
-                        Transport_Classification_Code = row['Transport_Classification_Code']
-                        calender_year = pd.to_datetime(Year).date()
-                    except Exception as e:
-                        errors.append({'row_index': index, 'data': transport_data, 'reason': str(e)})
-                        continue
-                    # Handle the date conversion error, such as logging a message or skipping the row
-                    try:
+                        transport_instance = Transport.objects.get(id = id)
+                        transport_data = data
 
-                        if transport_data['Unit'] not in unit_options:
-                            transport_data = {
-                                'Year': row['Year'].date().strftime('%Y-%m-%d'),
-                                'Country': row['Country'],
-                                'Transport_Classification_Code': row['Transport_Classification_Code'],
-                                'Unit': row['Unit'],
-                                'Quantity': row['Quantity']
-                            }
-                            errors.append({'row_index': index, 'data': transport_data, 'reason': f'Error inserting row {index}: Invalid unit value'})
-                        else:
-                            Year = calender_year
-                            Country = Country_meta.objects.get(Country_Name = Country )
-                            Transport_Classification_Code = Transport_Meta.objects.get(Code = Transport_Classification_Code)
+                        #check if meta values exist
+                        try:
+                            Country = Country_meta.objects.get(Country_Name = row['Country'] )
+                            Transport_Classification_Code = Transport_Meta.objects.get(Code = row['Transport Classification Code'])
 
-
-                            transport_instance.Year = Year
+                            transport_instance.Year = row['Year']
                             transport_instance.Country = Country
                             transport_instance.Transport_Classification_Code = Transport_Classification_Code
                             transport_instance.Unit = row['Unit']
@@ -189,88 +161,89 @@ def upload_transport_excel(request):
                             transport_instance.save()
 
                             updated_count += 1 
-                    except Exception as e:
-                        transport_data = {
-                            'Year': row['Year'].date().strftime('%Y-%m-%d'),
-                            'Country': row['Country'],
-                            'Transport_Classification_Code': row['Transport_Classification_Code'],
-                            'Unit': row['Unit'],
-                            'Quantity': row['Quantity']
-                        
-                        }
-                        errors.append({'row_index': index, 'data': transport_data, 'reason': str(e)})
-                        continue
-            else:
-                for index, row in df.iterrows():
-                    transport_data = {
-                        'Year': row['Year'].date().strftime('%Y-%m-%d'),
-                        'Country': row['Country'],
-                        'Transport_Classification_Code': row['Transport_Classification_Code'],
-                        'Unit': row['Unit'],
-                        'Quantity': row['Quantity'],
-                    }
-                        # Check if the 'Unit' value is in the predefined options
-                    if transport_data['Unit'] not in unit_options:
-                        errors.append({
-                            'row_index': index,
-                            'data': transport_data,
-                            'reason': f'Error inserting row {index}: Invalid unit value'
-                        })
-                    else:
-                        
-                        try:
-                            calender_date = datetime.strptime(str(row['Year'].date().strftime('%Y-%m-%d')), '%Y-%m-%d').date()
-                        except:
-                            calender_date = datetime.strptime(f'{str(row["Year"].date().strftime("%Y-%m-%d"))}-01-01', '%Y-%m-%d').date()
-                        
-                        # if not initialize it shows server error else shows in error template
-                        Country = None
-                        Transport_Classification_Code = None
-                        try:
-                            Year = calender_date.strftime('%Y-%m-%d')
-                            Country = Country_meta.objects.get(Country_Name=row['Country'])
-                            Transport_Classification_Code = Transport_Meta.objects.get(Code=row['Transport_Classification_Code'])
-
-                            transport_data = {
-                                'Year': Year,
-                                'Country': Country,
-                                'Transport_Classification_Code': Transport_Classification_Code,
-                                'Unit': row['Unit'],
-                                'Quantity': row['Quantity']
-                            }
-
+                        #meta does not exist
                         except Exception as e:
-                            errors.append({
-                                'row_index': index,
-                                'data': transport_data,
-                                'reason': f'Error inserting row  {index}: {e}'
-                            })
+                            transport_data = data
+                            errors.append({'row_index': index, 'data': transport_data, 'reason': str(e)})
                             continue
 
+
+                    #instance does not exist
+                    except Exception as e:
+                        transport_data = data
+
+                        errors.append({
+                            'row_index':index,
+                            'data':transport_data,
+                            'reason':f'Error inserting row {index}:{e}'
+                        })
+                        continue
+                    
+            else:
+                for index, row in df.iterrows():
+                    data = {
+                            'Year': row['Year'],
+                            'Country': row['Country'],
+                            'Transport Classification Code': row['Transport Classification Code'],
+                            'Transport Type':row['Transport Type'],
+                            'Unit': row['Unit'],
+                            'Quantity': row['Quantity']
+                        }
+                    
+                    try:
+                        Country = Country_meta.objects.get(Country_Name=row['Country'])
+                        Transport_Classification_Code = Transport_Meta.objects.get(Code=row['Transport Classification Code'])
+
+                        transport_data = {
+                            'Year': row['Year'],
+                            'Country': row['Country'],
+                            'Transport Classification Code': row['Transport Classification Code'],
+                            'Transport Type':row['Transport Type'],
+                            'Unit': row['Unit'],
+                            'Quantity': row['Quantity']
+                            }
+                        
                         existing_record = Transport.objects.filter(
-                            Q(Year=Year) & Q(Country=Country) & Q(Transport_Classification_Code=Transport_Classification_Code)
-                            & Q(Unit=transport_data['Unit']) & Q(Quantity=transport_data['Quantity'])).first()
+                            Q(Year=row['Year']) 
+                            & Q(Country=Country) 
+                            & Q(Transport_Classification_Code=Transport_Classification_Code)
+                            & Q(Unit=transport_data['Unit']) 
+                            & Q(Quantity=transport_data['Quantity'])).first()
 
                         if existing_record:
+                            transport_data = data
                             duplicate_data.append({
                                 'row_index': index,
                                 'data': transport_data,
                                 'reason': 'Duplicate record found'
                             })
-
+                            continue
                         else:
+                             #add new record
                             try:
-                                TransportData = Transport(**transport_data)
-                                TransportData.save()
+                                transport_data = {
+                                    'Year': row['Year'],
+                                    'Country': Country,
+                                    'Transport_Classification_Code': Transport_Classification_Code,
+                                    'Unit': row['Unit'],
+                                    'Quantity': row['Quantity']
+                                    }
+                                transportData = Transport(**transport_data)
+                                transportData.save()
                                 added_count += 1
-
                             except Exception as e:
-                                errors.append({
-                                    'row_index': index,
-                                    'data': transport_data,
-                                    'reason': f'Error inserting row  {index}: {e}'
-                                })
+                                errors.append(f"Error inserting row {index}: {e}")
                     
+
+                    except Exception as e:
+                        transport_data = data
+                        errors.append({
+                                'row_index': index,
+                                'data': transport_data,
+                                'reason': f'Error inserting row  {index}: {e}'
+                            })
+                        continue
+
             if added_count > 0:
                 messages.success(request, f'{added_count} records added')
 
@@ -279,10 +252,16 @@ def upload_transport_excel(request):
 
             if errors:
                 request.session['errors'] = errors
-                return render(request, 'general_data/error_template.html', {'errors': errors})
+                return render(request, 'trade_data/error_template.html', {'errors': errors, 'tables': tables, 'meta_tables': views.meta_tables, })
 
             if duplicate_data:
-                return render(request, 'general_data/duplicate_template.html', {'duplicate_data': duplicate_data})      
+                request.session['duplicate_data'] = duplicate_data
+                return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data, 'tables': tables, 'meta_tables': views.meta_tables,})  
+
+            else:
+           # form is not valid
+                return redirect('transport_table')   
+            
 
     else:
         form = UploadTransportDataForm()
@@ -311,12 +290,12 @@ def update_selected_transport(request):
         queryset = queryset.annotate(
         country = F('Country__Country_Name'),
         transport_classification_code = F('Transport_Classification_Code__Code'),
- 
+        transport_type =  F('Transport_Classification_Code__Transport_Type'),
         )
 
-        df = pd.DataFrame(list(queryset.values('id','Year','country','transport_classification_code','Unit','Quantity')))
-        df.rename(columns={'country': 'Country','transport_classification_code':'Transport_Classification_Code'}, inplace=True)
-        df = df[['id','Year','Country','Transport_Classification_Code','Unit','Quantity']]
+        df = pd.DataFrame(list(queryset.values('id','Year','country','transport_classification_code','transport_type','Unit','Quantity')))
+        df.rename(columns={'country': 'Country','transport_classification_code':'Transport Classification Code','transport_type':'Transport Type'}, inplace=True)
+        df = df[['id','Year','Country','Transport Classification Code','Transport Type','Unit','Quantity']]
         output = BytesIO()
         writer = pd.ExcelWriter(output, engine='xlsxwriter')  
         df.to_excel(writer, sheet_name='Sheet1', index=False)
