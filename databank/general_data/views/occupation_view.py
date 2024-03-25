@@ -12,12 +12,14 @@ from django.http import HttpResponse
 from django.db.models import F, Q
 from trade_data import views
 
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import allowed_users
 
 from ..models import Occupation, Occupation_Meta
 from ..forms import UploadOccupationForm
 
 
-
+@login_required(login_url = 'login')
 def display_occupation_meta(request):
     data = Occupation_Meta.objects.all()
     total_data = data.count()
@@ -28,6 +30,8 @@ def display_occupation_meta(request):
     
     return render(request, 'general_data/display_meta.html', context)
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_occupation_excel(request):
     errors = []
     duplicate_data = []
@@ -161,7 +165,8 @@ def upload_occupation_excel(request):
         form = UploadOccupationForm()    
 
     return render(request,'general_data/transport_templates/upload_transport_form.html',{'form':form})
-    
+
+@login_required(login_url = 'login') 
 def display_occupation_table(request):
     data = Occupation.objects.all()
 
@@ -194,6 +199,7 @@ def display_occupation_table(request):
     context ={'data_len':len(data),'code_categories':code_categories, 'country_categories':country_categories, 'page':page, 'query_len':len(page), 'tables': tables, 'meta_tables': views.meta_tables, 'year_categories':year_categories}
     return render(request, 'general_data/occupation_templates/occupation_table.html', context)
 
+@login_required(login_url = 'login')
 def export_occupation_excel(request):
     country = request.GET.get('country')
     code = request.GET.get('code')
@@ -242,6 +248,8 @@ def export_occupation_excel(request):
     response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
     return response
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def update_selected_occupation(request):
     selected_ids = request.POST.getlist('selected_items')
     if not selected_ids:

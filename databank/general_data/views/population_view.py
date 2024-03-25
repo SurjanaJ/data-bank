@@ -1,6 +1,5 @@
 from datetime import datetime
 from django.db import DataError
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render,redirect
 from django.core.paginator import Paginator
 from django.urls import reverse
@@ -12,12 +11,21 @@ from trade_data.views import tables
 from django.db import IntegrityError, transaction
 from django.contrib import messages
 from django.views.decorators.http import require_POST
+from django.db.models import F
+from io import BytesIO
+from django.http import HttpResponse
+from .energy_view import strip_spaces
+from trade_data import views
 
+
+
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import allowed_users
 
 def is_valid_queryparam(param):
     return param !='' and param is not None
 
-
+@login_required(login_url = 'login')
 def display_population_table(request):
     data = PopulationData.objects.all()
     country_categories = Country_meta.objects.all()
@@ -71,6 +79,8 @@ def display_population_table(request):
     }
     return render(request, 'general_data/population_templates/population_table.html',context)
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 @require_POST
 def delete_selected_population(request):
     selected_ids = request.POST.getlist('selected_items')
@@ -85,7 +95,8 @@ def delete_selected_population(request):
 
     return redirect('population_table')
 
-
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def delete_population_record(request,item_id):
     try:
         item_to_delete = get_object_or_404(PopulationData, id=item_id)
@@ -93,25 +104,27 @@ def delete_population_record(request,item_id):
         messages.success(request, 'Deleted successfully')
         return redirect('population_table')
     except Exception as e:
-        return HttpResponse(f"An error occurred: {str(e)}")
+        messages.error(request, f'Error deleting item: {e}')
 
 
+# @login_required(login_url = 'login')
+# @allowed_users(allowed_roles=['admin'])
+# def update_population_record(request,pk):
+#     population_record = PopulationData.objects.get(id=pk)
+#     form = UploadPopulationData(instance=population_record)
 
-def update_population_record(request,pk):
-    population_record = PopulationData.objects.get(id=pk)
-    form = UploadPopulationData(instance=population_record)
-
-    if request.method == 'POST':
-        form = UploadPopulationData(request.POST, instance=population_record)
-        if form.is_valid():
-            form.save()
-            return redirect('population_table')
+#     if request.method == 'POST':
+#         form = UploadPopulationData(request.POST, instance=population_record)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('population_table')
         
-    context={'form':form,}
-    return render(request,'general_data/population_templates/update_population_record.html',context)
+#     context={'form':form,}
+#     return render(request,'general_data/population_templates/update_population_record.html',context)
 
 
-
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_population_excel(request):
     errors = []
     duplicate_data = []
@@ -123,102 +136,87 @@ def upload_population_excel(request):
         if form.is_valid():
             excel_data = request.FILES['population_data_file']
             df = pd.read_excel(excel_data)
-
-
-
-            if 'ID' in df.columns or 'id' in df.columns:
+            df.fillna('', inplace=True)
+            df = df.map(strip_spaces)
+            # age_group_options = [option[0] for option in PopulationData.Age_Group_Options]
+            # gender_options = [option[0] for option in PopulationData.Gender_Options]
+            
+            if 'id' in df.columns:
                 for index, row in df.iterrows():
-                    id_value = row['ID']
-
-                    try:
-                        # Try to get an existing record with the given 'ID'
-                        population_instance = PopulationData.objects.get(id=id_value)
-                    except:
-                        # If not found, create a new instance
-                        population_instance = PopulationData()
-
-                    Year = row['Year']
-                    Country = row['Country']
-
-                    try:
-                        # Convert 'Year' to a datetime object
-                        calender_year =pd.to_datetime(Year).date()
-                    except ValueError:
-                        print(f"Error converting date in row {index}: {e}")
-                        print(f"Problematic row data: {row}")
-                    try:
-                        Year = calender_year
-                        Country = Country_meta.objects.get(Country_Name = Country )
-                    except DataError as e:
-                        print(f'error handling the row at {index}:{e}')
-                        continue
-                        # Update the instance with the new values
-                    population_instance.Year = calender_year.strftime('%Y-%m-%d')
-                    population_instance.Country = Country_meta.objects.get(Country_Name=Country)
-                    population_instance.Gender = row['Gender']
-                    population_instance.Age_Group = row['Age_Group']
-                    population_instance.Population = row['Population']
-                    population_instance.save()
-
-                    updated_count +=1
-            else:
-                gender_options = [option[0] for option in PopulationData.Gender_Options]
-                age_group_options = [option[0] for option in PopulationData.Age_Group_Options]
-
-
-                for index,row in df.iterrows():
-
-                    population_data = {
-                        'Year' : row['Year'].date().strftime('%Y-%m-%d'),
+                    id = row.get('id')
+                    data = {
+                        'Year' : row['Year'],
                         'Country' : row['Country'],
                         'Gender' : row['Gender'],
-                        'Age_Group' : row['Age_Group'],
+                        'Age Group' : row['Age Group'],
+                        'Population' : row['Population']
+                    }
+                    
+                    # get existing data
+                    try:
+                        population_instance = PopulationData.objects.get(id=id)
+                        population_data = data
+
+                        try:
+                            Country = Country_meta.objects.get(Country_Name = row['Country'] )
+
+                            population_instance.Year = row['Year']
+                            population_instance.Country = Country_meta.objects.get(Country_Name=Country)
+                            population_instance.Gender = row['Gender']
+                            population_instance.Age_Group = row['Age Group']
+                            population_instance.Population = row['Population']
+                            population_instance.save()
+
+                            updated_count +=1
+                        except Exception as e:
+                            population_data = data
+                            errors.append({'row_index': index, 'data': population_data, 'reason': str(e)})
+                            continue
+                    
+                    
+                    # no existing data
+                    except:
+                        population_data = data
+                        errors.append({
+                                        'row_index': index,
+                                        'data': population_data,
+                                        'reason': f'Error inserting row {index}: {e}'
+                                    })
+                        continue
+                    
+            else:
+                for index,row in df.iterrows():
+                    data = {
+                        'Year' : row['Year'],
+                        'Country' : row['Country'],
+                        'Gender' : row['Gender'],
+                        'Age Group' : row['Age Group'],
                         'Population' : row['Population']
                     }
 
+                      
 
-                    if population_data['Gender'] not in gender_options:
-                        errors.append({
-                            'row_index': index,
-                            'data': population_data,
-                            'reason': f'Error inserting row {index}: Invalid Gender value'
-                        })
-
-                    elif population_data['Age_Group'] not in age_group_options:
-                        errors.append({
-                            'row_index': index,
-                            'data': population_data,
-                            'reason': f'Error inserting row {index}: Invalid Age group value'
-                        })
-
-                    else:                        
-                   
-                        try:
-                            calender_date = datetime.strptime(str(row['Year'].date().strftime('%Y-%m-%d')), '%Y-%m-%d').date()
-                        except ValueError:
-                            calender_date = datetime.strptime(f'{str(row["Year"].date().strftime("%Y-%m-%d"))}-01-01', '%Y-%m-%d').date()
-                        
-                        Country = None
-
-                        try:
-                            Year = calender_date.strftime('%Y-%m-%d')
-                            Country = Country_meta.objects.get(Country_Name=row['Country'])
+                    try:
+                        Country = Country_meta.objects.get(Country_Name=row['Country'])
                             
-                            population_data ={
-                                'Year' : Year,
-                                'Country': Country,
-                                'Gender' : row['Gender'],
-                                'Age_Group' : row['Age_Group'],
-                                'Population' : row['Population']
-                            }
+                        population_data ={
+                        'Year' : row['Year'],
+                        'Country' : Country,
+                        'Gender' : row['Gender'],
+                        'Age Group' : row['Age Group'],
+                        'Population' : row['Population']
+                        }
 
-                        except Exception as e:
-                            errors.append({'row_index': index, 'data': population_data, 'reason': str(e)})
-                            continue
-
-                        existing_record = PopulationData.objects.filter(Q(Year = Year) & Q(Country = Country) & Q(Gender = population_data['Gender']) & Q(Age_Group = population_data['Age_Group']) & Q(Population = population_data['Population'])).first()
-
+                        existing_record = PopulationData.objects.filter(
+                                Q(Year = row['Year'])
+                                & Q(Country = Country)
+                                & Q(Gender = row['Gender'])
+                                & Q(Age_Group = row['Age Group'])
+                                & Q(Population = row['Population'])
+                            ).first()
+                
                         if existing_record:
+                            population_data = data
                             duplicate_data.append({
                                         'row_index' :index,
                                         'data': population_data,
@@ -226,36 +224,77 @@ def upload_population_excel(request):
                                     })
                         else:
                             try:
+                                population_data ={
+                                'Year' : row['Year'],
+                                'Country' : Country,
+                                'Gender' : row['Gender'],
+                                'Age_Group' : row['Age Group'],
+                                'Population' : row['Population']
+                                }
                                 populationData = PopulationData(**population_data)
                                 populationData.save()
                                 added_count += 1
                         
                             except Exception as e:
-                                errors.append({
-                                    'row_index': index,
-                                    'data': population_data,
-                                    'reason': f'Error inserting row  {index}: {e}'
-                                })
-                if added_count > 0 :
-                    messages.success(request,str(added_count)+'records added')
-                
-                if updated_count > 0 :
-                    messages.info(request,str(updated_count)+'records updated')
-                
-                if errors:
-                    request.session['errors'] = errors
-                    return render(request, 'general_data/error_template.html', {'errors': errors})
-                
-                if duplicate_data:
-                    return render(request,'general_data/duplicate_template.html',{'duplicate_data':duplicate_data})
+                                errors.append(f"Error inserting row {index}: {e}")
+
+
+                    except Exception as e:
+                        population_data = data
+                        errors.append({'row_index': index, 'data': population_data, 'reason': str(e)})
+                        continue
+                        
+            if added_count > 0 :
+                messages.success(request,str(added_count)+'records added')
+            
+            if updated_count > 0 :
+                messages.info(request,str(updated_count)+'records updated')
+            
+            if errors:
+                request.session['errors'] = errors
+                return render(request, 'trade_data/error_template.html', {'errors': errors, 'tables': tables, 'meta_tables': views.meta_tables, })
+            
+            if duplicate_data:
+                request.session['duplicate_data'] = duplicate_data
+                return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data, 'tables': tables, 'meta_tables': views.meta_tables,})
+            
+            else:
+           # form is not valid
+                return redirect('population_table') 
                 
     else:
         form = UploadPopulationDataForm()
 
     return render(request,'general_data/population_templates/upload_population_form.html',{'form':form})
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
+def update_selected_population(request):
+    selected_ids = request.POST.getlist('selected_items')
+    if not selected_ids:
+        messages.error(request, 'No items selected.')
+        return redirect('population_table')
 
+    else:
+        queryset = PopulationData.objects.filter(id__in=selected_ids)
+        queryset = queryset.annotate(
+        country = F('Country__Country_Name'),
+        )
 
+        df = pd.DataFrame(list(queryset.values('id','Year','country','Gender','Age_Group','Population')))
+        df.rename(columns={'country': 'Country','Age_Group':'Age Group' }, inplace=True)
+        df = df[['id','Year','Country','Gender','Age Group','Population']]
+        output = BytesIO()
+        writer = pd.ExcelWriter(output, engine='xlsxwriter')  
+        df.to_excel(writer, sheet_name='Sheet1', index=False)
+        writer.close()  
+        output.seek(0)
+
+        response = HttpResponse(
+            output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
+        return response
                 
 
 

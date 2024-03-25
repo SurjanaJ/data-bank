@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     # 'import_export.apps.ImportExportConfig',
     'trade_data.apps.Trade_DataConfig',
     'general_data.apps.GeneralDataConfig',
+    'accounts.apps.AccountsConfig',
     # 'django.contrib.messages'
 ]
 

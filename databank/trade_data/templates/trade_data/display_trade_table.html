@@ -27,7 +27,7 @@
         <div class="col-md-3">
           <label for="date_minimum">Calender Date Minimum</label>
           <input
-            type="date"
+            type="number"
             class="form-control"
             id="date_minimum"
             name="date_min"
@@ -36,7 +36,7 @@
         <div class="col-md-3">
           <label for="date_maximum">Calender Date Maximum</label>
           <input
-            type="date"
+            type="number"
             class="form-control"
             id="date_maximum"
             name="date_max"
@@ -64,6 +64,18 @@
             placeholder="1000"
             name="quantity_max"
           />
+        </div>
+
+        <div class="form-group col-md-3">
+          <label for="hs_code">HS Code</label>
+          <select id="hs_code" class="form-control col-12" name="hs_code" style="white-space: wrap; overflow-x: auto;">
+            <option selected>--</option>
+            {% for hs_code in hs_codes %}
+            <option value="{{hs_code.id }}">
+              {{hs_code}} - {{hs_code.Product_Information}}
+            </option>
+            {% endfor %}
+          </select>
         </div>
 
         <div class="form-group col-md-3">
@@ -100,17 +112,7 @@
           </select>
         </div>
 
-        <div class="form-group col-md-3">
-          <label for="hs_code">HS Code</label>
-          <select id="hs_code" class="form-control" name="hs_code">
-            <option selected>--</option>
-            {% for hs_code in hs_codes %}
-            <option value="{{hs_code.id }}">
-              {{hs_code}} - {{hs_code.Product_Information}}
-            </option>
-            {% endfor %}
-          </select>
-        </div>
+
 
         <div class="col-md-3 d-flex align-items-end">
           <button type="submit" class="btn btn-primary">
@@ -121,7 +123,11 @@
     </div>
   </div>
 </div>
-<div class="fs-4 fw-bold text-center mt-4">Trade Data</div>
+
+<div class="d-flex justify-content-center">
+  <a class="fs-4 fw-bold mt-4 link-secondary  link-offset-2 link-underline-opacity-0 link-underline-opacity-25-hover"
+      href="{% url 'display_trade_table' %}">Trade Data</a>
+</div>
 
 {% if query_len == 0 %}
 <div class="bg-light p-4 text-center fw-normal mt-4 text-danger">
@@ -138,6 +144,10 @@
         </span>
 
         <div class="d-flex align-items-center py-2">
+          <button type="button" class="btn border p-2 styled-link hover-shadow" onclick="updateSelected()">
+            <i class="fa-solid fa-file-pen"></i>
+            <span>Update Selected</span>
+        </button>
           <button type="button" class="btn border p-2 styled-link mx-3 hover-shadow" onclick="confirmDeleteAll()">
             <i class="fa-regular fa-trash-can" style="color: #ff0000"></i>
               <span>Delete Selected</span>
@@ -163,25 +173,25 @@
                 />
               </th>
               <th class="text-white fst-normal  " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;" scope="col">
-                Trade_Types
+                Trade Types
               </th>
               <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;" scope="col">
                 Calender
               </th>
               <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
-                Fiscal_Year
+                Fiscal Year
               </th>
               <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
                 Duration
               </th>
               <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
-                Country_Name
+                Country Name
               </th>
               <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
-                HS_Code
+                HS Code
               </th>
               <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
-                Product_Information
+                Product Information
               </th>
               <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
                 Unit
@@ -190,7 +200,7 @@
                 Quantity
               </th>
               <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
-                Currency_Type
+                Currency Type
               </th>
               <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
                 Amount
@@ -199,10 +209,10 @@
                 Tarrif
               </th>
               <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
-                Origin_Destination
+                Origin Destination
               </th>
               <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
-                TradersName_ExporterImporter
+                TradersName ExporterImporter
               </th>
               <th class="text-white fst-normal " scope="col" style="font-size:14px; font-weight: 500; background: #12486B;"" scope="col">
                 Documents
@@ -300,6 +310,49 @@
 </div>
 
 <script>
+    // Function to store the state of checkboxes in localStorage for the current page
+  function storeCheckboxState() {
+    const checkboxes = document.querySelectorAll('.item-checkbox');
+    const selectedItems = [];
+    checkboxes.forEach((checkbox) => {
+      if (checkbox.checked) {
+        selectedItems.push(checkbox.value);
+      }
+    });
+    localStorage.setItem('selectedItemsPage{{ page.number }}', JSON.stringify(selectedItems));
+  }
+
+  // Function to restore the state of checkboxes from localStorage for the current page
+  function restoreCheckboxState() {
+    const selectedItemsKey = 'selectedItemsPage{{ page.number }}';
+    const selectedItems = JSON.parse(localStorage.getItem(selectedItemsKey));
+    if (selectedItems) {
+      const checkboxes = document.querySelectorAll('.item-checkbox');
+      checkboxes.forEach((checkbox) => {
+        if (selectedItems.includes(checkbox.value)) {
+          checkbox.checked = true;
+        }
+      });
+    }
+  }
+
+  // Restore checkbox state when the page loads
+  window.addEventListener('load', restoreCheckboxState);
+
+  // Store checkbox state when a checkbox is clicked
+  document.querySelectorAll('.item-checkbox').forEach((checkbox) => {
+    checkbox.addEventListener('change', storeCheckboxState);
+  });
+
+  // Clear checkbox state for the current page when the form is submitted
+  document.getElementById('delete-form-trade').addEventListener('submit', () => {
+    localStorage.removeItem('selectedItemsPage{{ page.number }}');
+  });
+
+  function updateSelected(itemId) {
+        document.getElementById("delete-form-trade").action = "{% url 'update_selected_trade' %}";
+        document.getElementById("delete-form-trade").submit();
+    }
     function confirmDelete(itemId) {
       var result = confirm("Are you sure you want to delete this record?");
       if (result) {

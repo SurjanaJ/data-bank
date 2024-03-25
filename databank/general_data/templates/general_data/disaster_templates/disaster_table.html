@@ -7,7 +7,6 @@
   aria-expanded="false"
   aria-controls="collapseFilter"
   style="background-color: #419197;font-size:14px;font-weight: 500; color: white;"
-
   >
     Filters
   </button>
@@ -24,7 +23,6 @@
 </div>
 
 <div class="bg-light mt-3">
-
   <div class="collapse shadow rounded-2 " id="collapseFilter">
     <div class="px-2 py-2"> 
       <form class="row" method="GET" action="./disaster_table">
@@ -94,8 +92,6 @@
             name="maximum_human_loss"
             />
         </div>
-
-
         <div class="col-md-3">
           <label for="minimum_animal_loss">Minimum Animal Loss</label>
           <input
@@ -167,6 +163,10 @@
           * {{data_len}} records found.
         </span>
         <div class="d-flex align-items-center py-2">
+          <button type="button" class="btn border p-2 styled-link hover-shadow" onclick="updateSelected()">
+            <i class="fa-solid fa-file-pen"></i>
+            <span>Update Selected</span>
+          </button>
           <button type="button" class="btn border p-2 styled-link mx-3 hover-shadow" onclick="confirmDeleteAll()">
             <i class="fa-regular fa-trash-can" style="color: #ff0000"></i>
               <span class="fw-normal">Delete Selected</span>
@@ -256,6 +256,108 @@
         </tbody>
       </table>
     </div>
+
+    <div class="pagination m-3 d-flex justify-content-center">
+      <span class="step-links bg-light rounded-1 d-flex justify-content-center gap-3 p-3">
+        {% if page.has_previous %}
+        <a href="?page=1
+          {% if request.GET.Year %}
+            &Year={{ request.GET.Year }}
+          {% endif %}
+          {% if request.GET.Country %}
+            &Country={{ request.GET.Country }}
+          {% endif %}
+          {% if request.GET.Disaster_Code %}
+            &Disaster_Code={{ request.GET.Disaster_Code }}
+          {% endif %}
+          {% if request.GET.Human_Loss %}
+            &Human_Loss={{ request.GET.Human_Loss }}
+          {% endif %}
+          {% if request.GET.Animal_Loss %}
+            &Animal_Loss={{ request.GET.Animal_Loss }}
+          {% endif %}
+          {% if request.GET.Physical_Properties_Loss_In_USD %}
+            &Physical_Properties_Loss_In_USD={{ request.GET.Physical_Properties_Loss_In_USD }}
+          {% endif %}
+        ">
+          &laquo; First
+        </a>
+        <a href="?page={{ page.previous_page_number }}
+          {% if request.GET.Year %}
+            &Year={{ request.GET.Year }}
+          {% endif %}
+          {% if request.GET.Country %}
+            &Country={{ request.GET.Country }}
+          {% endif %}
+          {% if request.GET.Disaster_Code %}
+            &Disaster_Code={{ request.GET.Disaster_Code }}
+          {% endif %}
+          {% if request.GET.Human_Loss %}
+            &Human_Loss={{ request.GET.Human_Loss }}
+          {% endif %}
+          {% if request.GET.Animal_Loss %}
+            &Animal_Loss={{ request.GET.Animal_Loss }}
+          {% endif %}
+          {% if request.GET.Physical_Properties_Loss_In_USD %}
+            &Physical_Properties_Loss_In_USD={{ request.GET.Physical_Properties_Loss_In_USD }}
+          {% endif %}
+        ">
+          Previous
+        </a>
+      {% endif %}
+      
+      <span class="current-page">
+        Page {{ page.number }} of {{ page.paginator.num_pages }}.
+      </span>
+      
+      {% if page.has_next %}
+        <a href="?page={{ page.next_page_number }}
+          {% if request.GET.Year %}
+            &Year={{ request.GET.Year }}
+          {% endif %}
+          {% if request.GET.Country %}
+            &Country={{ request.GET.Country }}
+          {% endif %}
+          {% if request.GET.Disaster_Code %}
+            &Disaster_Code={{ request.GET.Disaster_Code }}
+          {% endif %}
+          {% if request.GET.Human_Loss %}
+            &Human_Loss={{ request.GET.Human_Loss }}
+          {% endif %}
+          {% if request.GET.Animal_Loss %}
+            &Animal_Loss={{ request.GET.Animal_Loss }}
+          {% endif %}
+          {% if request.GET.Physical_Properties_Loss_In_USD %}
+            &Physical_Properties_Loss_In_USD={{ request.GET.Physical_Properties_Loss_In_USD }}
+          {% endif %}
+        ">
+          Next
+        </a>
+        <a href="?page={{ page.paginator.num_pages }}
+          {% if request.GET.Year %}
+            &Year={{ request.GET.Year }}
+          {% endif %}
+          {% if request.GET.Country %}
+            &Country={{ request.GET.Country }}
+          {% endif %}
+          {% if request.GET.Disaster_Code %}
+            &Disaster_Code={{ request.GET.Disaster_Code }}
+          {% endif %}
+          {% if request.GET.Human_Loss %}
+            &Human_Loss={{ request.GET.Human_Loss }}
+          {% endif %}
+          {% if request.GET.Animal_Loss %}
+            &Animal_Loss={{ request.GET.Animal_Loss }}
+          {% endif %}
+          {% if request.GET.Physical_Properties_Loss_In_USD %}
+            &Physical_Properties_Loss_In_USD={{ request.GET.Physical_Properties_Loss_In_USD }}
+          {% endif %}
+        ">
+          Last &raquo;
+        </a>
+      {% endif %}
+      
+      </span>
     </div>
   </form>
 </div> 
@@ -269,6 +371,10 @@
         alert("Delete canceled!");
     }
 }
+function updateSelected(itemId) {
+        document.getElementById("delete-form-disaster").action = "{% url 'update_selected_disaster' %}";
+        document.getElementById("delete-form-disaster").submit();
+    }
 
 function confirmDeleteAll() {
       var confirmDelete = confirm(

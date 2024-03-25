@@ -5,6 +5,7 @@ import xlsxwriter  # Import the XlsxWriter library
 from django.db.models import Q
 from django.db.models import F
 from django.db.models import Sum
+from django.contrib.auth.decorators import login_required
 
 from . import views
 from .models import TradeData  
@@ -55,10 +56,9 @@ def filter(request):
     
     return data
 
+@login_required(login_url = 'login')
 def export_to_excel(request):
     data = filter(request)
-    
-    
     # getting the foreign key values
     data = data.annotate(
         country_name=F('Country__Country_Name'),  

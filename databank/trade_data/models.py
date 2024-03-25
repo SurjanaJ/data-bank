@@ -42,7 +42,7 @@ class TradeData(models.Model):
     )
     id = models.AutoField(primary_key=True)
     Trade_Type = models.CharField(max_length=100, choices=TRADE_OPTIONS, null=True, blank=True) 
-    Calender = models.DateField(null=True, blank=True)
+    Calender = models.IntegerField(null=True, blank=True)
     Fiscal_Year = models.CharField(max_length=10, null=True, blank=True)
     Duration = models.CharField(max_length=100, null=True, blank=True)
     Country = models.ForeignKey(Country_meta, on_delete=models.CASCADE, related_name='tradedata_country')

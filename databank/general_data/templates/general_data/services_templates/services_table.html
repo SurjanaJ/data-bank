@@ -12,11 +12,11 @@
             <form class="row g-3" method="GET" action="services_table">
                 <div class="col-md-3">
                     <label for="year_min">Calender Date Minimum</label>
-                    <input type="date" class="form-control" id="year_min" name="year_min" />
+                    <input type="number" class="form-control" id="year_min" name="year_min" />
                 </div>
                 <div class="col-md-3">
                     <label for="year_max">Calender Date Maximum</label>
-                    <input type="date" class="form-control" id="year_max" name="year_max" />
+                    <input type="number" class="form-control" id="year_max" name="year_max" />
                 </div>
 
                 <div class="col-md-3">
@@ -81,7 +81,12 @@
         </div>
     </div>
 </div>
-<div class="fs-4 fw-bold text-center mt-4">Services Data</div>
+
+<div class="d-flex justify-content-center">
+    <a class="fs-4 fw-bold mt-4 link-secondary  link-offset-2 link-underline-opacity-0 link-underline-opacity-25-hover"
+        href="{% url 'services_table' %}">Services Data</a>
+</div>
+
 {% if query_len == 0 %}
 <div class="bg-light p-4 text-center fw-normal mt-4 text-danger">
     No Records
@@ -89,7 +94,7 @@
 {% else %}
 
 
-<form action="{% url 'delete_selected_services' %}" method="post" id="delete-form-services">
+<form action="{% url 'delete_selected_services' %}" method="post" id="delete-form">
     {% csrf_token %}
     <div class="table-responsive mt-4 bg-light p-3">
         <div class="d-flex align-items-center justify-content-between px-2">
@@ -98,11 +103,15 @@
             </span>
 
             <div class="d-flex align-items-center py-2">
+                <button type="button" class="btn border p-2 styled-link hover-shadow" onclick="updateSelected()">
+                    <i class="fa-solid fa-file-pen"></i>
+                    <span>Update Selected</span>
+                </button>
                 <button type="button" class="btn border p-2 styled-link mx-3 hover-shadow" onclick="confirmDeleteAll()">
                     <i class="fa-regular fa-trash-can" style="color: #ff0000"></i>
                     <span>Delete Selected</span>
                 </button>
-                <a href="{% url 'export_to_excel' %}?{{ request.GET.urlencode }}" class="border p-2 styled-link">
+                <a href="{% url 'export_services_excel' %}?{{ request.GET.urlencode }}" class="border p-2 styled-link">
                     <i class="fa-solid fa-table"></i>
                     <span class="fw-normal">Export to Excel</span>
                 </a>
@@ -256,6 +265,11 @@
           alert("Delete canceled!");
       }
   }
+
+  function updateSelected(itemId) {
+        document.getElementById("delete-form").action = "{% url 'update_selected_services' %}";
+        document.getElementById("delete-form").submit();
+    }
 
   function confirmDeleteAll() {
         var confirmDelete = confirm(

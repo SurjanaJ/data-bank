@@ -10,7 +10,7 @@ class ForestData(models.Model):
         ('Hector','Hector'),
     )
     id = models.AutoField(primary_key=True)
-    Year = models.DateField(null=True, blank=True)
+    Year = models.IntegerField(null=True, blank=True)
     Country = models.ForeignKey(Country_meta, on_delete=models.CASCADE)
     Name_Of_The_Plant = models.CharField(max_length= 100)
     Scientific_Name = models.CharField(max_length=100)
@@ -35,7 +35,7 @@ class PopulationData(models.Model):
     )
 
     id = models.AutoField(primary_key=True)
-    Year=models.DateField(null=True, blank=True)
+    Year=models.IntegerField(null=True, blank=True)
     Country=models.ForeignKey(Country_meta,on_delete=models.CASCADE)
     Gender=models.CharField(max_length=10,choices=Gender_Options, null=True,blank=True)
     Age_Group=models.CharField(max_length=10,choices=Age_Group_Options, null=True, blank=True)
@@ -59,7 +59,7 @@ class Land(models.Model):
 
 
     id=models.AutoField(primary_key=True)
-    Year=models.DateField(null=True,blank=True)
+    Year=models.IntegerField(null=True,blank=True)
     Country=models.ForeignKey(Country_meta,on_delete=models.CASCADE)
     Land_Code=models.ForeignKey(Land_Code_Meta, on_delete=models.CASCADE)
     Unit=models.CharField(max_length=10, choices=Land_Unit_Options, null=True, blank=True)
@@ -70,6 +70,9 @@ class Transport_Meta(models.Model):
     Code=models.CharField(max_length=100)
     Transport_Type=models.TextField(null=True,blank=True)
 
+    def __str__(self):
+        return (f'{self.Code} - {self.Transport_Type}')
+
 class Transport(models.Model):
 
     Unit_Options=(
@@ -77,7 +80,7 @@ class Transport(models.Model):
     )
 
     id=models.AutoField(primary_key=True)
-    Year=models.DateField(null=True, blank=True)
+    Year=models.IntegerField(null=True, blank=True)
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
     Transport_Classification_Code=models.ForeignKey(Transport_Meta, on_delete=models.CASCADE)
     Unit=models.CharField(max_length=10, choices=Unit_Options, null=True,blank=True)
@@ -89,11 +92,11 @@ class Tourism_Meta(models.Model):
     Arrival_Mode=models.TextField(null=True,blank=True)
 
     def __str__(self):
-        return self.Code
+        return (f'{self.Code} - {self.Arrival_Mode}')
 
 class Tourism(models.Model):
     id=models.AutoField(primary_key=True)
-    Year=models.DateField(null=True,blank=True)
+    Year=models.IntegerField(null=True,blank=True)
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE, related_name='Tourism_Country')
     Number_Of_Tourist = models.IntegerField(null=True,blank=True)
     Nationality_Of_Tourism=models.ForeignKey(Country_meta, on_delete=models.CASCADE, related_name='Tourism_Nationality_Of_Tourism')
@@ -102,7 +105,7 @@ class Tourism(models.Model):
 
 class Hotel(models.Model):
     id=models.AutoField(primary_key=True)
-    Year=models.DateField(null=True,blank=True)
+    Year=models.IntegerField(null=True,blank=True)
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
     Name_Of_The_Hotel=models.CharField(null=True,blank=True)
     Capacity_Room=models.IntegerField(default=0,null=True,blank=True)
@@ -115,7 +118,7 @@ class Water_Meta(models.Model):
     Water_Type=models.TextField(null=True,blank=True)
 
     def __str__(self):
-        return self.Code
+        return (f'{self.Code} - {self.Water_Type}')
 
 
 class Water(models.Model):
@@ -125,7 +128,7 @@ class Water(models.Model):
     )
 
     id = models.AutoField(primary_key=True)
-    Year=models.DateField(null=True,blank=True)
+    Year=models.IntegerField(null=True,blank=True)
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
     Water_Type_Code=models.ForeignKey(Water_Meta,on_delete=models.CASCADE)
     Description = models.CharField(null=True, blank=True)
@@ -136,7 +139,7 @@ class Water(models.Model):
 
 class Public_Unitillity(models.Model):
     id = models.AutoField(primary_key=True)
-    Year=models.DateField(null=True , blank = True)
+    Year=models.IntegerField(null=True , blank = True)
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
     Type_Of_Public_Utility = models.CharField(max_length = 100,null= True,blank = True)
     Number = models.IntegerField(default=0,null=True,blank=True)
@@ -148,7 +151,7 @@ class Mine_Meta(models.Model):
     Mine_Type=models.TextField(null=True,blank=True)
 
     def __str__(self):
-        return self.Mine_Type
+        return self.Code
     
 
 class Mining(models.Model):
@@ -158,9 +161,9 @@ class Mining(models.Model):
     )
 
     id = models.AutoField(primary_key=True)
-    Year=models.DateField(null = True , blank =True)
+    Year=models.IntegerField(null = True , blank =True)
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
-    Name_Of_Mine=models.ForeignKey(Mine_Meta,on_delete=models.CASCADE)
+    Code=models.ForeignKey(Mine_Meta,on_delete=models.CASCADE)
     Unit = models.CharField(max_length = 10, choices=Unit_Options , null=True, blank=True)
     Current_Production = models.IntegerField(default=0,null=True,blank=True)
     Potential_Stock = models.IntegerField(default=0,null=True,blank=True)
@@ -174,7 +177,7 @@ class Road_Meta(models.Model):
     Road_Type = models.TextField(null=True,blank=True)
 
     def __str__(self):
-        return self.Code
+        return self.Code 
 
 class Road(models.Model):
 
@@ -238,7 +241,7 @@ class Health_disease(models.Model):
 
 class Political_Data(models.Model):
     id = models.AutoField(primary_key=True)
-    Year=models.DateField(null=True, blank=True)
+    Year=models.IntegerField(null=True, blank=True)
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
     Political_Party_Name = models.CharField(max_length = 30,null = True , blank = True)
     Number_Of_Member = models.IntegerField(default = 0,null=True, blank=True)
@@ -280,7 +283,7 @@ class Services(models.Model):
     )
     id = models.AutoField(primary_key=True)
     Country = models.ForeignKey(Country_meta, on_delete=models.CASCADE, related_name='services_country')
-    Year = models.DateField(null=True, blank=True)
+    Year = models.IntegerField(null=True, blank=True)
     Direction = models.CharField(max_length= 10, choices = DIRECTION_OPTIONS, null=True, blank=True )
     Code = models.ForeignKey(Services_Meta, on_delete = models.CASCADE)
     Value = models.FloatField(max_length=100,null=True, blank=True)
@@ -442,6 +445,32 @@ class Energy(models.Model):
 
     def __str__(self):
         return (str(self.id))
+    
+
+class Activity_Meta(models.Model):
+    id = models.AutoField(primary_key=True)
+    Code=models.CharField(max_length=100)
+    Description = models.TextField(null=True,blank=True)
+    created_date = models.DateTimeField(auto_now=True)
+    modified_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.Code
+
+
+
+class ActivityData(models.Model):
+    id = models.AutoField(primary_key=True)
+    Year = models.IntegerField()
+    Country = models.ForeignKey(Country_meta,on_delete = models.CASCADE)
+    Activity_Code = models.ForeignKey(Activity_Meta,on_delete = models.CASCADE)
+    Person = models.IntegerField()
+    Districts = models.CharField(max_length= 50, null=True, blank=True ) 
+    Text_Documents_Upload = models.CharField(max_length=300, null=True, blank=True)
+    created_date = models.DateTimeField(auto_now=True)
+    modified_date = models.DateTimeField(auto_now=True)
+    
+
 
 class Index(models.Model):
     id = models.AutoField(primary_key=True)

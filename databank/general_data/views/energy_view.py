@@ -11,6 +11,9 @@ from django.http import HttpResponse
 from django.db.models import F, Q
 from trade_data import views
 
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import allowed_users
+
 from ..models import Energy, Energy_Meta
 from ..forms import UploadEnergyForm
 
@@ -19,6 +22,7 @@ def strip_spaces(value):
         return value.strip()
     return value
 
+@login_required(login_url = 'login')
 def display_energy_meta(request):
     data = Energy_Meta.objects.all()
     total_data = data.count()
@@ -29,6 +33,8 @@ def display_energy_meta(request):
     
     return render(request, 'general_data/display_meta.html', context)
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_energy_excel(request):
     errors = []
     duplicate_data = []
@@ -205,7 +211,7 @@ def upload_energy_excel(request):
 
     return render(request,'general_data/transport_templates/upload_transport_form.html',{'form':form, 'tables': tables, 'meta_tables': views.meta_tables,})
     
-                    
+@login_required(login_url = 'login')              
 def display_energy_table(request):
     data = Energy.objects.all()
 
@@ -245,6 +251,7 @@ def display_energy_table(request):
                       }
     return render(request, 'general_data/energy_templates/energy_table.html', context)
 
+@login_required(login_url = 'login')
 def export_energy_excel(request):
     power_code = request.GET.get('power_code')
     country = request.GET.get('country')
@@ -302,7 +309,8 @@ def export_energy_excel(request):
     response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
     return response
 
-
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def update_selected_energy(request):
     selected_ids = request.POST.getlist('selected_items')
     if not selected_ids:

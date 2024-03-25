@@ -13,8 +13,10 @@ from trade_data.views import is_valid_queryparam, tables
 from django.http import HttpResponse
 from django.db.models import F, Q
 
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import allowed_users
 
-
+@login_required(login_url = 'login')
 def display_education_level_meta(request):
     data = Education_Level_Meta.objects.all()
     total_data = data.count()
@@ -25,6 +27,7 @@ def display_education_level_meta(request):
     
     return render(request, 'general_data/display_meta.html', context)
 
+@login_required(login_url = 'login')
 def display_education_degree_meta(request):
     data = Education_Degree_Meta.objects.all()
     total_data = data.count()
@@ -35,6 +38,8 @@ def display_education_degree_meta(request):
 
     return render(request, 'general_data/display_meta.html', context)
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_education_excel(request):
     errors = []
     duplicate_data = []
@@ -123,6 +128,7 @@ def upload_education_excel(request):
 
     return render(request,'general_data/transport_templates/upload_transport_form.html',{'form':form})
 
+@login_required(login_url = 'login')
 def display_education_table(request):
     data = Education.objects.all()
 
@@ -145,6 +151,8 @@ def display_education_table(request):
     context ={'data_len':len(data),'level_categories':level_categories, 'degree_categories':degree_categories, 'page':page, 'query_len':len(page), 'tables': tables, 'meta_tables': views.meta_tables}
     return render(request, 'general_data/education_templates/education_table.html', context)
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def export_education_excel(request):
     education_level = request.GET.get('education_level')
     education_degree = request.GET.get('education_degree')
@@ -182,5 +190,41 @@ def export_education_excel(request):
     response = HttpResponse(
         output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
+    response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
+    return response
+
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
+def update_selected_education(request):
+    selected_ids = request.POST.getlist('selected_items')
+    if not selected_ids:
+            messages.error(request, 'No items selected.')
+            return redirect('education_table')
+    else:
+        queryset = Education.objects.filter(id__in=selected_ids)
+        queryset = queryset.annotate(
+        education_level = F('Level_Code__Code'),
+        level_name = F('Level_Code__Level'),
+        education_degree = F('Degree_Code__Code'),
+        degree_name = F('Degree_Code__Degree'),
+    )
+        
+    data = pd.DataFrame(list(queryset.values('id','education_level','level_name', 'education_degree','degree_name','Male', 'Female')))
+
+    data.rename(columns={'education_degree':'Degree Code','education_level': 'Level Code', 'level_name':'Level Code Name', 'degree_name':'Degree Code Name'}, inplace=True)
+
+    column_order = ['id','Level Code', 'Level Code Name', 'Degree Code', 'Degree Code Name', 'Male', 'Female']
+
+    data = data[column_order]
+    output = BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')  
+    data.to_excel(writer, sheet_name='Sheet1', index=False)
+
+    writer.close()  
+    output.seek(0)
+
+    response = HttpResponse(
+        output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
     response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
     return response

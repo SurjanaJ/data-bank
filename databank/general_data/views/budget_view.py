@@ -14,9 +14,13 @@ from django.http import HttpResponse
 from django.db.models import F, Q
 from trade_data import views
 
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import allowed_users
+
 
 from ..models import Budgetary_Data
 
+@login_required(login_url = 'login')
 def display_budget_table(request):
     data = Budgetary_Data.objects.all()
     country_categories = Country_meta.objects.all()
@@ -39,6 +43,8 @@ def display_budget_table(request):
                       }
     return render(request, 'general_data/budget_templates/budget_table.html', context)
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_budget_excel(request):
     errors = []
     duplicate_data = []
@@ -176,6 +182,7 @@ def upload_budget_excel(request):
         form = UploadBudgetForm()
     return render(request, 'general_data/transport_templates/upload_transport_form.html', {'form':form, 'tables': tables, 'meta_tables': views.meta_tables,})
 
+@login_required(login_url = 'login')
 def export_budget_excel(request):
     country = request.GET.get('country')
     filter_conditions = {}
@@ -211,6 +218,8 @@ def export_budget_excel(request):
     response['Content-Disposition'] = 'attachment; filename=exported_data.xlsx'
     return response
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def update_selected_budget(request):
     selected_ids = request.POST.getlist('selected_items')
     if not selected_ids:

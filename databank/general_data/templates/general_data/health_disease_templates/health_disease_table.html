@@ -132,6 +132,10 @@
           * {{data_len}} records found.
         </span>
         <div class="d-flex align-items-center py-2">
+          <button type="button" class="btn border p-2 styled-link hover-shadow" onclick="updateSelected()">
+            <i class="fa-solid fa-file-pen"></i>
+            <span>Update Selected</span>
+          </button>
           <button type="button" class="btn border p-2 styled-link mx-3 hover-shadow" onclick="confirmDeleteAll()">
             <i class="fa-regular fa-trash-can" style="color: #ff0000"></i>
               <span class="fw-normal">Delete Selected</span>
@@ -216,6 +220,121 @@
       </table>
     </div>
     </div>
+    <div class="pagination m-3 d-flex justify-content-center">
+      <span class="step-links bg-light rounded-1 d-flex justify-content-center gap-3 p-3">
+        {% if page.has_previous %}
+        <a href="?page=1
+        {% if request.GET.Country %}
+            &Country={{ request.GET.Country }}
+        {% endif %}
+        {% if request.GET.Year_min %}
+            &Year_min={{ request.GET.Year_min }}
+        {% endif %}
+        {% if request.GET.Year_max %}
+            &Year_max={{ request.GET.Year_max }}
+        {% endif %}
+        {% if request.GET.Disease_Code %}
+            &Disease_Code={{ request.GET.Disease_Code }}
+        {% endif %}
+        {% if request.GET.Unit %}
+            &Unit={{ request.GET.Unit }}
+        {% endif %}
+        {% if request.GET.Number_Of_Case_min %}
+            &Number_Of_Case_min={{ request.GET.Number_Of_Case_min }}
+        {% endif %}
+        {% if request.GET.Number_Of_Case_max %}
+            &Number_Of_Case_max={{ request.GET.Number_Of_Case_max }}
+        {% endif %}
+        ">
+            &laquo; First
+        </a>
+        <a href="?page={{ page.previous_page_number }}
+        {% if request.GET.Country %}
+            &Country={{ request.GET.Country }}
+        {% endif %}
+        {% if request.GET.Year_min %}
+            &Year_min={{ request.GET.Year_min }}
+        {% endif %}
+        {% if request.GET.Year_max %}
+            &Year_max={{ request.GET.Year_max }}
+        {% endif %}
+        {% if request.GET.Disease_Code %}
+            &Disease_Code={{ request.GET.Disease_Code }}
+        {% endif %}
+        {% if request.GET.Unit %}
+            &Unit={{ request.GET.Unit }}
+        {% endif %}
+        {% if request.GET.Number_Of_Case_min %}
+            &Number_Of_Case_min={{ request.GET.Number_Of_Case_min }}
+        {% endif %}
+        {% if request.GET.Number_Of_Case_max %}
+            &Number_Of_Case_max={{ request.GET.Number_Of_Case_max }}
+        {% endif %}
+        ">
+            Previous
+        </a>
+    {% endif %}
+    
+    <span class="current-page">
+        Page {{ page.number }} of {{ page.paginator.num_pages }}.
+    </span>
+    
+    {% if page.has_next %}
+        <a href="?page={{ page.next_page_number }}
+        {% if request.GET.Country %}
+            &Country={{ request.GET.Country }}
+        {% endif %}
+        {% if request.GET.Year_min %}
+            &Year_min={{ request.GET.Year_min }}
+        {% endif %}
+        {% if request.GET.Year_max %}
+            &Year_max={{ request.GET.Year_max }}
+        {% endif %}
+        {% if request.GET.Disease_Code %}
+            &Disease_Code={{ request.GET.Disease_Code }}
+        {% endif %}
+        {% if request.GET.Unit %}
+            &Unit={{ request.GET.Unit }}
+        {% endif %}
+        {% if request.GET.Number_Of_Case_min %}
+            &Number_Of_Case_min={{ request.GET.Number_Of_Case_min }}
+        {% endif %}
+        {% if request.GET.Number_Of_Case_max %}
+            &Number_Of_Case_max={{ request.GET.Number_Of_Case_max }}
+        {% endif %}
+        ">
+            Next
+        </a>
+        <a href="?page={{ page.paginator.num_pages }}
+        {% if request.GET.Country %}
+            &Country={{ request.GET.Country }}
+        {% endif %}
+        {% if request.GET.Year_min %}
+            &Year_min={{ request.GET.Year_min }}
+        {% endif %}
+        {% if request.GET.Year_max %}
+            &Year_max={{ request.GET.Year_max }}
+        {% endif %}
+        {% if request.GET.Disease_Code %}
+            &Disease_Code={{ request.GET.Disease_Code }}
+        {% endif %}
+        {% if request.GET.Unit %}
+            &Unit={{ request.GET.Unit }}
+        {% endif %}
+        {% if request.GET.Number_Of_Case_min %}
+            &Number_Of_Case_min={{ request.GET.Number_Of_Case_min }}
+        {% endif %}
+        {% if request.GET.Number_Of_Case_max %}
+            &Number_Of_Case_max={{ request.GET.Number_Of_Case_max }}
+        {% endif %}
+        ">
+            Last &raquo;
+        </a>
+    {% endif %}
+    
+      </span>
+  </div>
+  
   </form>
 </div>
 
@@ -228,6 +347,10 @@
         alert("Delete canceled!");
     }
 }
+function updateSelected(itemId) {
+        document.getElementById("delete-form-health-disease").action = "{% url 'update_selected_health_disease' %}";
+        document.getElementById("delete-form-health-disease").submit();
+    }
 
 function confirmDeleteAll() {
       var confirmDelete = confirm(
