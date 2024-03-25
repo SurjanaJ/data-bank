@@ -174,91 +174,104 @@
     <div class="pagination m-3 d-flex justify-content-center">
       <span class="step-links bg-light rounded-1 d-flex justify-content-center gap-3 p-3">
         {% if page.has_previous %}
-        <a href="?page=1
-                  {% if request.GET.country %}
-                      &country={{ request.GET.country }}
-                  {% endif %}
-                  {% if request.GET.year_min %}
-                      &year_min={{ request.GET.year_min }}
-                  {% endif %}
-                  {% if request.GET.year_max %}
-                      &year_max={{ request.GET.year_max }}
-                  {% endif %}
-                  {% if request.GET.name %}
-                      &name={{ request.GET.name }}
-                  {% endif %}
-                  {% if request.GET.city %}
-                      &city={{ request.GET.city }}
-                  {% endif %}
-                  ">
-          &laquo; First
-        </a>
-        <a href="?page={{page.previous_page_number}}
-                  {% if request.GET.country %}
-                      &country={{ request.GET.country }}
-                  {% endif %}
-                  {% if request.GET.year_min %}
-                      &year_min={{ request.GET.year_min }}
-                  {% endif %}
-                  {% if request.GET.year_max %}
-                      &year_max={{ request.GET.year_max }}
-                  {% endif %}
-                  {% if request.GET.name %}
-                      &name={{ request.GET.name }}
-                  {% endif %}
-                  {% if request.GET.city %}
-                      &city={{ request.GET.city }}
-                  {% endif %}
-                  ">
-          Previous
-        </a>
+            <a href="?page=1
+                {% if request.GET.country %}
+                    &country={{ request.GET.country }}
+                {% endif %}
+                {% if request.GET.year %}
+                    &year={{ request.GET.year }}
+                {% endif %}
+                {% if request.GET.name_of_the_hotel %}
+                    &name_of_the_hotel={{ request.GET.name_of_the_hotel }}
+                {% endif %}
+                {% if request.GET.capacity_room %}
+                    &capacity_room={{ request.GET.capacity_room }}
+                {% endif %}
+                {% if request.GET.occupancy_in_year %}
+                    &occupancy_in_year={{ request.GET.occupancy_in_year }}
+                {% endif %}
+                {% if request.GET.city %}
+                    &city={{ request.GET.city }}
+                {% endif %}
+            ">
+                &laquo; First
+            </a>
+            <a href="?page={{page.previous_page_number}}
+                {% if request.GET.country %}
+                    &country={{ request.GET.country }}
+                {% endif %}
+                {% if request.GET.year %}
+                    &year={{ request.GET.year }}
+                {% endif %}
+                {% if request.GET.name_of_the_hotel %}
+                    &name_of_the_hotel={{ request.GET.name_of_the_hotel }}
+                {% endif %}
+                {% if request.GET.capacity_room %}
+                    &capacity_room={{ request.GET.capacity_room }}
+                {% endif %}
+                {% if request.GET.occupancy_in_year %}
+                    &occupancy_in_year={{ request.GET.occupancy_in_year }}
+                {% endif %}
+                {% if request.GET.city %}
+                    &city={{ request.GET.city }}
+                {% endif %}
+            ">
+                Previous
+            </a>
         {% endif %}
-
+    
         <span class="current-page">
-          Page {{ page.number }} of {{ page.paginator.num_pages }}.
+            Page {{ page.number }} of {{ page.paginator.num_pages }}.
         </span>
-
+    
         {% if page.has_next %}
-        <a href="?page={{page.next_page_number}}
-                  {% if request.GET.country %}
-                      &country={{ request.GET.country }}
-                  {% endif %}
-                  {% if request.GET.year_min %}
-                      &year_min={{ request.GET.year_min }}
-                  {% endif %}
-                  {% if request.GET.year_max %}
-                      &year_max={{ request.GET.year_max }}
-                  {% endif %}
-                  {% if request.GET.name %}
-                      &name={{ request.GET.name }}
-                  {% endif %}
-                  {% if request.GET.city %}
-                      &city={{ request.GET.city }}
-                  {% endif %}
-                  ">
-          Next
-        </a>
-        <a href="?page={{ page.paginator.num_pages }}
-                  {% if request.GET.country %}
-                      &country={{ request.GET.country }}
-                  {% endif %}
-                  {% if request.GET.year_min %}
-                      &year_min={{ request.GET.year_min }}
-                  {% endif %}
-                  {% if request.GET.year_max %}
-                      &year_max={{ request.GET.year_max }}
-                  {% endif %}
-                  {% if request.GET.name %}
-                      &name={{ request.GET.name }}
-                  {% endif %}
-                  {% if request.GET.city %}
-                      &city={{ request.GET.city }}
-                  {% endif %}
-                  ">
-          Last &raquo;
-        </a>
+            <a href="?page={{page.next_page_number}}
+                {% if request.GET.country %}
+                    &country={{ request.GET.country }}
+                {% endif %}
+                {% if request.GET.year %}
+                    &year={{ request.GET.year }}
+                {% endif %}
+                {% if request.GET.name_of_the_hotel %}
+                    &name_of_the_hotel={{ request.GET.name_of_the_hotel }}
+                {% endif %}
+                {% if request.GET.capacity_room %}
+                    &capacity_room={{ request.GET.capacity_room }}
+                {% endif %}
+                {% if request.GET.occupancy_in_year %}
+                    &occupancy_in_year={{ request.GET.occupancy_in_year }}
+                {% endif %}
+                {% if request.GET.city %}
+                    &city={{ request.GET.city }}
+                {% endif %}
+            ">
+                Next
+            </a>
+            <a href="?page={{ page.paginator.num_pages }}
+                {% if request.GET.country %}
+                    &country={{ request.GET.country }}
+                {% endif %}
+                {% if request.GET.year %}
+                    &year={{ request.GET.year }}
+                {% endif %}
+                {% if request.GET.name_of_the_hotel %}
+                    &name_of_the_hotel={{ request.GET.name_of_the_hotel }}
+                {% endif %}
+                {% if request.GET.capacity_room %}
+                    &capacity_room={{ request.GET.capacity_room }}
+                {% endif %}
+                {% if request.GET.occupancy_in_year %}
+                    &occupancy_in_year={{ request.GET.occupancy_in_year }}
+                {% endif %}
+                {% if request.GET.city %}
+                    &city={{ request.GET.city }}
+                {% endif %}
+            ">
+                Last &raquo;
+            </a>
         {% endif %}
-      </span>
+    </span>
+    
     </div>
 
   </form>

@@ -225,68 +225,153 @@
     </div>
     <div class="pagination m-3 d-flex justify-content-center">
       <span class="step-links bg-light rounded-1 d-flex justify-content-center gap-3 p-3">
-          {% if page.has_previous %}
-              <a href="?page=1
-              {% if request.GET.country %}
-                  &country={{ request.GET.country }}
-              {% endif %}
-              {% if request.GET.year_min %}
-                  &year_min={{ request.GET.year_min }}
-              {% endif %}
-              {% if request.GET.year_max %}
-                  &year_max={{ request.GET.year_max }}
-              {% endif %}
-              ">
-                  &laquo; First
-              </a>
-              <a href="?page={{page.previous_page_number}}
-              {% if request.GET.country %}
-                  &country={{ request.GET.country }}
-              {% endif %}
-              {% if request.GET.year_min %}
-                  &year_min={{ request.GET.year_min }}
-              {% endif %}
-              {% if request.GET.year_max %}
-                  &year_max={{ request.GET.year_max }}
-              {% endif %}
-              ">
-                  Previous
-              </a>
-          {% endif %}
-  
-          <span class="current-page">
-              Page {{ page.number }} of {{ page.paginator.num_pages }}.
-          </span>
-  
-          {% if page.has_next %}
-              <a href="?page={{page.next_page_number}}
-              {% if request.GET.country %}
-                  &country={{ request.GET.country }}
-              {% endif %}
-              {% if request.GET.year_min %}
-                  &year_min={{ request.GET.year_min }}
-              {% endif %}
-              {% if request.GET.year_max %}
-                  &year_max={{ request.GET.year_max }}
-              {% endif %}
-              ">
-                  Next
-              </a>
-              <a href="?page={{ page.paginator.num_pages }}
-              {% if request.GET.country %}
-                  &country={{ request.GET.country }}
-              {% endif %}
-              {% if request.GET.year_min %}
-                  &year_min={{ request.GET.year_min }}
-              {% endif %}
-              {% if request.GET.year_max %}
-                  &year_max={{ request.GET.year_max }}
-              {% endif %}
-              ">
-                  Last &raquo;
-              </a>
-          {% endif %}
-      </span>
+        {% if page.has_previous %}
+            <a href="?page=1
+                {% if request.GET.country %}
+                    &country={{ request.GET.country }}
+                {% endif %}
+                {% if request.GET.year_min %}
+                    &year_min={{ request.GET.year_min }}
+                {% endif %}
+                {% if request.GET.year_max %}
+                    &year_max={{ request.GET.year_max }}
+                {% endif %}
+                {% if request.GET.name_of_the_plant %}
+                    &name_of_the_plant={{ request.GET.name_of_the_plant }}
+                {% endif %}
+                {% if request.GET.scientific_name %}
+                    &scientific_name={{ request.GET.scientific_name }}
+                {% endif %}
+                {% if request.GET.local_name %}
+                    &local_name={{ request.GET.local_name }}
+                {% endif %}
+                {% if request.GET.stock_unit %}
+                    &stock_unit={{ request.GET.stock_unit }}
+                {% endif %}
+                {% if request.GET.stock_available %}
+                    &stock_available={{ request.GET.stock_available }}
+                {% endif %}
+                {% if request.GET.area_unit %}
+                    &area_unit={{ request.GET.area_unit }}
+                {% endif %}
+                {% if request.GET.area_covered %}
+                    &area_covered={{ request.GET.area_covered }}
+                {% endif %}
+            ">
+                &laquo; First
+            </a>
+            <a href="?page={{page.previous_page_number}}
+                {% if request.GET.country %}
+                    &country={{ request.GET.country }}
+                {% endif %}
+                {% if request.GET.year_min %}
+                    &year_min={{ request.GET.year_min }}
+                {% endif %}
+                {% if request.GET.year_max %}
+                    &year_max={{ request.GET.year_max }}
+                {% endif %}
+                {% if request.GET.name_of_the_plant %}
+                    &name_of_the_plant={{ request.GET.name_of_the_plant }}
+                {% endif %}
+                {% if request.GET.scientific_name %}
+                    &scientific_name={{ request.GET.scientific_name }}
+                {% endif %}
+                {% if request.GET.local_name %}
+                    &local_name={{ request.GET.local_name }}
+                {% endif %}
+                {% if request.GET.stock_unit %}
+                    &stock_unit={{ request.GET.stock_unit }}
+                {% endif %}
+                {% if request.GET.stock_available %}
+                    &stock_available={{ request.GET.stock_available }}
+                {% endif %}
+                {% if request.GET.area_unit %}
+                    &area_unit={{ request.GET.area_unit }}
+                {% endif %}
+                {% if request.GET.area_covered %}
+                    &area_covered={{ request.GET.area_covered }}
+                {% endif %}
+            ">
+                Previous
+            </a>
+        {% endif %}
+    
+        <span class="current-page">
+            Page {{ page.number }} of {{ page.paginator.num_pages }}.
+        </span>
+    
+        {% if page.has_next %}
+            <a href="?page={{page.next_page_number}}
+                {% if request.GET.country %}
+                    &country={{ request.GET.country }}
+                {% endif %}
+                {% if request.GET.year_min %}
+                    &year_min={{ request.GET.year_min }}
+                {% endif %}
+                {% if request.GET.year_max %}
+                    &year_max={{ request.GET.year_max }}
+                {% endif %}
+                {% if request.GET.name_of_the_plant %}
+                    &name_of_the_plant={{ request.GET.name_of_the_plant }}
+                {% endif %}
+                {% if request.GET.scientific_name %}
+                    &scientific_name={{ request.GET.scientific_name }}
+                {% endif %}
+                {% if request.GET.local_name %}
+                    &local_name={{ request.GET.local_name }}
+                {% endif %}
+                {% if request.GET.stock_unit %}
+                    &stock_unit={{ request.GET.stock_unit }}
+                {% endif %}
+                {% if request.GET.stock_available %}
+                    &stock_available={{ request.GET.stock_available }}
+                {% endif %}
+                {% if request.GET.area_unit %}
+                    &area_unit={{ request.GET.area_unit }}
+                {% endif %}
+                {% if request.GET.area_covered %}
+                    &area_covered={{ request.GET.area_covered }}
+                {% endif %}
+            ">
+                Next
+            </a>
+            <a href="?page={{ page.paginator.num_pages }}
+                {% if request.GET.country %}
+                    &country={{ request.GET.country }}
+                {% endif %}
+                {% if request.GET.year_min %}
+                    &year_min={{ request.GET.year_min }}
+                {% endif %}
+                {% if request.GET.year_max %}
+                    &year_max={{ request.GET.year_max }}
+                {% endif %}
+                {% if request.GET.name_of_the_plant %}
+                    &name_of_the_plant={{ request.GET.name_of_the_plant }}
+                {% endif %}
+                {% if request.GET.scientific_name %}
+                    &scientific_name={{ request.GET.scientific_name }}
+                {% endif %}
+                {% if request.GET.local_name %}
+                    &local_name={{ request.GET.local_name }}
+                {% endif %}
+                {% if request.GET.stock_unit %}
+                    &stock_unit={{ request.GET.stock_unit }}
+                {% endif %}
+                {% if request.GET.stock_available %}
+                    &stock_available={{ request.GET.stock_available }}
+                {% endif %}
+                {% if request.GET.area_unit %}
+                    &area_unit={{ request.GET.area_unit }}
+                {% endif %}
+                {% if request.GET.area_covered %}
+                    &area_covered={{ request.GET.area_covered }}
+                {% endif %}
+            ">
+                Last &raquo;
+            </a>
+        {% endif %}
+    </span>
+
   </div>
   
   </form>
@@ -308,6 +393,8 @@
           alert("Delete canceled!");
       }
   }
+
+  
 
   function updateSelected(itemId) {
         document.getElementById("delete-form-forest").action = "{% url 'update_selected_forest' %}";

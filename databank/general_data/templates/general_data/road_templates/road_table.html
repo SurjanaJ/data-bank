@@ -242,104 +242,117 @@
     </div>
     <div class="pagination m-3 d-flex justify-content-center">
       <span class="step-links bg-light rounded-1 d-flex justify-content-center gap-3 p-3">
-          {% if page.has_previous %}
-              <a href="?page=1
-              {% if request.GET.country %}
-                  &country={{ request.GET.country }}
-              {% endif %}
-              {% if request.GET.year_min %}
-                  &year_min={{ request.GET.year_min }}
-              {% endif %}
-              {% if request.GET.year_max %}
-                  &year_max={{ request.GET.year_max }}
-              {% endif %}
-              {% if request.GET.highway_no %}
-                  &highway_no={{ request.GET.highway_no }}
-              {% endif %}
-              {% if request.GET.road_name %}
-                  &road_name={{ request.GET.road_name }}
-              {% endif %}
-              {% if request.GET.road_code_type %}
-                  &road_code_type={{ request.GET.road_code_type }}
-              {% endif %}
-              ">
-                  &laquo; First
-              </a>
-              <a href="?page={{page.previous_page_number}}
-              {% if request.GET.country %}
-                  &country={{ request.GET.country }}
-              {% endif %}
-              {% if request.GET.year_min %}
-                  &year_min={{ request.GET.year_min }}
-              {% endif %}
-              {% if request.GET.year_max %}
-                  &year_max={{ request.GET.year_max }}
-              {% endif %}
-              {% if request.GET.highway_no %}
-                  &highway_no={{ request.GET.highway_no }}
-              {% endif %}
-              {% if request.GET.road_name %}
-                  &road_name={{ request.GET.road_name }}
-              {% endif %}
-              {% if request.GET.road_code_type %}
-                  &road_code_type={{ request.GET.road_code_type }}
-              {% endif %}
-              ">
-                  Previous
-              </a>
-          {% endif %}
-  
-          <span class="current-page">
-              Page {{ page.number }} of {{ page.paginator.num_pages }}.
-          </span>
-  
-          {% if page.has_next %}
-              <a href="?page={{page.next_page_number}}
-              {% if request.GET.country %}
-                  &country={{ request.GET.country }}
-              {% endif %}
-              {% if request.GET.year_min %}
-                  &year_min={{ request.GET.year_min }}
-              {% endif %}
-              {% if request.GET.year_max %}
-                  &year_max={{ request.GET.year_max }}
-              {% endif %}
-              {% if request.GET.highway_no %}
-                  &highway_no={{ request.GET.highway_no }}
-              {% endif %}
-              {% if request.GET.road_name %}
-                  &road_name={{ request.GET.road_name }}
-              {% endif %}
-              {% if request.GET.road_code_type %}
-                  &road_code_type={{ request.GET.road_code_type }}
-              {% endif %}
-              ">
-                  Next
-              </a>
-              <a href="?page={{ page.paginator.num_pages }}
-              {% if request.GET.country %}
-                  &country={{ request.GET.country }}
-              {% endif %}
-              {% if request.GET.year_min %}
-                  &year_min={{ request.GET.year_min }}
-              {% endif %}
-              {% if request.GET.year_max %}
-                  &year_max={{ request.GET.year_max }}
-              {% endif %}
-              {% if request.GET.highway_no %}
-                  &highway_no={{ request.GET.highway_no }}
-              {% endif %}
-              {% if request.GET.road_name %}
-                  &road_name={{ request.GET.road_name }}
-              {% endif %}
-              {% if request.GET.road_code_type %}
-                  &road_code_type={{ request.GET.road_code_type }}
-              {% endif %}
-              ">
-                  Last &raquo;
-              </a>
-          {% endif %}
-      </span>
+        {% if page.has_previous %}
+            <a href="?page=1
+                {% if request.GET.year %}
+                    &year={{ request.GET.year }}
+                {% endif %}
+                {% if request.GET.country %}
+                    &country={{ request.GET.country }}
+                {% endif %}
+                {% if request.GET.highway_no %}
+                    &highway_no={{ request.GET.highway_no }}
+                {% endif %}
+                {% if request.GET.name_of_the_road %}
+                    &name_of_the_road={{ request.GET.name_of_the_road }}
+                {% endif %}
+                {% if request.GET.code_type_of_road %}
+                    &code_type_of_road={{ request.GET.code_type_of_road }}
+                {% endif %}
+                {% if request.GET.length_unit_options %}
+                    &length_unit_options={{ request.GET.length_unit_options }}
+                {% endif %}
+                {% if request.GET.length %}
+                    &length={{ request.GET.length }}
+                {% endif %}
+            ">
+                &laquo; First
+            </a>
+            <a href="?page={{page.previous_page_number}}
+                {% if request.GET.year %}
+                    &year={{ request.GET.year }}
+                {% endif %}
+                {% if request.GET.country %}
+                    &country={{ request.GET.country }}
+                {% endif %}
+                {% if request.GET.highway_no %}
+                    &highway_no={{ request.GET.highway_no }}
+                {% endif %}
+                {% if request.GET.name_of_the_road %}
+                    &name_of_the_road={{ request.GET.name_of_the_road }}
+                {% endif %}
+                {% if request.GET.code_type_of_road %}
+                    &code_type_of_road={{ request.GET.code_type_of_road }}
+                {% endif %}
+                {% if request.GET.length_unit_options %}
+                    &length_unit_options={{ request.GET.length_unit_options }}
+                {% endif %}
+                {% if request.GET.length %}
+                    &length={{ request.GET.length }}
+                {% endif %}
+            ">
+                Previous
+            </a>
+        {% endif %}
+    
+        <span class="current-page">
+            Page {{ page.number }} of {{ page.paginator.num_pages }}.
+        </span>
+    
+        {% if page.has_next %}
+            <a href="?page={{page.next_page_number}}
+                {% if request.GET.year %}
+                    &year={{ request.GET.year }}
+                {% endif %}
+                {% if request.GET.country %}
+                    &country={{ request.GET.country }}
+                {% endif %}
+                {% if request.GET.highway_no %}
+                    &highway_no={{ request.GET.highway_no }}
+                {% endif %}
+                {% if request.GET.name_of_the_road %}
+                    &name_of_the_road={{ request.GET.name_of_the_road }}
+                {% endif %}
+                {% if request.GET.code_type_of_road %}
+                    &code_type_of_road={{ request.GET.code_type_of_road }}
+                {% endif %}
+                {% if request.GET.length_unit_options %}
+                    &length_unit_options={{ request.GET.length_unit_options }}
+                {% endif %}
+                {% if request.GET.length %}
+                    &length={{ request.GET.length }}
+                {% endif %}
+            ">
+                Next
+            </a>
+            <a href="?page={{ page.paginator.num_pages }}
+                {% if request.GET.year %}
+                    &year={{ request.GET.year }}
+                {% endif %}
+                {% if request.GET.country %}
+                    &country={{ request.GET.country }}
+                {% endif %}
+                {% if request.GET.highway_no %}
+                    &highway_no={{ request.GET.highway_no }}
+                {% endif %}
+                {% if request.GET.name_of_the_road %}
+                    &name_of_the_road={{ request.GET.name_of_the_road }}
+                {% endif %}
+                {% if request.GET.code_type_of_road %}
+                    &code_type_of_road={{ request.GET.code_type_of_road }}
+                {% endif %}
+                {% if request.GET.length_unit_options %}
+                    &length_unit_options={{ request.GET.length_unit_options }}
+                {% endif %}
+                {% if request.GET.length %}
+                    &length={{ request.GET.length }}
+                {% endif %}
+            ">
+                Last &raquo;
+            </a>
+        {% endif %}
+    </span>
+    
   </div>
   
   </form>

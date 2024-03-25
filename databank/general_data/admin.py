@@ -133,8 +133,6 @@ class Health_Disease_Admin(admin.ModelAdmin ):
 
 admin.site.register(Health_disease,Health_Disease_Admin)
 
-admin.site.register(Budgetary_Data)
-
 
 
 class Political_Admin(admin.ModelAdmin ):

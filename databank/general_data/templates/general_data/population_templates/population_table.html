@@ -219,92 +219,93 @@
     </div>
     <div class="pagination m-3 d-flex justify-content-center">
       <span class="step-links bg-light rounded-1 d-flex justify-content-center gap-3 p-3">
-          {% if page.has_previous %}
-              <a href="?page=1
-              {% if request.GET.country %}
-                  &country={{ request.GET.country }}
-              {% endif %}
-              {% if request.GET.year_min %}
-                  &year_min={{ request.GET.year_min }}
-              {% endif %}
-              {% if request.GET.year_max %}
-                  &year_max={{ request.GET.year_max }}
-              {% endif %}
-              {% if request.GET.gender %}
-                  &gender={{ request.GET.gender }}
-              {% endif %}
-              {% if request.GET.age_group %}
-                  &age_group={{ request.GET.age_group }}
-              {% endif %}
-              ">
-                  &laquo; First
-              </a>
-              <a href="?page={{page.previous_page_number}}
-              {% if request.GET.country %}
-                  &country={{ request.GET.country }}
-              {% endif %}
-              {% if request.GET.year_min %}
-                  &year_min={{ request.GET.year_min }}
-              {% endif %}
-              {% if request.GET.year_max %}
-                  &year_max={{ request.GET.year_max }}
-              {% endif %}
-              {% if request.GET.gender %}
-                  &gender={{ request.GET.gender }}
-              {% endif %}
-              {% if request.GET.age_group %}
-                  &age_group={{ request.GET.age_group }}
-              {% endif %}
-              ">
-                  Previous
-              </a>
-          {% endif %}
-  
-          <span class="current-page">
-              Page {{ page.number }} of {{ page.paginator.num_pages }}.
-          </span>
-  
-          {% if page.has_next %}
-              <a href="?page={{page.next_page_number}}
-              {% if request.GET.country %}
-                  &country={{ request.GET.country }}
-              {% endif %}
-              {% if request.GET.year_min %}
-                  &year_min={{ request.GET.year_min }}
-              {% endif %}
-              {% if request.GET.year_max %}
-                  &year_max={{ request.GET.year_max }}
-              {% endif %}
-              {% if request.GET.gender %}
-                  &gender={{ request.GET.gender }}
-              {% endif %}
-              {% if request.GET.age_group %}
-                  &age_group={{ request.GET.age_group }}
-              {% endif %}
-              ">
-                  Next
-              </a>
-              <a href="?page={{ page.paginator.num_pages }}
-              {% if request.GET.country %}
-                  &country={{ request.GET.country }}
-              {% endif %}
-              {% if request.GET.year_min %}
-                  &year_min={{ request.GET.year_min }}
-              {% endif %}
-              {% if request.GET.year_max %}
-                  &year_max={{ request.GET.year_max }}
-              {% endif %}
-              {% if request.GET.gender %}
-                  &gender={{ request.GET.gender }}
-              {% endif %}
-              {% if request.GET.age_group %}
-                  &age_group={{ request.GET.age_group }}
-              {% endif %}
-              ">
-                  Last &raquo;
-              </a>
-          {% endif %}
-      </span>
+        {% if page.has_previous %}
+            <a href="?page=1
+                {% if request.GET.year %}
+                    &year={{ request.GET.year }}
+                {% endif %}
+                {% if request.GET.country %}
+                    &country={{ request.GET.country }}
+                {% endif %}
+                {% if request.GET.gender %}
+                    &gender={{ request.GET.gender }}
+                {% endif %}
+                {% if request.GET.age_group %}
+                    &age_group={{ request.GET.age_group }}
+                {% endif %}
+                {% if request.GET.population %}
+                    &population={{ request.GET.population }}
+                {% endif %}
+            ">
+                &laquo; First
+            </a>
+            <a href="?page={{page.previous_page_number}}
+                {% if request.GET.year %}
+                    &year={{ request.GET.year }}
+                {% endif %}
+                {% if request.GET.country %}
+                    &country={{ request.GET.country }}
+                {% endif %}
+                {% if request.GET.gender %}
+                    &gender={{ request.GET.gender }}
+                {% endif %}
+                {% if request.GET.age_group %}
+                    &age_group={{ request.GET.age_group }}
+                {% endif %}
+                {% if request.GET.population %}
+                    &population={{ request.GET.population }}
+                {% endif %}
+            ">
+                Previous
+            </a>
+        {% endif %}
+    
+        <span class="current-page">
+            Page {{ page.number }} of {{ page.paginator.num_pages }}.
+        </span>
+    
+        {% if page.has_next %}
+            <a href="?page={{page.next_page_number}}
+                {% if request.GET.year %}
+                    &year={{ request.GET.year }}
+                {% endif %}
+                {% if request.GET.country %}
+                    &country={{ request.GET.country }}
+                {% endif %}
+                {% if request.GET.gender %}
+                    &gender={{ request.GET.gender }}
+                {% endif %}
+                {% if request.GET.age_group %}
+                    &age_group={{ request.GET.age_group }}
+                {% endif %}
+                {% if request.GET.population %}
+                    &population={{ request.GET.population }}
+                {% endif %}
+            ">
+                Next
+            </a>
+            <a href="?page={{ page.paginator.num_pages }}
+                {% if request.GET.year %}
+                    &year={{ request.GET.year }}
+                {% endif %}
+                {% if request.GET.country %}
+                    &country={{ request.GET.country }}
+                {% endif %}
+                {% if request.GET.gender %}
+                    &gender={{ request.GET.gender }}
+                {% endif %}
+                {% if request.GET.age_group %}
+                    &age_group={{ request.GET.age_group }}
+                {% endif %}
+                {% if request.GET.population %}
+                    &population={{ request.GET.population }}
+                {% endif %}
+            ">
+                Last &raquo;
+            </a>
+        {% endif %}
+    </span>
+    
   </div>
   
   </form>

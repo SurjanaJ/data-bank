@@ -264,80 +264,117 @@
     </div>
     <div class="pagination m-3 d-flex justify-content-center">
       <span class="step-links bg-light rounded-1 d-flex justify-content-center gap-3 p-3">
-          {% if page.has_previous %}
-              <a href="?page=1
-              {% if request.GET.country %}
-                  &country={{ request.GET.country }}
-              {% endif %}
-              {% if request.GET.year_min %}
-                  &year_min={{ request.GET.year_min }}
-              {% endif %}
-              {% if request.GET.year_max %}
-                  &year_max={{ request.GET.year_max }}
-              {% endif %}
-              {% if request.GET.mine_name %}
-                  &mine_name={{ request.GET.mine_name }}
-              {% endif %}
-              ">
-                  &laquo; First
-              </a>
-              <a href="?page={{page.previous_page_number}}
-              {% if request.GET.country %}
-                  &country={{ request.GET.country }}
-              {% endif %}
-              {% if request.GET.year_min %}
-                  &year_min={{ request.GET.year_min }}
-              {% endif %}
-              {% if request.GET.year_max %}
-                  &year_max={{ request.GET.year_max }}
-              {% endif %}
-              {% if request.GET.mine_name %}
-                  &mine_name={{ request.GET.mine_name }}
-              {% endif %}
-              ">
-                  Previous
-              </a>
-          {% endif %}
-  
-          <span class="current-page">
-              Page {{ page.number }} of {{ page.paginator.num_pages }}.
-          </span>
-  
-          {% if page.has_next %}
-              <a href="?page={{page.next_page_number}}
-              {% if request.GET.country %}
-                  &country={{ request.GET.country }}
-              {% endif %}
-              {% if request.GET.year_min %}
-                  &year_min={{ request.GET.year_min }}
-              {% endif %}
-              {% if request.GET.year_max %}
-                  &year_max={{ request.GET.year_max }}
-              {% endif %}
-              {% if request.GET.mine_name %}
-                  &mine_name={{ request.GET.mine_name }}
-              {% endif %}
-              ">
-                  Next
-              </a>
-              <a href="?page={{ page.paginator.num_pages }}
-              {% if request.GET.country %}
-                  &country={{ request.GET.country }}
-              {% endif %}
-              {% if request.GET.year_min %}
-                  &year_min={{ request.GET.year_min }}
-              {% endif %}
-              {% if request.GET.year_max %}
-                  &year_max={{ request.GET.year_max }}
-              {% endif %}
-              {% if request.GET.mine_name %}
-                  &mine_name={{ request.GET.mine_name }}
-              {% endif %}
-              ">
-                  Last &raquo;
-              </a>
-          {% endif %}
-      </span>
+        {% if page.has_previous %}
+            <a href="?page=1
+                {% if request.GET.year %}
+                    &year={{ request.GET.year }}
+                {% endif %}
+                {% if request.GET.country %}
+                    &country={{ request.GET.country }}
+                {% endif %}
+                {% if request.GET.name_of_mine %}
+                    &name_of_mine={{ request.GET.name_of_mine }}
+                {% endif %}
+                {% if request.GET.unit %}
+                    &unit={{ request.GET.unit }}
+                {% endif %}
+                {% if request.GET.current_production %}
+                    &current_production={{ request.GET.current_production }}
+                {% endif %}
+                {% if request.GET.potential_stock %}
+                    &potential_stock={{ request.GET.potential_stock }}
+                {% endif %}
+                {% if request.GET.mining_company_name %}
+                    &mining_company_name={{ request.GET.mining_company_name }}
+                {% endif %}
+            ">
+                &laquo; First
+            </a>
+            <a href="?page={{page.previous_page_number}}
+                {% if request.GET.year %}
+                    &year={{ request.GET.year }}
+                {% endif %}
+                {% if request.GET.country %}
+                    &country={{ request.GET.country }}
+                {% endif %}
+                {% if request.GET.name_of_mine %}
+                    &name_of_mine={{ request.GET.name_of_mine }}
+                {% endif %}
+                {% if request.GET.unit %}
+                    &unit={{ request.GET.unit }}
+                {% endif %}
+                {% if request.GET.current_production %}
+                    &current_production={{ request.GET.current_production }}
+                {% endif %}
+                {% if request.GET.potential_stock %}
+                    &potential_stock={{ request.GET.potential_stock }}
+                {% endif %}
+                {% if request.GET.mining_company_name %}
+                    &mining_company_name={{ request.GET.mining_company_name }}
+                {% endif %}
+            ">
+                Previous
+            </a>
+        {% endif %}
+    
+        <span class="current-page">
+            Page {{ page.number }} of {{ page.paginator.num_pages }}.
+        </span>
+    
+        {% if page.has_next %}
+            <a href="?page={{page.next_page_number}}
+                {% if request.GET.year %}
+                    &year={{ request.GET.year }}
+                {% endif %}
+                {% if request.GET.country %}
+                    &country={{ request.GET.country }}
+                {% endif %}
+                {% if request.GET.name_of_mine %}
+                    &name_of_mine={{ request.GET.name_of_mine }}
+                {% endif %}
+                {% if request.GET.unit %}
+                    &unit={{ request.GET.unit }}
+                {% endif %}
+                {% if request.GET.current_production %}
+                    &current_production={{ request.GET.current_production }}
+                {% endif %}
+                {% if request.GET.potential_stock %}
+                    &potential_stock={{ request.GET.potential_stock }}
+                {% endif %}
+                {% if request.GET.mining_company_name %}
+                    &mining_company_name={{ request.GET.mining_company_name }}
+                {% endif %}
+            ">
+                Next
+            </a>
+            <a href="?page={{ page.paginator.num_pages }}
+                {% if request.GET.year %}
+                    &year={{ request.GET.year }}
+                {% endif %}
+                {% if request.GET.country %}
+                    &country={{ request.GET.country }}
+                {% endif %}
+                {% if request.GET.name_of_mine %}
+                    &name_of_mine={{ request.GET.name_of_mine }}
+                {% endif %}
+                {% if request.GET.unit %}
+                    &unit={{ request.GET.unit }}
+                {% endif %}
+                {% if request.GET.current_production %}
+                    &current_production={{ request.GET.current_production }}
+                {% endif %}
+                {% if request.GET.potential_stock %}
+                    &potential_stock={{ request.GET.potential_stock }}
+                {% endif %}
+                {% if request.GET.mining_company_name %}
+                    &mining_company_name={{ request.GET.mining_company_name }}
+                {% endif %}
+            ">
+                Last &raquo;
+            </a>
+        {% endif %}
+    </span>
+    
   </div>
   
   </form>

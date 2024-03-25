@@ -39,6 +39,15 @@ class UploadHotelData(ModelForm):
         model = Hotel
         fields='__all__'
 
+        widgets = {
+            'Year': forms.DateInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Name_Of_The_Hotel':forms.TextInput(attrs={'class': 'form-control '}),
+            'Capacity_Room': forms.NumberInput(attrs={'class': 'form-control  '}),
+            'Occupancy_In_Year': forms.NumberInput(attrs={'class': 'form-control  '}),
+            'City':forms.TextInput(attrs={'class': 'form-control '}),
+        }
+
 
 # Land Data
 class UploadLandDataForm(forms.Form):
@@ -49,6 +58,14 @@ class UploadLandData(ModelForm):
     class Meta:
         model = Land
         fields='__all__'
+
+        widgets = {
+            'Year': forms.DateInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Land_Code':forms.Select(attrs={'class': 'form-control  '}),
+            'Unit':forms.Select(attrs={'class': 'form-control  '}),
+            'Area': forms.NumberInput(attrs={'class': 'form-control  '}),
+        }
 
 class UploadLandMetaForm(forms.Form):
     meta_file = forms.FileField()
@@ -63,6 +80,14 @@ class UploadPopulationData(ModelForm):
         model = PopulationData
         fields='__all__'
 
+        widgets = {
+            'Year': forms.DateInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Gender': forms.Select(attrs={'class': 'form-control '}),
+            'Age_Group': forms.Select(attrs={'class': 'form-control '}),
+            'Population': forms.NumberInput(attrs={'class': 'form-control  '}),
+        }
+
 
 # water
 class UploadWaterDataForm(forms.Form):
@@ -73,6 +98,16 @@ class UploadWaterData(ModelForm):
     class Meta:
         model = Water 
         fields='__all__'
+
+        widgets = {
+            'Year': forms.DateInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Water_Type_Code': forms.Select(attrs={'class': 'form-control '}),
+            'Description': forms.TextInput(attrs={'class': 'form-control '}),
+            'Unit': forms.Select(attrs={'class': 'form-control '}),
+            'Volume': forms.NumberInput(attrs={'class': 'form-control '}),
+            'Name_Of_The_River': forms.TextInput(attrs={'class': 'form-control '}),
+        }
 
 class UploadWaterMetaForm(forms.Form):
     meta_file = forms.FileField()
@@ -85,6 +120,15 @@ class UploadTourismData(ModelForm):
     class Meta:
         model = Tourism
         fields='__all__'
+
+        widgets = {
+            'Year': forms.DateInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Number_Of_Tourist': forms.NumberInput(attrs={'class': 'form-control '}),
+            'Nationality_Of_Tourism': forms.Select(attrs={'class': 'form-control '}),
+            'Arrival_code': forms.Select(attrs={'class': 'form-control '}),
+            'Number': forms.NumberInput(attrs={'class': 'form-control '}),
+        }
 
 class UploadTourismMetaForm(forms.Form):
     meta_file = forms.FileField()
@@ -99,6 +143,14 @@ class UploadTransportData(ModelForm):
         model = Transport
         fields='__all__'
 
+        widgets = {
+            'Year': forms.DateInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Transport_Classification_Code': forms.Select(attrs={'class': 'form-control '}),
+            'Unit': forms.Select(attrs={'class': 'form-control '}),
+            'Quantity': forms.NumberInput(attrs={'class': 'form-control '}),
+        }
+
 class UploadTransportMetaForm(forms.Form):
     meta_file = forms.FileField()
 
@@ -111,6 +163,13 @@ class UploadPublicUnitillityData(ModelForm):
     class Meta:
         model = Public_Unitillity
         fields='__all__'
+
+        widgets = {
+            'Year': forms.DateInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Type_Of_Public_Utility': forms.TextInput(attrs={'class': 'form-control '}),
+            'Number': forms.NumberInput(attrs={'class': 'form-control '}),
+        }
 # SERVICE DATA
 class UploadServicesMetaForm(forms.Form):
     meta_file = forms.FileField()
@@ -207,6 +266,15 @@ class UpdateDisaster(ModelForm):
         model = Disaster_Data
         fields='__all__'
 
+        widgets = {
+            'Year': forms.DateInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Disaster_Code': forms.Select(attrs={'class': 'form-control '}),
+            'Human_Loss': forms.NumberInput(attrs={'class': 'form-control  '}),
+            'Animal_Loss': forms.NumberInput(attrs={'class': 'form-control  '}),
+            'Physical_Properties_Loss_In_USD': forms.NumberInput(attrs={'class': 'form-control  '}),
+        }
+
 class UploadDisasterForm(forms.Form):
     file = forms.FileField()
 
@@ -221,6 +289,14 @@ class UpdateHealthDisease(ModelForm):
         model = Health_disease
         fields='__all__'
 
+        widgets = {
+            'Year': forms.DateInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Disease_Code': forms.Select(attrs={'class': 'form-control '}),
+            'Unit': forms.Select(attrs={'class': 'form-control '}),
+            'Number_Of_Case': forms.NumberInput(attrs={'class': 'form-control '}),
+        }
+
 class UploadHealthDiseaseForm(forms.Form):
     file = forms.FileField()
 
@@ -234,6 +310,17 @@ class UpdateMining(ModelForm):
         model = Mining
         fields='__all__'
 
+        widgets = {
+            'Year': forms.DateInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Name_Of_Mine': forms.TextInput(attrs={'class': 'form-control '}),
+            'Unit': forms.Select(attrs={'class': 'form-control '}),
+            'Current_Production': forms.NumberInput(attrs={'class': 'form-control '}),
+            'Potential_Stock': forms.NumberInput(attrs={'class': 'form-control '}),
+            'Mining_Company_Name': forms.TextInput(attrs={'class': 'form-control '}),
+
+        }
+
 class UploadMiningForm(forms.Form):
     file = forms.FileField()
 
@@ -246,7 +333,16 @@ class UploadHousingMetaForm(forms.Form):
 class UpdateHousing(ModelForm):
     class Meta:
         model = Housing
-        fields='__all__'
+        fields= '__all__'
+
+        widgets = {
+            'Year': forms.DateInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'House_Code': forms.Select(attrs={'class': 'form-control '}),
+            'City': forms.TextInput(attrs={'class': 'form-control '}),
+            'Number': forms.NumberInput(attrs={'class': 'form-control '}),
+
+        }
 
 class UploadHousingForm(forms.Form):
     file = forms.FileField()
@@ -258,6 +354,17 @@ class UpdatePolitical(ModelForm):
         model = Political_Data
         fields='__all__'
 
+        widgets = {
+            'Year': forms.DateInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Political_Party_Name': forms.TextInput(attrs={'class': 'form-control '}),
+            'Number_Of_Member': forms.NumberInput(attrs={'class': 'form-control '}),
+            'Province': forms.TextInput(attrs={'class': 'form-control '}),
+            'District': forms.TextInput(attrs={'class': 'form-control '}),
+            'Municipality': forms.TextInput(attrs={'class': 'form-control '}),
+            'Wards': forms.TextInput(attrs={'class': 'form-control '}),
+        }
+
 class UploadPoliticalForm(forms.Form):
     file = forms.FileField()
 
@@ -266,6 +373,12 @@ class UpdateActivity(ModelForm):
     class Meta:
         model = ActivityData
         fields='__all__'
+
+        widgets = {
+            'Year': forms.DateInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+
+        }
 
 class UploadActivityDataForm(forms.Form):
     file = forms.FileField()
@@ -283,6 +396,17 @@ class UpdateRoad(ModelForm):
         model = Road
         fields='__all__'
 
+        widgets = {
+            
+            'Year': forms.DateInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Highway_No': forms.TextInput(attrs={'class': 'form-control '}),
+            'Name_Of_The_Road': forms.TextInput(attrs={'class': 'form-control '}),
+            'Code_Type_Of_Road': forms.Select(attrs={'class': 'form-control '}), 
+            'Length_Unit_Options':forms.Select(attrs={'class': 'form-control '}),
+            'Length': forms.NumberInput(attrs={'class': 'form-control '}),
+        }
+
 class UploadRoadForm(forms.Form):
     file = forms.FileField()
 
@@ -291,10 +415,16 @@ class UploadPublicUnitillityDataForm(forms.Form):
     Public_Unitillity_data_file = forms.FileField()
 
 
-class UploadPublicUnitillityData(ModelForm):
-    class Meta:
-        model = Public_Unitillity
-        fields='__all__'
+# class UploadPublicUnitillityData(ModelForm):
+#     class Meta:
+#         model = Public_Unitillity
+#         fields='__all__'
+
+#         widgets = {
+#             'Year': forms.DateInput(attrs={'class': 'form-control '}),
+#             'Country': forms.Select(attrs={'class': 'form-control '}),
+
+#         }
 
 # CLIMATE DATA
 class UploadClimatePlaceMeta(forms.Form):

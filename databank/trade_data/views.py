@@ -117,7 +117,7 @@ tables =[
         "name": "Water Data",
         "url": "water_table"
     },
-    ,
+    
     {
         "name": "Index Data",
         "url": "index_table"
@@ -907,3 +907,5 @@ def download_error_excel(request):
         return response
     else:
         return HttpResponse('No data to export.')
+    
+
