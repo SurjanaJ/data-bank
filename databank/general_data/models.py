@@ -257,7 +257,7 @@ class Disaster_Data_Meta(models.Model):
     Disaster_Type = models.TextField(null=True,blank=True)
     
     def __str__(self):
-        return self.Code
+        return (f'{self.Code} - {self.Disaster_Type}')
 
 class Disaster_Data(models.Model):
     id = models.AutoField(primary_key=True)

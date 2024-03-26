@@ -999,13 +999,15 @@ def export_disaster_table_to_excel(request):
     data = filter_disaster(request)
 
     data =data.annotate(
-        country_name = F('Country__Country_Name'),
-        disaster_code = F('Disaster_Code__Code')
-    )
-    df = pd.DataFrame(data.values('Year','country_name','disaster_code','Human_Loss','Animal_Loss','Physical_Properties_Loss_In_USD'))
-    df.rename(columns={'country_name':'Country','disaster_code':'Disaster_id'},inplace=True)
+        country = F('Country__Country_Name'),
+        disaster_code = F('Disaster_Code__Code'),
+        disaster_type = F('Disaster_Code__Disaster_Type'),
 
-    df=df[['Year','Country','Disaster_id','Human_Loss','Animal_Loss','Physical_Properties_Loss_In_USD']] 
+    )
+    df = pd.DataFrame(data.values('id','Year','country','disaster_code','disaster_type','Human_Loss','Animal_Loss','Physical_Properties_Loss_In_USD'))
+    df.rename(columns={'country': 'Country', 'disaster_code': 'Disaster Code','disaster_type':'Disaster Type','Human_Loss':'Human Loss','Animal_Loss':'Animal Loss','Physical_Properties_Loss_In_USD':'Physical Properties Loss In USD'}, inplace=True)
+    df = df[['Year','Country','Disaster Code','Disaster Type','Human Loss','Animal Loss','Physical Properties Loss In USD']]
+
     output=BytesIO()
     writer=pd.ExcelWriter(output,engine='xlsxwriter')
     df.to_excel(writer,sheet_name='sheet1',index=False)
