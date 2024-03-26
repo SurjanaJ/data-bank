@@ -41,16 +41,33 @@ def upload_crime_excel(request):
             excel_data = request.FILES['file']
             df = pd.read_excel(excel_data, dtype={'Code': str})
             df.fillna('', inplace=True)
-            df['Year'] = pd.to_datetime(df['Year']).dt.date
             df = df.map(strip_spaces)
+
+            # Check if required columns exist
+            required_columns = ['Year', 'Country', 'Code','Gender','Age','District']  # Add your required column names here
+            missing_columns = [col for col in required_columns if col not in df.columns]
+            if missing_columns:
+                errors.append(f"Missing columns: {', '.join(missing_columns)}")
+                return render(request,'general_data/invalid_upload.html', {'missing_columns': missing_columns, 'tables': tables, 'meta_tables': views.meta_tables,} )
+            
+            df['Year'] = pd.to_datetime(df['Year']).dt.date
 
             # Update existing data
             if 'id' in df.columns:
                 for index, row in df.iterrows():
                     id = row.get('id')
+                    data = {
+                                'Country':row['Country'],
+                                'Year':row['Year'].isoformat(),
+                                'Code':row['Code'],
+                                'Crime Type' : row['Crime Type'],
+                                'Gender': row['Gender'],
+                                'Age': row['Age'],
+                                'District': row['District']
+                    }
                     try: 
                         crime_instance = Crime.objects.get(id = id)
-                        
+                        crime_data = data
                         # Check for the existence of meta data
                         try:
                             Country = Country_meta.objects.get(Country_Name = row['Country'])
@@ -71,29 +88,12 @@ def upload_crime_excel(request):
                             updated_count += 1
                         
                         except Exception as e:
-                            crime_data = {
-                                'Country':row['Country'],
-                                'Year':row['Year'].isoformat(),
-                                'Code':row['Code'],
-                                'Crime Type' : row['Crime Type'],
-                                'Gender': row['Gender'],
-                                'Age': row['Age'],
-                                'District': row['District']
-                            }
-
+                            crime_data = data
                             errors.append({'row_index': index, 'data': crime_data, 'reason': str(e)})
                             continue
 
                     except Exception as e:
-                        crime_data = {
-                                'Country':row['Country'],
-                                'Year':row['Year'].isoformat(),
-                                'Code':row['Code'],
-                                'Crime Type' : row['Crime Type'],
-                                'Gender': row['Gender'],
-                                'Age': row['Age'],
-                                'District': row['District']
-                            }
+                        crime_data = data
                         errors.append({
                                     'row_index': index,
                                     'data': crime_data,
@@ -103,23 +103,22 @@ def upload_crime_excel(request):
             # Add new data
             else:
                 for index, row in df.iterrows():
-                    try:
-                        Country = Country_meta.objects.get(Country_Name = row['Country'])
-                        Code = Crime_Meta.objects.get(Code = row['Code'])
-                        gender = row['Gender']
-
-                        crime_data = {
+                    data = {
                                 'Country':row['Country'],
-                                'Year':row['Year'],
+                                'Year':row['Year'].isoformat(),
                                 'Code':row['Code'],
                                 'Crime Type' : row['Crime Type'],
                                 'Gender': row['Gender'],
                                 'Age': row['Age'],
                                 'District': row['District']
-                            }
-                            
+                    }
+                    try:
+                        Country = Country_meta.objects.get(Country_Name = row['Country'])
+                        Code = Crime_Meta.objects.get(Code = row['Code'])
+                        gender = row['Gender']
+
                         if gender not in ['Male','Female']:
-                            raise ValueError(f"Invalid Trade_Type at row {index}: {gender}")
+                            raise ValueError(f"Invalid Trade Type at row {index}: {gender}")
 
                         existing_record = Crime.objects.filter(
                             Q(Country = Country)
@@ -131,16 +130,7 @@ def upload_crime_excel(request):
                         ).first()
 
                         if existing_record: 
-                            crime_data = {
-                                'Country':row['Country'],
-                                'Year':row['Year'].isoformat(),
-                                'Code':row['Code'],
-                                'Crime Type' : row['Crime Type'],
-                                'Gender': row['Gender'],
-                                'Age': row['Age'],
-                                'District': row['District']
-                            }
-
+                            crime_data = data
                             duplicate_data.append({
                              'row_index': index,
                                 'data': {key: str(value) for key, value in crime_data.items()}
@@ -149,26 +139,23 @@ def upload_crime_excel(request):
 
                         else:
                             try:
+                                crime_data= {
+                                    'Country':Country,
+                                    'Year':row['Year'].isoformat(),
+                                    'Code':Code,
+                                    'Gender': gender,
+                                    'Age': row['Age'],
+                                    'District': row['District']
+                                }
                                 crimeData = Crime(**crime_data)
                                 crimeData.save()
                                 added_count +=1
 
-                            except:
+                            except Exception as e:
                                 errors.append(f"Error inserting row {index}: {e}")
                             
-                                
-                        
                     except Exception as e:
-                        crime_data = {
-                                'Country':row['Country'],
-                                'Year':row['Year'].isoformat(),
-                                'Code':row['Code'],
-                                'Crime Type' : row['Crime Type'],
-                                'Gender': row['Gender'],
-                                'Age': row['Age'],
-                                'District': row['District']
-                            }
-                        
+                        crime_data = data
                         errors.append({'row_index': index, 'data': crime_data, 'reason': str(e)})
                         continue         
             
@@ -187,7 +174,7 @@ def upload_crime_excel(request):
                 return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data})
                 
             else:
-                return redirect('services_table')  
+                return redirect('crime_table')  
             
     else:
         form = UploadCrimeForm()
