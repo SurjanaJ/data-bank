@@ -12,6 +12,8 @@ from django.core.paginator import Paginator
 from trade_data.views import is_valid_queryparam, tables
 from django.http import HttpResponse
 from django.db.models import F, Q
+from .energy_view import strip_spaces
+
 
 from django.contrib.auth.decorators import login_required
 from accounts.decorators import allowed_users
@@ -50,63 +52,108 @@ def upload_education_excel(request):
         form = UploadEducationForm(request.POST, request.FILES)
         if form.is_valid():
             excel_data = request.FILES['file']
-            df = pd.read_excel(excel_data, dtype={'Level_Code': str, 'Degree_Code':str})
-            cols = df.columns.tolist()
+            df = pd.read_excel(excel_data, dtype={'Level Code': str, 'Degree Code':str})
             df.fillna('', inplace= True)
+            df = df.map(strip_spaces)
 
-            for index,row in df.iterrows():
-                education_data = {col: row[col] for col in cols}
-                try:
-                    Level_Code = Education_Level_Meta.objects.get(Code = row['Level_Code'])
-                    Degree_Code = Education_Degree_Meta.objects.get(Code = row['Degree_Code'])
+            required_columns = ['Level Code', 'Degree Code', 'Male','Female']  # Add your required column names here
+            missing_columns = [col for col in required_columns if col not in df.columns]
+            if missing_columns:
+                errors.append(f"Missing columns: {', '.join(missing_columns)}")
+                return render(request,'general_data/invalid_upload.html', {'missing_columns': missing_columns, 'tables': tables, 'meta_tables': views.meta_tables,} )
+            
+            if 'id' in df.columns:
+                for index,row in df.iterrows():
+                    id = row.get('id') 
+                    data = {
+                                'Level Code':row['Level Code'],
+                                'Degree Code': row['Degree Code'],
+                                'Male':row['Male'],
+                                'Female': row['Female']
+                            }
+                    try:
+                        education_instance = Education.objects.get(id = id)
+                        education_data = data
+                        try:
 
-                    education_data = {
-                        'Level_Code':Level_Code,
-                        'Degree_Code': Degree_Code,
-                        'Male':row['Male'],
-                        'Female': row['Female']
-                    }
-                except Exception as e:
-                    errors.append({'row_index': index, 'data': education_data, 'reason': str(e)})
-                    continue
+                            Level_Code = Education_Level_Meta.objects.get(Code = row['Level Code'])
+                            Degree_Code = Education_Degree_Meta.objects.get(Code = row['Degree Code'])
 
-                existing_record = Education.objects.filter(
-                    Q(Level_Code = Level_Code) & Q(Degree_Code = Degree_Code)).first()
-                
-                if existing_record:
-                    existing_dict = model_to_dict(existing_record)
-                    education_data_dict = model_to_dict(Education(**education_data))
+                            education_instance.Level_Code = Level_Code
+                            education_instance.Degree_Code = Degree_Code
+                            education_instance.Male = row['Male']
+                            education_instance.Female = row['Female']
 
-                    if all(existing_dict[key] == education_data_dict[key] or (pd.isna(existing_dict[key]) and pd.isna(education_data_dict[key])) for key in education_data_dict if key != 'id'):
+                            education_instance.save()
+                            updated_count += 1
+
+                        except Exception as e:
+                            education_data= data
+                            errors.append({'row_index': index, 'data': education_data, 'reason': str(e)})
+                            continue
+
+                    except Exception as e:
+                        education_data= data
+                        errors.append({
+                                        'row_index': index,
+                                        'data': education_data,
+                                        'reason': f'Error inserting row {index}: {e}'
+                                    })
+                        continue
+
+                    
+            else:
+                for index, row in df.iterrows():
+                    data = {
+                                'Level Code':row['Level Code'],
+                                'Degree Code': row['Degree Code'],
+                                'Male':row['Male'],
+                                'Female': row['Female']
+                            }
+                    try:
+                        Level_Code = Education_Level_Meta.objects.get(Code = row['Level Code'])
+                        Degree_Code = Education_Degree_Meta.objects.get(Code = row['Degree Code'])
                         education_data = {
-                            'Level_Code':Level_Code,
-                            'Degree_Code': Degree_Code,
-                            'Male':row['Male'],
-                            'Female': row['Female']
+                                'Level Code':Level_Code,
+                                'Degree Code': Degree_Code,
+                                'Male':row['Male'],
+                                'Female': row['Female']
                         }
 
-                        duplicate_data.append({
-                             'row_index': index,
+                        existing_record = Education.objects.filter(
+                        Q(Level_Code = Level_Code) 
+                        & Q(Degree_Code = Degree_Code)
+                        & Q(Male = row['Male'])
+                        & Q(Female = row['Female'])
+                        ).first()
+
+                        if existing_record:
+                            education_data = data
+                            duplicate_data.append({
+                                'row_index': index,
                                 'data': {key: str(value) for key, value in education_data.items()}
-                        })
-                
-                    else:
-                        for key, value in education_data.items():
-                                setattr(existing_record, key, value)
-                        try:
-                            existing_record.save()
-                            updated_count += 1
-                        except IntegrityError as e:
-                                errors.append(f"Error updating row {index}: {e}")
-
-                else:
-                    try:
-                        educationData = Education(**education_data)
-                        educationData.save()
-                        added_count += 1
+                            })
+                            continue
+                        
+                        # add new record
+                        else:
+                            try:
+                                education_data = {
+                                'Level_Code':Level_Code,
+                                'Degree_Code': Degree_Code,
+                                'Male':row['Male'],
+                                'Female': row['Female']
+                            }
+                                educationData = Education(**education_data)
+                                educationData.save()
+                                added_count += 1
+                            except Exception as e:
+                                errors.append(f"Error inserting row {index}: {e}")
+                    
                     except Exception as e:
-                        errors.append(f"Error inserting row {index}: {e}")
-
+                        education_data = data
+                        errors.append({'row_index': index, 'data': education_data, 'reason': str(e)})
+                        continue
             if added_count > 0:
                 messages.success(request, str(added_count) + ' records added.')
             
