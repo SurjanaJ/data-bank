@@ -144,19 +144,28 @@ def upload_exchange_excel(request):
             df.fillna('', inplace=True)
             df = df.map(strip_spaces)
 
+             # Check if required columns exist
+            required_columns = ['Country', 'Currency','Selling Against USD','Buying Against USD']  # Add your required column names here
+            missing_columns = [col for col in required_columns if col not in df.columns]
+            if missing_columns:
+                errors.append(f"Missing columns: {', '.join(missing_columns)}")
+                return render(request,'general_data/invalid_upload.html', {'missing_columns': missing_columns, 'tables': tables, 'meta_tables': views.meta_tables,} )
+            
+
             # update the data
             if 'id' in df.columns:
                 for index, row in df.iterrows():
                     id = row.get('id')
-                    try:
-                        # find instance 
-                        exchange_instance = Exchange.objects.get(id = id)
-                        exchange_data = {
+                    data = {
                             'Country': row['Country'],
                             'Selling' : row['Selling Against USD'],
                             'Buying' : row ['Buying Against USD'],
                             'Currency' : row['Currency'],
                         }
+                    try:
+                        # find instance 
+                        exchange_instance = Exchange.objects.get(id = id)
+                        exchange_data = data
                         # check if all the meta datas exist
                         try:
                             Country  = Country_meta.objects.get(Country_Name = row['Country'])
@@ -173,23 +182,13 @@ def upload_exchange_excel(request):
                         
                         # error : meta data does not exist
                         except Exception as e:
-                            exchange_data = {
-                            'Country': row['Country'],
-                            'Selling' : row['Selling Against USD'],
-                            'Buying' : row ['Buying Against USD'],
-                            'Currency' : row['Currency'],
-                        }
+                            exchange_data =data
                             errors.append({'row_index': index, 'data': exchange_data, 'reason': str(e)})
                             continue
                     
                     # instance does not exist
                     except Exception as e:
-                        exchange_data = {
-                            'Country': row['Country'],
-                            'Selling' : row['Selling Against USD'],
-                            'Buying' : row ['Buying Against USD'],
-                            'Currency' : row['Currency'],
-                        }
+                        exchange_data = data
 
                         errors.append({
                                     'row_index': index,
@@ -200,6 +199,12 @@ def upload_exchange_excel(request):
             # Add new data
             else:
                 for index, row in df.iterrows():
+                    data = {
+                            'Country': row['Country'],
+                            'Selling' : row['Selling Against USD'],
+                            'Buying' : row ['Buying Against USD'],
+                            'Currency' : row['Currency'],
+                        }
                     # Find if the meta data exists
                     try:
                         Country  = Country_meta.objects.get(Country_Name = row['Country'])
@@ -213,12 +218,7 @@ def upload_exchange_excel(request):
                         }
 
                         if Country.id != Currency.Country.id:
-                            exchange_data = {
-                                'Country': row['Country'],
-                                'Selling Against USD' : row['Selling Against USD'],
-                                'Buying Against USD' : row ['Buying Against USD'],
-                                'Currency' : row['Currency'],
-                    }
+                            exchange_data = data
                             raise ValueError(f"Country value and Currency Value Mismatch")
 
 
@@ -230,18 +230,19 @@ def upload_exchange_excel(request):
                             ).first()
                         
                         if existing_record:
-                            exchange_data = {
-                                'Country': row['Country'],
-                                'Selling Against USD' : row['Selling Against USD'],
-                                'Buying Against USD' : row ['Buying Against USD'],
-                                'Currency' : row['Currency'],
-                            }       
+                            exchange_data =data
                             duplicate_data.append({
                                 'row_index': index,
                                 'data': {key: str(value) for key, value in exchange_data.items()}
                             })
                         else:
                             try:
+                                exchange_data = {
+                                'Country': Country,
+                                'Selling' : row['Selling Against USD'],
+                                'Buying' : row ['Buying Against USD'],
+                                'Currency' : Currency,
+                        }
                                 exchangeData = Exchange(**exchange_data)
                                 exchangeData.save()
                                 added_count += 1
@@ -250,13 +251,7 @@ def upload_exchange_excel(request):
                     
                     # Meta data doesnt exist
                     except Exception as e:
-                        exchange_data = {
-                                'Country': row['Country'],
-                                'Selling Against USD' : row['Selling Against USD'],
-                                'Buying Against USD' : row ['Buying Against USD'],
-                                'Currency' : row['Currency'],
-                            }  
-
+                        exchange_data = data
                         errors.append({'row_index': index, 'data': exchange_data, 'reason': str(e)})
                         continue
             
