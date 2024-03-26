@@ -141,8 +141,16 @@ def upload_climate_excel(request):
             excel_data = request.FILES['file']
             df = pd.read_excel(excel_data)
             df.fillna('', inplace=True)
-            df['Date'] = pd.to_datetime(df['Date']).dt.date
             df = df.map(strip_spaces)
+
+             # Check if required columns exist
+            required_columns = ['Date', 'Country', 'Place','Temperature Unit','Max Temperature','Min Temperature','Climate','Climate Unit','Amount']  # Add your required column names here
+            missing_columns = [col for col in required_columns if col not in df.columns]
+            if missing_columns:
+                errors.append(f"Missing columns: {', '.join(missing_columns)}")
+                return render(request,'general_data/invalid_upload.html', {'missing_columns': missing_columns, 'tables': tables, 'meta_tables': views.meta_tables,} )
+            
+            df['Date'] = pd.to_datetime(df['Date']).dt.date
 
             # Update the existing data
             if 'id' in df.columns:
@@ -152,11 +160,11 @@ def upload_climate_excel(request):
                         'Country': row['Country'],
                         'Date': row['Date'].isoformat(),
                         'Place':row['Place'],
-                        'Temperature_Unit': row['Temperature Unit'],
-                        'Max_Temperature': row['Max Temperature'],
-                        'Min_Temperature': row['Min Temperature'],
+                        'Temperature Unit': row['Temperature Unit'],
+                        'Max Temperature': row['Max Temperature'],
+                        'Min Temperature': row['Min Temperature'],
                         'Climate': row['Climate'],
-                        'Climate_Unit' : row['Climate Unit'],
+                        'Climate Unit' : row['Climate Unit'],
                         'Amount': row['Amount'],
                     }
                     try:
@@ -209,11 +217,11 @@ def upload_climate_excel(request):
                         'Country': row['Country'],
                         'Date': row['Date'].isoformat(),
                         'Place':row['Place'],
-                        'Temperature_Unit': row['Temperature Unit'],
-                        'Max_Temperature': row['Max Temperature'],
-                        'Min_Temperature': row['Min Temperature'],
+                        'Temperature Unit': row['Temperature Unit'],
+                        'Max Temperature': row['Max Temperature'],
+                        'Min Temperature': row['Min Temperature'],
                         'Climate': row['Climate'],
-                        'Climate_Unit' : row['Climate Unit'],
+                        'Climate Unit' : row['Climate Unit'],
                         'Amount': row['Amount'],
                     }
                     try:
@@ -232,10 +240,10 @@ def upload_climate_excel(request):
                             'Date':Date.isoformat(),
                             'Place': Place,
                             'Temperature_Unit' : Temperature_Unit,
-                            'Max_Temperature': row['Max Temperature'],
-                            'Min_Temperature': row['Min Temperature'],
+                            'Max Temperature': row['Max Temperature'],
+                            'Min Temperature': row['Min Temperature'],
                             'Climate': climate_type,
-                            'Climate_Unit':Climate_Unit,
+                            'Climate Unit':Climate_Unit,
                             'Amount': row['Amount']
                         }
 
@@ -262,6 +270,17 @@ def upload_climate_excel(request):
 
                         else:
                             try:
+                                climate_data = {
+                                    'Country': Country,
+                                    'Date':Date.isoformat(),
+                                    'Place': Place,
+                                    'Temperature_Unit' : Temperature_Unit,
+                                    'Max_Temperature': row['Max Temperature'],
+                                    'Min_Temperature': row['Min Temperature'],
+                                    'Climate': climate_type,
+                                    'Climate_Unit':Climate_Unit,
+                                    'Amount': row['Amount']
+                                }
                                 ClimateData = Climate_Data(**climate_data)
                                 ClimateData.save()
                                 added_count += 1
