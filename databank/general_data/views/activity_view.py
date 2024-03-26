@@ -2,6 +2,8 @@ from django.shortcuts import render,redirect
 from django.core.paginator import Paginator
 from django.db.models import Q
 import pandas as pd
+
+from .energy_view import strip_spaces
 from ..models import ActivityData,Country_meta,Activity_Meta
 from ..forms import UploadActivityDataForm
 from trade_data.views import tables
@@ -84,6 +86,16 @@ def upload_activity_excel(request):
         if form.is_valid():
             excel_data = request.FILES['file']
             df = pd.read_excel(excel_data,dtype={'Activity_Code': str})
+            df.fillna('', inplace=True)
+            df = df.map(strip_spaces)
+
+             # Check if required columns exist
+            required_columns = ['Year', 'Country', 'Activity Code','Person','Districts','Text Documents Upload']  # Add your required column names here
+            missing_columns = [col for col in required_columns if col not in df.columns]
+            if missing_columns:
+                errors.append(f"Missing columns: {', '.join(missing_columns)}")
+                return render(request,'general_data/invalid_upload.html', {'missing_columns': missing_columns, 'tables': tables, 'meta_tables': views.meta_tables,} )
+            
 
             if 'id' in df.columns:
                 cols = df.columns.tolist()
