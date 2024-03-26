@@ -18,12 +18,14 @@ from django.http import HttpResponse
 from .energy_view import strip_spaces
 from trade_data import views
 
-
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import allowed_users
 
 
 def is_valid_queryparam(param):
     return param !='' and param is not None
 
+@login_required(login_url = 'login')
 def display_hotel_table(request):
 
     url = reverse('population_table')
@@ -74,6 +76,8 @@ def display_hotel_table(request):
     }
     return render(request, 'general_data/hotel_templates/hotel_table.html',context)
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 @require_POST
 def delete_selected_hotel(request):
     selected_ids = request.POST.getlist('selected_items')
@@ -88,6 +92,8 @@ def delete_selected_hotel(request):
 
     return redirect('hotel_table')
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def delete_hotel_record(request,item_id):
     try:
         item_to_delete = get_object_or_404(Hotel, id=item_id)
@@ -96,7 +102,9 @@ def delete_hotel_record(request,item_id):
         return redirect('hotel_table')
     except Exception as e:
         return HttpResponse(f"An error occurred: {str(e)}")
-       
+
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])       
 def upload_hotel_excel(request):
 
     errors = []
@@ -111,6 +119,14 @@ def upload_hotel_excel(request):
             df = pd.read_excel(excel_data)
             df.fillna('', inplace=True)
             df = df.map(strip_spaces)
+
+            # Check if required columns exist
+            required_columns = ['Year', 'Country', 'Name Of The Hotel','Capacity Room','Occupancy In Year','City']  # Add your required column names here
+            missing_columns = [col for col in required_columns if col not in df.columns]
+            if missing_columns:
+                errors.append(f"Missing columns: {', '.join(missing_columns)}")
+                return render(request,'general_data/invalid_upload.html', {'missing_columns': missing_columns, 'tables': tables, 'meta_tables': views.meta_tables,} )
+            
 
             if 'id' in df.columns:
                 for index,row in df.iterrows():
@@ -248,7 +264,9 @@ def upload_hotel_excel(request):
         form = UploadHotelDataForm()
 
     return render(request,'general_data/upload_form.html',{'form':form}) 
-                             
+
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])                             
 def update_selected_hotel(request):
     selected_ids = request.POST.getlist('selected_items')
     if not selected_ids:
