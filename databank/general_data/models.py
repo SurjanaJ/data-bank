@@ -222,15 +222,13 @@ class Health_disease_Meta(models.Model):
     Disease_Type = models.TextField(null=True,blank=True)
 
     def __str__(self):
-        return self.Code
+        return (f'{self.Code} - {self.Disease_Type}')
 
 
 class Health_disease(models.Model):
-
     Unit_Options = (
         ('Person','Person'),
     )
-
     id = models.AutoField(primary_key=True)
     Year = models.IntegerField()
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)

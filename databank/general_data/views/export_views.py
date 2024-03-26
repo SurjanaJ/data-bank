@@ -787,12 +787,12 @@ def export_health_diseases_table_to_excel(request):
 
     data = data.annotate(
         country_name = F('Country__Country_Name'),
-        disease_code = F('Disease_Code__Code')
+        disease_code = F('Disease_Code__Code'),
+        disease_type = F('Disease_Code__Disease_Type'),
     )
-    df = pd.DataFrame(data.values('Year','country_name','disease_code','Unit','Number_Of_Case'))
-    df.rename(columns={'country_name':'Country','disease_code':'Disease_Code'},inplace=True)
-
-    df=df[['Year','Country','Disease_Code','Unit','Number_Of_Case']]
+    df = pd.DataFrame(data.values('Year','country_name','disease_code','disease_type','Unit','Number_Of_Case'))
+    df.rename(columns={'country': 'Country', 'disease_code':'Disease Code','disease_type':'Disease Type','Number_Of_Case':'Number Of Case'}, inplace=True)
+    df = df[['Year','Country','Disease Code','Disease Type','Unit','Number Of Case']]
     output=BytesIO()
     writer=pd.ExcelWriter(output,engine='xlsxwriter')
     df.to_excel(writer,sheet_name='sheet1',index=False)
