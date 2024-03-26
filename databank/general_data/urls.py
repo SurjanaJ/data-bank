@@ -1,4 +1,6 @@
 from django.urls import include, path
+
+from general_data.views import analysis_views
 from .views import activity_view,climate_view, occupation_view, health_diseases_views, education_view, view, population_view, hotel_view, land_view, political_views, tourism_view, mining_views, water_view, housing_views, road_views, transport_view, services_view, crime_view, public_unitillity_views, disaster_views, energy_view, exchange_view, export_views
 
 
@@ -276,5 +278,7 @@ urlpatterns = [
     path('delete_selected_production/', view.delete_selected, name='delete_selected_production'),
     path('export_production_excel', production_view.export_production_excel, name='export_production_excel'),
     path('update_selected_production/', production_view.update_selected_production, name='update_selected_production'),
+
+    path('analysis_forest/', analysis_views.analysis_forest, name='analysis_forest'),
 
 ]   

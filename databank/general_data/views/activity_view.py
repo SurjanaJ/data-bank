@@ -11,9 +11,13 @@ from django.db.models import F
 from io import BytesIO
 from django.http import HttpResponse
 
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import allowed_users
+
 def is_valid_queryparam(param):
     return param !='' and  param is not None
 
+@login_required(login_url = 'login')
 def display_activity_table(request):
     data = ActivityData.objects.all()
     country_categories = Country_meta.objects.all()
@@ -66,7 +70,9 @@ def display_activity_table(request):
     }
 
     return render(request, 'general_data/activity_templates/activity_table.html', context)
-  
+
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_activity_excel(request):
     errors = []
     duplicate_data = []
@@ -198,6 +204,7 @@ def upload_activity_excel(request):
 
     return render(request, 'general_data/transport_templates/upload_transport_form.html', {'form': form})
 
+@login_required(login_url = 'login')
 def display_activity_data_meta(request):
     data = Activity_Meta.objects.all()
     total_data = data.count()
@@ -207,6 +214,8 @@ def display_activity_data_meta(request):
     context = {'data': data,'total_data':total_data,'meta_tables':views.meta_tables, 'tables':tables, 'column_names':column_names}
     return render(request, 'general_data/display_meta.html', context)
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def update_selected_activity(request):
     selected_ids = request.POST.getlist('selected_items')
     if not selected_ids:

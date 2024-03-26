@@ -1,0 +1,14 @@
+{% extends 'main.html' %}
+{% block content %}
+<div class="container bg-light p-4">
+
+<p>The file could not be uploaded because of the missing columns:</p>
+<ul>
+    {% for column in missing_columns %}
+        <li> {{column}} </li>
+    {% endfor %}
+</ul>
+</div>
+
+
+{% endblock content %}

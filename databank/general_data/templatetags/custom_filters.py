@@ -8,3 +8,7 @@ def get_key(obj, key):
         return obj.get(key, '')
     else:
         return getattr(obj, key, '')
+
+@register.filter
+def get_keyValue(dictionary, key):
+    return dictionary.get(key, "")
