@@ -49,22 +49,32 @@ def upload_energy_excel(request):
             df.fillna('', inplace=True)
             df = df.map(strip_spaces)
 
+            # Check if required columns exist
+            required_columns = ['Year', 'Country', 'Power Code','Potential Unit','Potential Capacity MW','Unit Production','Current Production In MW','Generating Company']  # Add your required column names here
+            missing_columns = [col for col in required_columns if col not in df.columns]
+            if missing_columns:
+                errors.append(f"Missing columns: {', '.join(missing_columns)}")
+                return render(request,'general_data/invalid_upload.html', {'missing_columns': missing_columns, 'tables': tables, 'meta_tables': views.meta_tables,} )
+            
+
             # Update existing data
             if 'id' in df.columns:
                 for index, row in df.iterrows():
                     id = row.get('id')
-                    try:
-                        energy_instance = Energy.objects.get(id = id)
-                        energy_data = {
+                    data = {
                             'Country': row['Country'],
                             'Year': row['Year'],
-                            'Power_Code':row['Power Code'],
-                            'Potential_Unit': row['Potential Unit'],
-                            'Potential_Capacity_MW': row['Potential Capacity MW'],
-                            'Unit_Production':row['Unit Production'],
-                            'Current_Production_In_MW':row['Current Production In MW'],
-                            'Generating_Company':row['Generating Company']
+                            'Power Code':row['Power Code'],
+                            'Energy Type':row['Energy Type'],
+                            'Potential Unit': row['Potential Unit'],
+                            'Potential Capacity MW': row['Potential Capacity MW'],
+                            'Unit Production':row['Unit Production'],
+                            'Current Production In MW':row['Current Production In MW'],
+                            'Generating Company':row['Generating Company']
                         }
+                    try:
+                        energy_instance = Energy.objects.get(id = id)
+                        energy_data = data
                         
                         #Check if all the meta datas exist
                         try:
@@ -86,31 +96,12 @@ def upload_energy_excel(request):
                             updated_count += 1
 
                         except Exception as e:
-                            energy_data  = {
-                                        'Country': row['Country'],
-                                        'Year': row['Year'],
-                                        'Power_Code':row['Power Code'],
-                                        'Energy Type': row['Energy Type'],
-                                        'Potential_Unit': row['Potential Unit'],
-                                        'Potential_Capacity_MW': row['Potential Capacity MW'],
-                                        'Unit_Production':row['Unit Production'],
-                                        'Current_Production_In_MW':row['Current Production In MW'],
-                                        'Generating_Company':row['Generating Company']
-                                    }
+                            energy_data  = data
                             errors.append({'row_index': index, 'data': energy_data, 'reason': str(e)})
                             continue
 
                     except Exception as e:
-                        energy_data = {
-                            'Country': row['Country'],
-                            'Year': row['Year'],
-                            'Power_Code':row['Power Code'],
-                            'Potential_Unit': row['Potential Unit'],
-                            'Potential_Capacity_MW': row['Potential Capacity MW'],
-                            'Unit_Production':row['Unit Production'],
-                            'Current_Production_In_MW':row['Current Production In MW'],
-                            'Generating_Company':row['Generating Company']
-                        }
+                        energy_data = data
                         errors.append({
                                     'row_index': index,
                                     'data': energy_data,
@@ -120,22 +111,22 @@ def upload_energy_excel(request):
             else:
                 # Add new data
                 for index, row in df.iterrows():
+                    data = {
+                            'Country': row['Country'],
+                            'Year': row['Year'],
+                            'Power Code':row['Power Code'],
+                            'Energy Type':row['Energy Type'],
+                            'Potential Unit': row['Potential Unit'],
+                            'Potential Capacity MW': row['Potential Capacity MW'],
+                            'Unit Production':row['Unit Production'],
+                            'Current Production In MW':row['Current Production In MW'],
+                            'Generating Company':row['Generating Company']
+                        }
                     try:
                         Country = Country_meta.objects.get(Country_Name = row['Country'])
                         Power_Code = Energy_Meta.objects.get(Code = row['Power Code'])
                         Potential_Unit = Unit_meta.objects.get(Unit_Code = row['Potential Unit'])
                         Unit_Production= Unit_meta.objects.get(Unit_Code = row['Unit Production'])
-                        
-                        energy_data = {
-                                'Country': Country,
-                                'Year': row['Year'],
-                                'Power_Code': Power_Code,
-                                'Potential_Unit': Potential_Unit,
-                                'Potential_Capacity_MW': row['Potential Capacity MW'],
-                                'Unit_Production':Unit_Production,
-                                'Current_Production_In_MW':row['Current Production In MW'],
-                                'Generating_Company':row['Generating Company']
-                            }
                         
                         existing_record = Energy.objects.filter(
                             Q(Country = Country) 
@@ -149,17 +140,7 @@ def upload_energy_excel(request):
                         ).first()
 
                         if existing_record:
-                            energy_data = {
-                            'Country': row['Country'],
-                            'Year': row['Year'],
-                            'Power Code': row['Power Code'],
-                            'Energy Type': row['Energy Type'],
-                            'Potential Unit': row['Potential Unit'],
-                            'Potential Capacity MW': row['Potential Capacity MW'],
-                            'Unit Production':row['Unit Production'],
-                            'Current Production In MW':row['Current Production In MW'],
-                            'Generating Company':row['Generating Company']
-                        }   
+                            energy_data = data
                            
                             duplicate_data.append({
                              'row_index': index,
@@ -168,6 +149,16 @@ def upload_energy_excel(request):
                             
                         else:
                             try:
+                                energy_data={
+                                    'Country': Country,
+                                    'Year': row['Year'],
+                                    'Power_Code':Power_Code,
+                                    'Potential_Unit':Potential_Unit,
+                                    'Potential_Capacity_MW': row['Potential Capacity MW'],
+                                    'Unit_Production':Unit_Production,
+                                    'Current_Production_In_MW':row['Current Production In MW'],
+                                    'Generating_Company':row['Generating Company']
+                                }
                                 energyData = Energy(**energy_data)
                                 energyData.save()
                                 added_count += 1
@@ -176,17 +167,7 @@ def upload_energy_excel(request):
                             
                     
                     except Exception as e:
-                        energy_data  = {
-                                'Country': row['Country'],
-                                'Year': row['Year'],
-                                'Power_Code':row['Power Code'],
-                                'Energy Type': row['Energy Type'],
-                                'Potential_Unit': row['Potential Unit'],
-                                'Potential_Capacity_MW': row['Potential Capacity MW'],
-                                'Unit_Production':row['Unit Production'],
-                                'Current_Production_In_MW':row['Current Production In MW'],
-                                'Generating_Company':row['Generating Company']
-                            }
+                        energy_data  = data
                         errors.append({'row_index': index, 'data': energy_data, 'reason': str(e)})
                         continue
 
