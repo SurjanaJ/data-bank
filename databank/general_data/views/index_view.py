@@ -48,10 +48,10 @@ def upload_index_excel(request):
                     data = {
                         'Year': row['Year'],
                         'Country': row['Country'],
-                        'Index_Name': row['Index Name'],
+                        'Index Name': row['Index Name'],
                         'Score':row['Score'],
                         'Rank': row['Rank'],
-                        'No_Of_Countries': row['No Of Countries']
+                        'No Of Countries': row['No Of Countries']
                     }
                     #get the existing instance
                     try:
@@ -94,23 +94,16 @@ def upload_index_excel(request):
                     data = {
                         'Year': row['Year'],
                         'Country': row['Country'],
-                        'Index_Name': row['Index Name'],
+                        'Index Name': row['Index Name'],
                         'Score':row['Score'],
                         'Rank': row['Rank'],
-                        'No_Of_Countries': row['No Of Countries']
+                        'No Of Countries': row['No Of Countries']
                     }
 
                     #check if the meta values exist
                     try:
                         Country = Country_meta.objects.get(Country_Name = row['Country'])
-                        index_data = {
-                        'Year': row['Year'],
-                        'Country': Country,
-                        'Index_Name': row['Index Name'],
-                        'Score':row['Score'],
-                        'Rank': row['Rank'],
-                        'No_Of_Countries': row['No Of Countries']
-                    }
+                        
 
                         existing_record =Index.objects.filter(
                             Q(Country = Country) 
@@ -133,6 +126,14 @@ def upload_index_excel(request):
                         # add new record
                         else:
                             try:
+                                index_data = {
+                                'Year': row['Year'],
+                                'Country': row['Country'],
+                                'Index_Name': row['Index Name'],
+                                'Score':row['Score'],
+                                'Rank': row['Rank'],
+                                'No_Of_Countries': row['No Of Countries']
+                            }
                                 indexData = Index(**index_data)
                                 indexData.save()
                                 added_count += 1
