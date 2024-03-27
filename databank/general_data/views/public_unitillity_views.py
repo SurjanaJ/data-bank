@@ -7,6 +7,8 @@ from django.urls import reverse
 from django.db.models import Q
 import pandas as pd
 
+from trade_data import views
+
 from .energy_view import strip_spaces
 from ..models import Public_Unitillity, Country_meta
 from ..forms import UploadPublicUnitillityDataForm,UploadPublicUnitillityData
@@ -17,13 +19,14 @@ from django.views.decorators.http import require_POST
 from django.db.models import F
 from io import BytesIO
 from django.http import HttpResponse
-
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import allowed_users
 
 
 def is_valid_queryparam(param):
     return param !='' and param is not None
 
-
+@login_required(login_url = 'login')
 def display_public_unitillity_table(request):
 
     data = Public_Unitillity.objects.all()
@@ -68,6 +71,8 @@ def display_public_unitillity_table(request):
 
     return render(request, 'general_data/public_unitillity_templates/public_unitillity_table.html', context)
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def delete_public_unitillity_record(request, item_id):
     try:
         item_to_delete = get_object_or_404(Public_Unitillity, id=item_id)
@@ -77,6 +82,8 @@ def delete_public_unitillity_record(request, item_id):
     except Exception as e:
         return HttpResponse(f"An error occurred: {str(e)}")
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 @require_POST
 def delete_selected_public_unitillity(request):
     selected_ids = request.POST.getlist('selected_items')
@@ -90,6 +97,7 @@ def delete_selected_public_unitillity(request):
         messages.error(request, f'Error deleting items: {e}')
 
     return redirect('public_unitillity_table')
+
 
 def duplicate_data_to_excel(duplicate_data):
     column_names = list(duplicate_data[0]['data'].keys())
@@ -114,7 +122,9 @@ def download_duplicate_excel(request):
         return response
     else:
         return HttpResponse('No data to export.')
-    
+
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def update_public_unitillity_record(request,pk):
     public_unitillity_record = Public_Unitillity.objects.get(id=pk)
     form = UploadPublicUnitillityData(instance=public_unitillity_record)
@@ -128,6 +138,8 @@ def update_public_unitillity_record(request,pk):
     context={'form':form,}
     return render(request,'general_data/public_unitillity_templates/update_public_unitillity_record.html',context)
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_public_unitillity_excel(request):
     errors = []
     duplicate_data = []
@@ -142,6 +154,14 @@ def upload_public_unitillity_excel(request):
             df.fillna('', inplace=True)
             df = df.map(strip_spaces)
             
+            # Check if required columns exist
+            required_columns = ['Year', 'Country', 'Type Of Public Utility','Number']  # Add your required column names here
+            missing_columns = [col for col in required_columns if col not in df.columns]
+            if missing_columns:
+                errors.append(f"Missing columns: {', '.join(missing_columns)}")
+                return render(request,'general_data/invalid_upload.html', {'missing_columns': missing_columns, 'tables': tables, 'meta_tables': views.meta_tables,} )
+            
+
             #Update existing data
             if 'id' in df.columns:
                 for index,row in df.iterrows():
@@ -270,7 +290,8 @@ def upload_public_unitillity_excel(request):
 
     return render(request, 'general_data/upload_form.html', {'form': form, 'tables':tables})
 
-
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def update_selected_public_unitillity(request):
     selected_ids = request.POST.getlist('selected_items')
     if not selected_ids:
