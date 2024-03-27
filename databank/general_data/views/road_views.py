@@ -18,12 +18,15 @@ from django.db.models import F
 from io import BytesIO
 from django.http import HttpResponse
 
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import allowed_users
+
 from trade_data import views
 
 def is_valid_queryparam(param):
     return param !='' and param is not None
 
-
+@login_required(login_url = 'login')
 def display_road_table(request):
 
 
@@ -82,7 +85,8 @@ def display_road_table(request):
     return render(request, 'general_data/Road_templates/Road_table.html',context)
 
 
-
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_road_excel(request):
     errors=[]
     duplicate_data = []
@@ -99,6 +103,13 @@ def upload_road_excel(request):
 
             unit_options = [option[0] for option in Road.Length_Unit]
 
+            # Check if required columns exist
+            required_columns = ['Year', 'Country', 'Highway No','Name Of The Road','Code','Length Unit', 'Length']  # Add your required column names here
+            missing_columns = [col for col in required_columns if col not in df.columns]
+            if missing_columns:
+                errors.append(f"Missing columns: {', '.join(missing_columns)}")
+                return render(request,'general_data/invalid_upload.html', {'missing_columns': missing_columns, 'tables': tables, 'meta_tables': views.meta_tables,} )
+            
             if 'id' in df.columns:
                 for index, row in df.iterrows():
                     id = row.get('id')
@@ -232,6 +243,7 @@ def upload_road_excel(request):
 
     return render(request, 'general_data/upload_form.html', {'form': form, 'tables':tables})                            
 
+@login_required(login_url = 'login')
 def display_road_meta(request):
     data = Road_Meta.objects.all()
     total_data = data.count()
@@ -241,7 +253,8 @@ def display_road_meta(request):
     context = {'data': data, 'total_data':total_data, 'meta_tables':views.meta_tables, 'tables':tables, 'column_names':column_names}
     return render(request, 'general_data/display_meta.html', context)
 
-
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def update_selected_road(request):
     selected_ids = request.POST.getlist('selected_items')
     if not selected_ids:
