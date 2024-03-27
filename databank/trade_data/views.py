@@ -506,6 +506,14 @@ def upload_trade_excel(request):
             df.fillna('', inplace=True)
             df = df.map(strip_spaces)
             
+             # Check if required columns exist
+            required_columns = ['Trade Type', 'Calender', 'Calender Year','Duration','Country','HS Code' ,'Product Information','Unit','Quantity','Currency Type','Amount','Tarrif','Origin Destination','TradersName ExporterImporter','Documents Legal Procedural']  # Add your required column names here
+            missing_columns = [col for col in required_columns if col not in df.columns]
+            if missing_columns:
+                errors.append(f"Missing columns: {', '.join(missing_columns)}")
+                return render(request,'general_data/invalid_upload.html', {'missing_columns': missing_columns, 'tables': tables, 'meta_tables': meta_tables,} )
+            
+
             #update existing data
             if 'id' in df.columns:
                 for index, row in df.iterrows():
@@ -513,7 +521,7 @@ def upload_trade_excel(request):
                     data = {
                     'Trade Type':row['Trade Type'],
                     'Calender': row['Calender'],
-                    'Fiscal Year':row['Fiscal Year'],
+                    'Calender Year':row['Fiscal Year'],
                     'Duration':row['Duration'],
                     'Country' : row['Country'],
                     'HS Code' : row['HS Code'],
