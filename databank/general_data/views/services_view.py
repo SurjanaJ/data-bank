@@ -106,6 +106,14 @@ def upload_services_excel(request):
             df = pd.read_excel(excel_data, dtype={'Code':str})
             df.fillna('', inplace=True)
             df = df.map(strip_spaces)
+
+            # Check if required columns exist
+            required_columns = ['Year', 'Country', 'Direction','Code','Value','Origin Destination']  # Add your required column names here
+            missing_columns = [col for col in required_columns if col not in df.columns]
+            if missing_columns:
+                errors.append(f"Missing columns: {', '.join(missing_columns)}")
+                return render(request,'general_data/invalid_upload.html', {'missing_columns': missing_columns, 'tables': tables, 'meta_tables': views.meta_tables,} )
+            
             
             #Update existing data
             if 'id' in df.columns:
@@ -214,8 +222,6 @@ def upload_services_excel(request):
 
                         except Exception as e:
                             services_data = data
-                            print('services_data!!!!!!!!!!!!!!!!', services_data)
-
                             errors.append({'row_index': index, 'data': services_data, 'reason': str(e)})
                             continue
 
