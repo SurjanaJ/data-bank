@@ -122,6 +122,14 @@ def upload_tourism_excel(request):
             df.fillna('', inplace=True)
             df = df.map(strip_spaces)
 
+            # Check if required columns exist
+            required_columns = ['Year', 'Country', 'Number Of Tourist','Nationality Of Tourism','Arrival Code','Number']  # Add your required column names here
+            missing_columns = [col for col in required_columns if col not in df.columns]
+            if missing_columns:
+                errors.append(f"Missing columns: {', '.join(missing_columns)}")
+                return render(request,'general_data/invalid_upload.html', {'missing_columns': missing_columns, 'tables': tables, 'meta_tables': views.meta_tables,} )
+            
+
             if 'id' in df.columns:
                 for index,row in df.iterrows():
                     id = row.get('id')
