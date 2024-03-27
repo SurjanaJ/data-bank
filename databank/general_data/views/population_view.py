@@ -141,6 +141,13 @@ def upload_population_excel(request):
             # age_group_options = [option[0] for option in PopulationData.Age_Group_Options]
             # gender_options = [option[0] for option in PopulationData.Gender_Options]
             
+             # Check if required columns exist
+            required_columns = ['Year', 'Country', 'Gender','Age Group','Population']  # Add your required column names here
+            missing_columns = [col for col in required_columns if col not in df.columns]
+            if missing_columns:
+                errors.append(f"Missing columns: {', '.join(missing_columns)}")
+                return render(request,'general_data/invalid_upload.html', {'missing_columns': missing_columns, 'tables': tables, 'meta_tables': views.meta_tables,} )
+            
             if 'id' in df.columns:
                 for index, row in df.iterrows():
                     id = row.get('id')
