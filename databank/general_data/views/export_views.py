@@ -856,8 +856,8 @@ def export_housing_table_to_excel(request):
     )
 
     df = pd.DataFrame(data.values('Year','country_name','house_code','house_type','City','Number'))
-    df.rename(columns={'country_name':'Country','house_code':'House_Code','house_type':'House_Type'},inplace=True)
-    df = df[['Year','Country','House_Code','House_Type','City','Number']]
+    df.rename(columns={'country_name':'Country','house_code':'House Code','house_type':'House Type'},inplace=True)
+    df = df[['Year','Country','House Code','House Type','City','Number']]
     output=BytesIO()
     writer=pd.ExcelWriter(output,engine='xlsxwriter')
     df.to_excel(writer,sheet_name='sheet1',index=False)

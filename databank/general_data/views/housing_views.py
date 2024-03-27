@@ -7,6 +7,8 @@ from django.core.paginator import Paginator
 from django.urls import reverse
 from django.db.models import Q
 import pandas as pd
+
+from .energy_view import strip_spaces
 from ..models import Housing, Country_meta,Housing_Meta
 from ..forms import UploadHousingForm
 from trade_data.views import tables
@@ -17,11 +19,15 @@ from django.db.models import F
 from io import BytesIO
 from django.http import HttpResponse
 
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import allowed_users
+
 from trade_data import views
 
 def is_valid_queryparam(param):
     return param !='' and param is not None
 
+@login_required(login_url = 'login')
 def display_housing_table(request):
 
     data = Housing.objects.all()
@@ -76,6 +82,9 @@ def display_housing_table(request):
     }
     return render(request, 'general_data/housing_templates/housing_table.html',context)
 
+
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_housing_excel(request):
     errors = []
     duplicate_data = []
@@ -86,106 +95,105 @@ def upload_housing_excel(request):
         form = UploadHousingForm(request.POST,request.FILES)
         if form.is_valid():
             excel_data = request.FILES['file']
-            df = pd.read_excel(excel_data,dtype={'House_Code':str})
+            df = pd.read_excel(excel_data,dtype={'House Code':str})
             df.fillna('',inplace=True)
+            df = df.map(strip_spaces)
 
             if 'id' in df.columns:
-                cols = df.columns.to_list()
                 for index, row in df.iterrows():
-                    id_value = row.get('id')
+                    id = row.get('id')
+                    data =  {
+                        'Year':row['Year'],
+                        'Country':row['Country'],
+                        'House Code':row['House Code'],
+                        'House Type': row['House Type'],
+                        'City':row['City'],
+                        'Number':row['Number']
+                    }
                     try:
-                        housing_instance = Housing.objects.get(id=id_value)
+                        housing_instance = Housing.objects.get(id=id)
+                        housing_data = data
+                        
+                        try:
+                            country = Country_meta.objects.get(Country_Name=row['Country'])
+                            code = Housing_Meta.objects.get(Code = row['House Code'])
+                            
+                            housing_instance.Year = row['Year']
+                            housing_instance.Country = country
+                            housing_instance.House_Code = code
+                            housing_instance.City = row['City']
+                            housing_instance.Number = row['Number']
+                            housing_instance.save()
+
+                            updated_count +=1
+
+                        except Exception as e:
+                            housing_data= data
+                            errors.append({'row_index': index, 'data': housing_data, 'reason': str(e)})
+                            continue
+
+
                     except Exception as e:
-                        data = {col: row[col] for col in cols}
+                        housing_data= data
+
                         errors.append({
                             'row_index':index,
-                            'data':data,
+                            'data':housing_data,
                             'reason':f'Error inserting row {index}:{e}'
                         })
                         continue
-                    housing_data =  {
-                        'Year':row['Year'],
-                        'Country':row['Country'],
-                        'House_Code':row['House_Code'],
-                        'City':row['City'],
-                        'Number':row['Number']
-                    }
 
-                    try:
-                        country_instance = Country_meta.objects.get(Country_Name=row['Country'])
-                        housing_id = Housing_Meta.objects.get(Code = row['House_Code'])
-                        
-                        housing_instance.Year = row['Year']
-                        housing_instance.Country = country_instance
-                        housing_instance.House_Code = housing_id
-                        housing_instance.City = row['City']
-                        housing_instance.Number = row['Number']
-                        housing_instance.save()
-
-                        updated_count +=1
-
-                    except Exception as e:
-                        housing_data = {
-                            'Year':row['Year'],
-                            'Country':row['Country'],
-                            'House_Code':row['House_Code'],
-                            'City':row['City'],
-                            'Number':row['Number']
-                        }
-                        errors.append({'row_index':index,'data':housing_data,'reason':str(e)})
-                        continue
-
+                    
             else:
                 for index,row in df.iterrows():
-                    housing_data =  {
+                    data =  {
                         'Year':row['Year'],
                         'Country':row['Country'],
-                        'House_Code':row['House_Code'],
+                        'House Code':row['House Code'],
+                        'House Type': row['House Type'],
                         'City':row['City'],
                         'Number':row['Number']
                     }
-                    Country = None
+                    
                     try:
-                        country_instance = Country_meta.objects.get(Country_Name = row['Country'])
-                        housing_code = Housing_Meta.objects.get(Code = row['House_Code'])
+                        country = Country_meta.objects.get(Country_Name = row['Country'])
+                        code = Housing_Meta.objects.get(Code = row['House Code'])
 
-                        housing_data = {
-                            'Year':row['Year'],
-                            'Country':country_instance,
-                            'House_Code':housing_code,
-                            'City':row['City'],
-                            'Number':row['Number']
-                        }
-                    except Exception as e:
-                        errors.append({'row_index':index,'data':housing_data,'reason':str(e)})
-                        continue
+                        existing_record = Housing.objects.filter(
+                            Q(Year = row['Year'])
+                            & Q(Country = country)
+                            & Q(House_Code = code)
+                            & Q(City = row['City'])
+                            & Q(Number = row['Number'])
+                            ).first()
 
-                    existing_record = Housing.objects.filter(
-                        Q(Country=country_instance ) & Q(Year = housing_data['Year']) & Q(House_Code = housing_code) & Q(City = housing_data['City']) & Q(Number=housing_data['Number'])
-                    ).first()
-                    print(existing_record)
-
-                    if existing_record:
-                            housing_data = {
-                                'Year':row['Year'],
-                                'Country':Country,
-                                'House_Code':housing_code,
-                                'City':row['City'],
-                                'Number':row['Number']
-                            }
+                        if existing_record:
+                            housing_data = data
                             duplicate_data.append({
-                                'row_index':index,
-                                'data':{key:str(value)for key,value in housing_data.items()}
-                            })
+                                    'row_index':index,
+                                    'data':{key:str(value)for key,value in housing_data.items()}
+                                })
 
-                    else:
-                        try:
-                            HousingData = Housing(**housing_data)
-                            HousingData.save()
-                            added_count +=1
-                        
-                        except Exception as e:
-                            errors.append({'row_index': index, 'data': housing_data, 'reason': str(e)})
+                        else:
+                            try:
+                                housing_data =  {
+                                    'Year':row['Year'],
+                                    'Country':country,
+                                    'House_Code':code,
+                                    'City':row['City'],
+                                    'Number':row['Number']
+                                }
+                                HousingData = Housing(**housing_data)
+                                HousingData.save()
+                                added_count +=1
+                            
+                            except Exception as e:
+                                errors.append({'row_index': index, 'data': housing_data, 'reason': str(e)})
+
+                    except Exception as e:
+                        housing_data = data
+                        errors.append({'row_index': index, 'data': housing_data, 'reason': str(e)})
+                        continue
 
             if added_count > 0:
                 messages.success(request, str(added_count) + ' records added.')
@@ -205,6 +213,8 @@ def upload_housing_excel(request):
         form = UploadHousingForm()
     return render(request,'general_data/transport_templates/upload_transport_form.html',{'form':form})
 
+
+@login_required(login_url = 'login')
 def display_housing_meta(request):
     data = Housing_Meta.objects.all()
     total_data = data.count()
@@ -214,6 +224,8 @@ def display_housing_meta(request):
     context = {'data': data, 'total_data':total_data, 'meta_tables':views.meta_tables, 'tables':tables, 'column_names':column_names}
     return render(request, 'general_data/display_meta.html', context)
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def update_selected_housing(request):
     selected_ids = request.POST.getlist('selected_items')
     if not selected_ids:
@@ -229,8 +241,8 @@ def update_selected_housing(request):
         )
 
         df = pd.DataFrame(list(queryset.values('id','Year','country','house_code','house_type','City','Number')))
-        df.rename(columns={'country': 'Country','house_code':'House_Code','house_type':'House_Type'}, inplace=True)
-        df = df[['id','Year','Country','House_Code','House_Type','City','Number']]
+        df.rename(columns={'country': 'Country','house_code':'House Code','house_type':'House Type'}, inplace=True)
+        df = df[['id','Year','Country','House Code','House Type','City','Number']]
         output = BytesIO()
         writer = pd.ExcelWriter(output, engine='xlsxwriter')  
         df.to_excel(writer, sheet_name='Sheet1', index=False)

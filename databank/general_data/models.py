@@ -202,18 +202,17 @@ class Housing_Meta(models.Model):
     Code = Code=models.CharField(max_length=100)
     House_Type = models.TextField(null=True,blank=True)
     def __str__(self):
-        return self.Code
+        return (f'{self.Code} - {self.House_Type}')
 
 class Housing(models.Model):
-
     id = models.AutoField(primary_key=True)
     Year = models.IntegerField()
     Country=models.ForeignKey(Country_meta, on_delete=models.CASCADE)
     House_Code = models.ForeignKey(Housing_Meta,on_delete = models.CASCADE)
     City = models.CharField(null=True,blank=True)
     Number = models.IntegerField(default = 0 , null = True , blank = True)
-    modified_date = models.DateTimeField(auto_now=True)
-    created_date = models.DateTimeField(auto_now=True)
+    # modified_date = models.DateTimeField(auto_now=True)
+    # created_date = models.DateTimeField(auto_now=True)
 
 
 class Health_disease_Meta(models.Model):
