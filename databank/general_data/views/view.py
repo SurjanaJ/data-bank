@@ -38,6 +38,14 @@ def upload_forest_excel(request):
             df = pd.read_excel(excel_data)
             df.fillna('', inplace=True)
             df = df.map(strip_spaces)
+
+            # Check if required columns exist
+            required_columns = ['Year', 'Country', 'Name Of The Plant','Scientific Name','Local Name','Stock Unit','Stock Available','Area Unit','Area Covered']  # Add your required column names here
+            missing_columns = [col for col in required_columns if col not in df.columns]
+            if missing_columns:
+                errors.append(f"Missing columns: {', '.join(missing_columns)}")
+                return render(request,'general_data/invalid_upload.html', {'missing_columns': missing_columns, 'tables': tables, 'meta_tables': views.meta_tables,} )
+            
             
             #Update existing data
             if 'id' in df.columns:
