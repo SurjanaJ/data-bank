@@ -16,11 +16,13 @@ from io import BytesIO
 from django.http import HttpResponse
 
 from trade_data import views
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import allowed_users
 
 def is_valid_queryparam(param):
     return param !='' and param is not None
 
-
+@login_required(login_url = 'login')
 def display_transport_table(request):
     url = reverse('transport_table')
     data = Transport.objects.all()
@@ -77,6 +79,8 @@ def display_transport_table(request):
     }
     return render(request, 'general_data/transport_templates/transport_table.html',context)
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 @require_POST
 def delete_selected_transport(request):
     selected_ids = request.POST.getlist('selected_items')
@@ -91,7 +95,8 @@ def delete_selected_transport(request):
 
     return redirect('transport_table')
 
-
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def delete_transport_record(request,item_id):
     try:
         item_to_delete = get_object_or_404(Transport, id=item_id)
@@ -102,7 +107,8 @@ def delete_transport_record(request,item_id):
        messages.error(request, f'Error deleting item: {e}')
     
 
-
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def update_transport_record(request,pk):
     transport_record = Transport.objects.get(id=pk)
     form = UploadTransportData(instance=transport_record)
@@ -116,7 +122,8 @@ def update_transport_record(request,pk):
     context={'form':form,}
     return render(request,'general_data/transport_templates/update_transport_record.html',context)
 
-
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_transport_excel(request):
     errors = []
     duplicate_data = []
@@ -130,6 +137,12 @@ def upload_transport_excel(request):
             excel_data = request.FILES['Transport_data_file']
             df = pd.read_excel(excel_data,dtype={'Transport Classification Code':str})
             unit_options = [option[0] for option in Transport.Unit_Options]
+            # Check if required columns exist
+            required_columns = ['Year', 'Country', 'Transport Classification Code','Unit','Quantity']  # Add your required column names here
+            missing_columns = [col for col in required_columns if col not in df.columns]
+            if missing_columns:
+                errors.append(f"Missing columns: {', '.join(missing_columns)}")
+                return render(request,'general_data/invalid_upload.html', {'missing_columns': missing_columns, 'tables': tables, 'meta_tables': views.meta_tables,} )
             
             if 'id' in df.columns:
                 for index,row in df.iterrows():
@@ -268,7 +281,7 @@ def upload_transport_excel(request):
 
     return render(request,'general_data/transport_templates/upload_transport_form.html',{'form':form})
 
-
+@login_required(login_url = 'login')
 def display_transport_meta(request):
     data = Transport_Meta.objects.all()
     total_data = data.count()
@@ -278,7 +291,8 @@ def display_transport_meta(request):
     
     return render(request, 'general_data/display_meta.html', context)
 
-
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def update_selected_transport(request):
     selected_ids = request.POST.getlist('selected_items')
     if not selected_ids:
