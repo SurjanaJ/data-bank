@@ -6,6 +6,8 @@ from django.core.paginator import Paginator
 from django.urls import reverse
 from django.db.models import Q
 import pandas as pd
+
+from .energy_view import strip_spaces
 from ..models import Road, Country_meta,Road_Meta
 from ..forms import UploadRoadForm
 from trade_data.views import tables
@@ -91,144 +93,139 @@ def upload_road_excel(request):
         form = UploadRoadForm(request.POST, request.FILES)
         if form.is_valid():
             excel_data = request.FILES['file']
-            df = pd.read_excel(excel_data,dtype={'Code_Type_Of_Road':str})
+            df = pd.read_excel(excel_data,dtype={'Code':str})
+            df.fillna('', inplace=True)
+            df = df.map(strip_spaces)
 
             unit_options = [option[0] for option in Road.Length_Unit]
 
             if 'id' in df.columns:
-                cols = df.columns.tolist()
                 for index, row in df.iterrows():
-                    id_value = row.get('id')
-                    try:
-                        road_instance = Road.objects.get(id=id_value)
-                    except Exception as e:
-                        data = {col: row[col] for col in cols}
-                        errors.append({
-                            'row_index':index,
-                            'data':data,
-                            'reason':f'Error inserting row {index}:{e}'
-                        })
-                        continue
-                    road_data = {
+                    id = row.get('id')
+                    data = {
                         'Year':row['Year'],
                         'Country':row['Country'],
-                        'Highway_No':row['Highway_No'],
-                        'Name_Of_The_Road':row['Name_Of_The_Road'],
-                        'Code_Type_Of_Road':row['Code_Type_Of_Road'],
-                        'Length_Unit_Options':row['Length_Unit'],
+                        'Highway No':row['Highway No'],
+                        'Name Of The Road':row['Name Of The Road'],
+                        'Code':row['Code'],
+                        'Road Type':row['Road Type'],
+                        'Length Unit':row['Length Unit'],
                         'Length':row['Length']
                     }
-                    
-
                     try:
-                            
-                        if road_data['Length_Unit_Options'] not in unit_options:
-                            road_data = {
-                                'Year':row['Year'],
-                                'Country':row['Country'],
-                                'Highway_No':row['Highway_No'],
-                                'Name_Of_The_Road':row['Name_Of_The_Road'],
-                                'Code_Type_Of_Road':row['Code_Type_Of_Road'],
-                                'Length_Unit_Options':row['Length_Unit'],
-                                'Length':row['Length']
-                            }
-                            errors.append({'row_index': index, 'data': road_data, 'reason':f'Error inserting row {index}: Invalid unit value'})
-                        else:
-                            country_instance = Country_meta.objects.get(Country_Name=row['Country'])
-                            road_id = Road_Meta.objects.get(Code = row['Code_Type_Of_Road'])
-                            
+                        road_instance = Road.objects.get(id=id)
+                        road_data = data
+
+                        try:
+                            country = Country_meta.objects.get(Country_Name=row['Country'])
+                            code = Road_Meta.objects.get(Code = row['Code'])
+                                
                             road_instance.Year = row['Year']
-                            road_instance.Country=country_instance
-                            road_instance.Highway_No= row['Highway_No']
-                            # road_instance.Name_Of_The_Road = row['Name_Of_The_Road']
-                            road_instance.Code_Type_Of_Road = road_id
-                            road_instance.Length_Unit_Options=row['Length_Unit']            
+                            road_instance.Country=country
+                            road_instance.Highway_No= row['Highway No']
+                            road_instance.Name_Of_The_Road = row['Name Of The Road']
+                            road_instance.Code_Type_Of_Road = code
+                            road_instance.Length_Unit_Options=row['Length Unit']            
                             road_instance.Length = row['Length']
 
                             road_instance.save()
                             updated_count +=1
-                    
-                    except Exception as e:
-                        road_data = {
-                            'Year':row['Year'],
-                            'Country':row['Country'],
-                            'Highway_No':row['Highway_No'],
-                            'Name_Of_The_Road':row['Name_Of_The_Road'],
-                            'Code_Type_Of_Road':row['Code_Type_Of_Road'],
-                            'Length_Unit_Options':row['Length_Unit'],
-                            'Length':row['Length']
-                        }
-                        errors.append({'row_index': index, 'data': road_data, 'reason':str(e)})
-                        continue
-            else:
-                for index,row in df.iterrows():
-                    road_data = {
-                        'Year':row['Year'],
-                        'Country':row['Country'],
-                        'Highway_No':row['Highway_No'],
-                        'Name_Of_The_Road':row['Name_Of_The_Road'],
-                        'Code_Type_Of_Road':row['Code_Type_Of_Road'],
-                        'Length_Unit_Options':row['Length_Unit'],
-                        'Length':row['Length']
-                    }
-
-                    if road_data['Length_Unit_Options'] not in unit_options:
-                        errors.append({'row_index': index,'data': road_data, 'reason': f'Error inserting row {index}: Invalid length unit value'})
-
-                    else:
-                        country_instance = None
-                        try:
-                            country_instance = Country_meta.objects.get(Country_Name = row['Country'])
-                            road_id = Road_Meta.objects.get(Code = row['Code_Type_Of_Road'])
-                            
-                            road_data = {
-                                'Year':row['Year'],
-                                'Country':country_instance,
-                                'Highway_No':row['Highway_No'],
-                                'Name_Of_The_Road':row['Name_Of_The_Road'],
-                                'Code_Type_Of_Road':road_id,
-                                'Length_Unit_Options':row['Length_Unit'],
-                                'Length':row['Length']
-                            }
-
+                        
                         except Exception as e:
-                            errors.append({'row_index':index, 'data':road_data , 'reason': str(e)})
+                            road_data = data
+                            errors.append({'row_index': index, 'data': road_data, 'reason': str(e)})
                             continue
 
-                        existing_record = Road.objects.filter(Q(Year = row['Year'] )& Q(Country = country_instance) & Q(Highway_No = row['Highway_No']) &Q(Length_Unit_Options = row['Length_Unit']) & Q(Code_Type_Of_Road = road_id) & Q(Length = row['Length'])).first()
+
+                    except Exception as e:
+                        road_data= data
+                        errors.append({
+                            'row_index':index,
+                            'data':road_data,
+                            'reason':f'Error inserting row {index}:{e}'
+                        })
+                        continue
+                    
+                    
+            else:
+                for index,row in df.iterrows():
+                    data = {
+                        'Year':row['Year'],
+                        'Country':row['Country'],
+                        'Highway No':row['Highway No'],
+                        'Name Of The Road':row['Name Of The Road'],
+                        'Code':row['Code'],
+                        'Road Type':row['Road Type'],
+                        'Length Unit':row['Length Unit'],
+                        'Length':row['Length']
+                    }
+                    
+                    try:
+                        country = Country_meta.objects.get(Country_Name = row['Country'])
+                        code = Road_Meta.objects.get(Code = row['Code'])
+                        
+                        existing_record = Road.objects.filter(
+                            Q(Year = row['Year'] )
+                            & Q(Country = country) 
+                            & Q(Highway_No = row['Highway No']) 
+                            & Q(Length_Unit_Options = row['Length Unit']) 
+                            & Q(Code_Type_Of_Road = code) 
+                            & Q(Length = row['Length'])
+                            ).first()
+                        
                         if existing_record:
+                            road_data= data
                             duplicate_data.append({
                                 'row_index':index,
                                 'data': road_data,
                                 'reason': 'Duplicate data found'
                             })
 
-
                         else:
                             try:
+                                road_data = {
+                                    'Year':row['Year'],
+                                    'Country':country,
+                                    'Highway_No':row['Highway No'],
+                                    'Name_Of_The_Road':row['Name Of The Road'],
+                                    'Code_Type_Of_Road':code,
+                                    'Length_Unit_Options':row['Length Unit'],
+                                    'Length':row['Length']
+                                }
+                                print('ROAD DATA')
+                                print(road_data)
+
                                 Roaddata = Road(**road_data)
                                 Roaddata.save()
                                 added_count +=1
 
                             except Exception as e:
-                                errors.append({
-                                    'row_index': index,
-                                    'data': road_data,
-                                    'reason': f"Error inserting row {index}: {e}"
-                                })
+                                errors.append(f"Error inserting row {index}: {e}")
+
+                            
+                    except Exception as e:
+                        road_data = data
+                        errors.append({'row_index': index, 'data': road_data, 'reason': str(e)})
+                        continue
+
 
             if added_count > 0:
                 messages.success(request, f'{added_count} records added')
 
             if updated_count > 0:
-                messages.success(request, f'{updated_count} records updated')
+                messages.info(request, str(updated_count) + ' records updated.')
+
 
             if errors:
                 request.session['errors'] = errors
-                return render(request, 'general_data/error_template.html', {'errors': errors})
+                return render(request, 'trade_data/error_template.html', {'errors': errors, 'tables': tables, 'meta_tables': views.meta_tables, })
 
             if duplicate_data:
-                return render(request, 'general_data/duplicate_template.html', {'duplicate_data': duplicate_data})
+                return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data, 'tables': tables, 'meta_tables': views.meta_tables,})
+            
+            else:
+            # form is not valid
+                return redirect('road_table') 
 
     else:
         form = UploadRoadForm()
@@ -256,12 +253,12 @@ def update_selected_road(request):
         queryset = queryset.annotate(
         country = F('Country__Country_Name'),
         code_type_of_road = F('Code_Type_Of_Road__Code'),
-        Type_Of_The_Road = F('Code_Type_Of_Road__Road_Type'),
+        road_type = F('Code_Type_Of_Road__Road_Type'),
         )
 
-        df = pd.DataFrame(list(queryset.values('id','Year','country','Highway_No','Name_Of_The_Road','code_type_of_road','Type_Of_The_Road','Length_Unit_Options','Length')))
-        df.rename(columns={'country': 'Country','code_type_of_road':'Code_Type_Of_Road','Length_Unit_Options':'Length_Unit'}, inplace=True)
-        df = df[['id','Year','Country','Highway_No','Name_Of_The_Road','Code_Type_Of_Road','Type_Of_The_Road','Length_Unit','Length']]
+        df = pd.DataFrame(list(queryset.values('id','Year','country','Highway_No','Name_Of_The_Road','code_type_of_road','road_type','Length_Unit_Options','Length')))
+        df.rename(columns={'country': 'Country','code_type_of_road':'Code','road_type':'Road Type','Highway_No':'Highway No','Name_Of_The_Road':'Name Of The Road','Length_Unit_Options':'Length Unit'}, inplace=True)
+        df = df[['id','Year','Country','Highway No','Name Of The Road','Code','Road Type','Length Unit','Length']]
         output = BytesIO()
         writer = pd.ExcelWriter(output, engine='xlsxwriter')  
         df.to_excel(writer, sheet_name='Sheet1', index=False)
