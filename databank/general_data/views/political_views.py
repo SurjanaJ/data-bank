@@ -20,10 +20,13 @@ from django.http import HttpResponse
 
 from trade_data import views
 
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import allowed_users
+
 def is_valid_queryparam(param):
     return param !='' and param is not None
 
-
+@login_required(login_url = 'login')
 def display_political_table(request):
 
     data = Political_Data.objects.all()
@@ -84,6 +87,8 @@ def display_political_table(request):
     }
     return render(request, 'general_data/political_templates/political_table.html',context)
 
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def upload_political_excel(request):
     errors = []
     duplicate_data = []
@@ -97,6 +102,13 @@ def upload_political_excel(request):
             df.fillna('', inplace=True)
             df = df.map(strip_spaces)
 
+             # Check if required columns exist
+            required_columns = ['Year', 'Country', 'Political Party Name','Number Of Member','Province','District','Municipality','Wards']  # Add your required column names here
+            missing_columns = [col for col in required_columns if col not in df.columns]
+            if missing_columns:
+                errors.append(f"Missing columns: {', '.join(missing_columns)}")
+                return render(request,'general_data/invalid_upload.html', {'missing_columns': missing_columns, 'tables': tables, 'meta_tables': views.meta_tables,} )
+            
             #Update existing data
             if 'id' in df.columns:
                 for index,row in df.iterrows():
@@ -239,7 +251,8 @@ def upload_political_excel(request):
 
     return render(request, 'general_data/upload_form.html', {'form': form, 'tables':tables})
 
-
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles=['admin'])
 def update_selected_political(request):
     selected_ids = request.POST.getlist('selected_items')
     if not selected_ids:
