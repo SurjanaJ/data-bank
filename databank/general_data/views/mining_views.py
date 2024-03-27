@@ -57,7 +57,7 @@ def display_mining_table(request):
         data = data.filter(Country_id=country_category)
 
     if is_valid_queryparam(mine_code) and mine_code != '--':
-        data=data.filter(Name_Of_Mine_id = mine_code)
+        data=data.filter(Code_id = mine_code)
 
     if is_valid_queryparam(unit)  and unit != '--':
         data=data.filter(Unit=unit) 
@@ -111,7 +111,13 @@ def upload_mining_excel(request):
             df = df.map(strip_spaces)
 
             unit_options = [option[0] for option in Mining.Unit_Options]
-
+             # Check if required columns exist
+            required_columns = ['Year', 'Country', 'Code','Unit','Current Production','Potential Stock','Mining Company Name']  # Add your required column names here
+            missing_columns = [col for col in required_columns if col not in df.columns]
+            if missing_columns:
+                errors.append(f"Missing columns: {', '.join(missing_columns)}")
+                return render(request,'general_data/invalid_upload.html', {'missing_columns': missing_columns, 'tables': tables, 'meta_tables': views.meta_tables,} )
+            
             if 'id' in df.columns:
                 for index, row in df.iterrows():
                     id = row.get('id')
