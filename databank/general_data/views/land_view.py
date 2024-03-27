@@ -140,6 +140,14 @@ def upload_land_excel(request):
             df = pd.read_excel(excel_data,dtype={'Land Code':str})
             df.fillna('', inplace=True)
             df = df.map(strip_spaces)
+
+             # Check if required columns exist
+            required_columns = ['Year', 'Country', 'Land Code','Unit','Area']  # Add your required column names here
+            missing_columns = [col for col in required_columns if col not in df.columns]
+            if missing_columns:
+                errors.append(f"Missing columns: {', '.join(missing_columns)}")
+                return render(request,'general_data/invalid_upload.html', {'missing_columns': missing_columns, 'tables': tables, 'meta_tables': views.meta_tables,} )
+            
             
             if 'id' in df.columns:
                 for index,row in df.iterrows():
@@ -148,6 +156,7 @@ def upload_land_excel(request):
                         'Year': row['Year'],
                         'Country': row['Country'],
                         'Land Code': row['Land Code'],
+                        'Land Type': row['Land Type'],
                         'Unit': row['Unit'],
                         'Area': row['Area']
                     }   
@@ -190,6 +199,7 @@ def upload_land_excel(request):
                         'Year': row['Year'],
                         'Country': row['Country'],
                         'Land Code': row['Land Code'],
+                        'Land Type': row['Land Type'],
                         'Unit': row['Unit'],
                         'Area': row['Area']
                     }  
@@ -198,15 +208,6 @@ def upload_land_excel(request):
                     try:
                         Country = Country_meta.objects.get(Country_Name=row['Country'])
                         Code = Land_Code_Meta.objects.get(Code = row['Land Code'])
-                        
-
-                        land_data={
-                                'Year': row['Year'],
-                                'Country': row['Country'],
-                                'Land Code': row['Land Code'],
-                                'Unit': row['Unit'],
-                                'Area': row['Area']
-                            }     
                         
                         existing_record = Land.objects.filter(
                             Q(Year = row['Year'])

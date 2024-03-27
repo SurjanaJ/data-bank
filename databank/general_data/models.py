@@ -48,7 +48,7 @@ class Land_Code_Meta(models.Model):
     Land_Type=models.TextField(null=True,blank=True)
 
     def __str__(self):
-        return self.Code
+        return (f'{self.Code} - {self.Land_Type}')
 
 
 class Land(models.Model):
@@ -56,7 +56,6 @@ class Land(models.Model):
     Land_Unit_Options=(
         ('Ha','Ha'),
     )
-
 
     id=models.AutoField(primary_key=True)
     Year=models.IntegerField(null=True,blank=True)
