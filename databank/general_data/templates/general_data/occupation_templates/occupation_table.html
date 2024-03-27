@@ -20,22 +20,12 @@
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label for="year_min">Calender Year Minimum</label>
-                    <select id="year_min" class="form-control" name="year_min">
-                        <option selected>--</option>
-                        {% for year in year_categories %}
-                        <option value="{{year}}">{{year}}</option>
-                        {% endfor %}
-                    </select>
+                    <label for="year_min">Calender Date Minimum</label>
+                    <input type="number" class="form-control" id="year_min" name="year_min" />
                 </div>
                 <div class="col-md-3">
-                    <label for="year_max">Calender Year Maximum</label>
-                    <select id="year_max" class="form-control" name="year_max">
-                        <option selected>--</option>
-                        {% for year in year_categories %}
-                        <option value="{{year}}">{{year}}</option>
-                        {% endfor %}
-                    </select>
+                    <label for="year_max">Calender Date Maximum</label>
+                    <input type="number" class="form-control" id="year_max" name="year_max" />
                 </div>
                 <div class="form-group col-md-3">
                     <label for="code">Code</label>

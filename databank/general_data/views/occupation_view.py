@@ -46,6 +46,14 @@ def upload_occupation_excel(request):
             df.fillna('', inplace= True)
             df = df.map(strip_spaces)
 
+            # Check if required columns exist
+            required_columns = ['Year', 'Country', 'Code','Number']  # Add your required column names here
+            missing_columns = [col for col in required_columns if col not in df.columns]
+            if missing_columns:
+                errors.append(f"Missing columns: {', '.join(missing_columns)}")
+                return render(request,'general_data/invalid_upload.html', {'missing_columns': missing_columns, 'tables': tables, 'meta_tables': views.meta_tables,} )
+            
+
             # update existing data
             if 'id' in df.columns:
                 for index, row in df.iterrows():
@@ -172,7 +180,6 @@ def display_occupation_table(request):
 
     code_categories = Occupation_Meta.objects.all()
     country_categories = Country_meta.objects.all()
-    year_categories = Occupation.objects.values_list('Year', flat=True).distinct()
 
     country = request.GET.get('country')
     code = request.GET.get('code')
@@ -196,7 +203,7 @@ def display_occupation_table(request):
     page = paginator.get_page(page_number)
 
 
-    context ={'data_len':len(data),'code_categories':code_categories, 'country_categories':country_categories, 'page':page, 'query_len':len(page), 'tables': tables, 'meta_tables': views.meta_tables, 'year_categories':year_categories}
+    context ={'data_len':len(data),'code_categories':code_categories, 'country_categories':country_categories, 'page':page, 'query_len':len(page), 'tables': tables, 'meta_tables': views.meta_tables}
     return render(request, 'general_data/occupation_templates/occupation_table.html', context)
 
 @login_required(login_url = 'login')
