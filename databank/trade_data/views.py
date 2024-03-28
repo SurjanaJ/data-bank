@@ -143,6 +143,10 @@ tables =[
         "name": "Population Data",
         "url": "population_table"
     },
+    {
+        "name": "Activity Data",
+        "url": "activity_table"
+    },
     ]
 
 
@@ -252,6 +256,12 @@ meta_tables =[
         "name":"Production Meta",
         "url":"production_meta",
         "upload_url":"upload_production_meta_excel"
+    },
+    
+    {
+        "name":"Activity Meta",
+        "url":"activity_meta",
+        "upload_url":"upload_activity_meta_excel"
     },
     ]
 

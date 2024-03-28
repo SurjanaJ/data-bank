@@ -83,14 +83,15 @@ def upload_activity_excel(request):
 
     if request.method == 'POST':
         form = UploadActivityDataForm(request.POST, request.FILES)
+        
         if form.is_valid():
             excel_data = request.FILES['file']
-            df = pd.read_excel(excel_data,dtype={'Activity_Code': str})
+            df = pd.read_excel(excel_data,dtype={'Code': str})
             df.fillna('', inplace=True)
             df = df.map(strip_spaces)
 
              # Check if required columns exist
-            required_columns = ['Year', 'Country', 'Activity Code','Person','Districts','Text Documents Upload']  # Add your required column names here
+            required_columns = ['Year', 'Country', 'Code','Person','Districts','Text Documents Upload']  # Add your required column names here
             missing_columns = [col for col in required_columns if col not in df.columns]
             if missing_columns:
                 errors.append(f"Missing columns: {', '.join(missing_columns)}")
@@ -98,76 +99,77 @@ def upload_activity_excel(request):
             
 
             if 'id' in df.columns:
-                cols = df.columns.tolist()
                 for index, row in df.iterrows():
-                    id_value = row.get('id')
+                    id = row.get('id')
+                    data = {
+                        'Year': row['Year'],
+                        'Country': row['Country'],
+                        'Code': row['Code'],
+                        'Description': row['Description'],
+                        'Person': row['Person'],
+                        'Districts': row['Districts'],
+                        'Text Documents Upload': row['Text Documents Upload']
+                    }
                     try:
-                        activity_instance = ActivityData.objects.get(id=id_value)
+                        activity_instance = ActivityData.objects.get(id=id)
+                        activity_data = data
+
+                        try:
+                            country = Country_meta.objects.filter(Country_Name=row['Country']).first()
+                            code = Activity_Meta.objects.filter(Code=row['Code']).first()
+
+                            activity_instance.Year = row['Year']
+                            activity_instance.Country = country
+                            activity_instance.Activity_Code = code
+                            activity_instance.Person = row['Person']
+                            activity_instance.Districts = row['Districts']
+                            activity_instance.Text_Documents_Upload = row['Text Documents Upload']
+
+                            activity_instance.save()
+                            updated_count += 1
+
+                        except Exception as e:
+                            activity_data= data
+                            errors.append({'row_index': index, 'data': activity_data, 'reason': str(e)})
+                            continue
+                    
                     except Exception as e:
-                        data = {col: row[col] for col in cols}
+                        activity_data= data
+
                         errors.append({
                             'row_index': index,
-                            'data': data,
+                            'data': activity_data,
                             'reason': f'Error inserting row {index}:{e}'
                         })
                         continue
 
-                    activity_data = {
-                        'Year': row['Year'],
-                        'Country': row['Country'],
-                        'Activity_Code': row['Activity_Code'],
-                        'Person': row['Person'],
-                        'Districts': row['Districts'],
-                        'Text_Documents_Upload': row['Text_Documents_Upload']
-                    }
-
-                    country_instance = Country_meta.objects.filter(Country_Name=row['Country']).first()
-                    activity_code_instance = Activity_Meta.objects.filter(Code=row['Activity_Code']).first()
-
-                    if country_instance is None:
-                        errors.append({
-                            'row_index': index,
-                            'data': activity_data,
-                            'reason': f"Country not found"
-                        })
-                        continue
-
-                    if activity_code_instance is None:
-                        errors.append({
-                            'row_index': index,
-                            'data': activity_data,
-                            'reason': f"activity_meta code not found"
-                        })
-                        continue
-
-                    activity_instance.Year = row['Year']
-                    activity_instance.Country = country_instance
-                    activity_instance.Activity_Code = activity_code_instance
-                    activity_instance.Person = row['Person']
-                    activity_instance.Districts = row['Districts']
-                    activity_instance.Text_Documents_Upload = row['Text_Documents_Upload']
-
-                    activity_instance.save()
-                    updated_count += 1
-
             else:
                 for index, row in df.iterrows():
-                    activity_data = {
+                    data = {
                         'Year': row['Year'],
                         'Country': row['Country'],
-                        'Activity_Code': row['Activity_Code'],
+                        'Code': row['Code'],
+                        'Description': row['Description'],
                         'Person': row['Person'],
                         'Districts': row['Districts'],
-                        'Text_Documents_Upload': row['Text_Documents_Upload']
+                        'Text Documents Upload': row['Text Documents Upload']
                     }
-                    country_instance = None
-                    activity_code_instance = None
+                    
                     try:
-                        country_instance = Country_meta.objects.get(Country_Name=row['Country'])
-                        activity_code_instance = Activity_Meta.objects.get(Code=row['Activity_Code'])
+                        country = Country_meta.objects.get(Country_Name=row['Country'])
+                        code = Activity_Meta.objects.get(Code=row['Code'])
 
-                        existing_record = ActivityData.objects.filter(Q(Year=row['Year']) & Q(Country=country_instance) & Q(Activity_Code=activity_code_instance) & Q(Person=row['Person']) & Q(Districts = row['Districts']) &Q(Text_Documents_Upload= row['Text_Documents_Upload'])).first()
+                        existing_record = ActivityData.objects.filter(
+                            Q(Year=row['Year']) 
+                            & Q(Country=country) 
+                            & Q(Activity_Code=code) 
+                            & Q(Person=row['Person']) 
+                            & Q(Districts = row['Districts']) 
+                            &Q(Text_Documents_Upload= row['Text Documents Upload'])
+                            ).first()
+                        
                         if existing_record:
+                            activity_data= data
                             duplicate_data.append({
                                 'row_index': index,
                                 'data': activity_data,
@@ -177,39 +179,41 @@ def upload_activity_excel(request):
                             try:
                                 activity_data = {
                                     'Year': row['Year'],
-                                    'Country': country_instance,
-                                    'Activity_Code': activity_code_instance,
+                                    'Country': country,
+                                    'Activity_Code': code,
                                     'Person': row['Person'],
                                     'Districts': row['Districts'],
-                                    'Text_Documents_Upload': row['Text_Documents_Upload']
+                                    'Text_Documents_Upload': row['Text Documents Upload']
                                 }
                                 Activity_data=ActivityData(**activity_data)
                                 Activity_data.save()
                                 added_count += 1
                             except Exception as e:
-                                errors.append({
-                                    'row_index': index,
-                                    'data': activity_data,
-                                    'reason': f"Error inserting row {index}: {e}"
-                                })
+                                errors.append(f"Error inserting row {index}: {e}")
+
                     except Exception as e:
+                        activity_data = data
                         errors.append({'row_index': index, 'data': activity_data, 'reason': str(e)})
                         continue
+        
 
-                    
 
-            if added_count > 0:
-                messages.success(request, f'{added_count} records added')
+        if added_count > 0:
+            messages.success(request, f'{added_count} records added')
 
-            if updated_count > 0:
-                messages.success(request, f'{updated_count} records updated')
+        if updated_count > 0:
+            messages.info(request, f'{updated_count} records updated')
 
-            if errors:
-                request.session['errors'] = errors
-                return render(request, 'general_data/error_template.html', {'errors': errors})
-
-            if duplicate_data:
-                return render(request, 'general_data/duplicate_template.html', {'duplicate_data': duplicate_data})
+        if errors:
+            request.session['errors'] = errors
+            return render(request, 'trade_data/error_template.html', {'errors': errors, 'tables': tables, 'meta_tables': views.meta_tables, })
+            
+        if duplicate_data:
+            request.session['duplicate_data'] = duplicate_data
+            return render(request, 'trade_data/duplicate_template.html', {'duplicate_data': duplicate_data, 'tables': tables, 'meta_tables': views.meta_tables,})
+        
+        else:
+            return redirect('activity_table') 
 
     else:
         form = UploadActivityDataForm()
@@ -238,12 +242,13 @@ def update_selected_activity(request):
         queryset = ActivityData.objects.filter(id__in=selected_ids)
         queryset = queryset.annotate(
         country = F('Country__Country_Name'),
-        activity_code=F('Activity_Code__Code'),
+        code=F('Activity_Code__Code'),
+        description = F('Activity_Code__Description'),
         )
 
-        df = pd.DataFrame(list(queryset.values('id','Year','country','activity_code', 'Person', 'Districts', 'Text_Documents_Upload')))
-        df.rename(columns={'country': 'Country', 'activity_code': 'Activity_Code'}, inplace=True)
-        df = df[['id','Year', 'Country', 'Activity_Code', 'Person', 'Districts', 'Text_Documents_Upload']]
+        df = pd.DataFrame(list(queryset.values('id','Year','country','code','description', 'Person', 'Districts', 'Text_Documents_Upload')))
+        df.rename(columns={'country': 'Country', 'code': 'Code','description':'Description','Text_Documents_Upload':'Text Documents Upload'}, inplace=True)
+        df = df[['id','Year', 'Country', 'Code','Description', 'Person', 'Districts', 'Text Documents Upload']]
         output = BytesIO()
         writer = pd.ExcelWriter(output, engine='xlsxwriter')  
         df.to_excel(writer, sheet_name='Sheet1', index=False)

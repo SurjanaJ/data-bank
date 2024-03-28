@@ -451,7 +451,7 @@ class Activity_Meta(models.Model):
     modified_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.Code
+        return (f'{self.Code} - {self.Description}')
 
 
 

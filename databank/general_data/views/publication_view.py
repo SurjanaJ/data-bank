@@ -132,12 +132,7 @@ def upload_publication_excel(request):
                     #check if the meta values exist
                     try:
                         Country = Country_meta.objects.get(Country_Name = row['Country'])
-                        publication_data = {
-                        'Year': row['Year'],
-                        'Country': Country,
-                        'Book_Name': row['Book Name'],
-                        'Writer_Name':row['Writer Name'],
-                    }
+                        
                         
                         existing_record = Publication.objects.filter(
                             Q(Country = Country)
@@ -157,6 +152,12 @@ def upload_publication_excel(request):
                         else:
                             #add new record
                             try:
+                                publication_data = {
+                                    'Year': row['Year'],
+                                    'Country': Country,
+                                    'Book_Name': row['Book Name'],
+                                    'Writer_Name':row['Writer Name'],
+                                }
                                 publicationData = Publication(**publication_data)
                                 publicationData.save()
                                 added_count += 1
