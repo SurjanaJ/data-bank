@@ -593,7 +593,7 @@ def update_record(request,pk):
             form.save()
             return redirect(model_view)
 
-    context = {'form': form, 'meta_tables': views.meta_tables}
+    context = {'form': form,'tables':views.tables, 'meta_tables': views.meta_tables}
     return render(request, 'general_data/update_record.html', context)
 
 @login_required(login_url = 'login')

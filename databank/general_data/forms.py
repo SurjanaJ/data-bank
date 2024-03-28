@@ -17,7 +17,7 @@ class UploadForestData(ModelForm):
         fields='__all__'
 
         widgets={
-            'Year': forms.DateInput(attrs={'class': 'form-control '}),
+            'Year': forms.NumberInput(attrs={'class': 'form-control '}),
             'Country': forms.Select(attrs={'class': 'form-control '}),
             'Name_Of_The_Plant': forms.TextInput(attrs={'class': 'form-control '}),
             'Scientific_Name': forms.TextInput(attrs={'class': 'form-control '}),
@@ -35,7 +35,7 @@ class UpdateForest(ModelForm):
 
         widgets={
             'Country': forms.Select(attrs={'class': 'form-control '}),
-            'Year': forms.DateInput(attrs={'class': 'form-control '}),
+            'Year': forms.NumberInput(attrs={'class': 'form-control '}),
             'Name_Of_The_Plant': forms.TextInput(attrs={'class': 'form-control '}),
             'Scientific_Name': forms.TextInput(attrs={'class': 'form-control '}),
             'Local_Name': forms.TextInput(attrs={'class': 'form-control '}),
@@ -380,6 +380,24 @@ class UpdateDisaster(ModelForm):
         model = Disaster_Data
         fields='__all__'
 
+        widgets={
+            'Year': forms.NumberInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Disaster_Code': forms.Select(attrs={'class': 'form-control '}),
+            'Human_Loss': forms.NumberInput(attrs={'class': 'form-control '}),
+            'Animal_Loss': forms.NumberInput(attrs={'class': 'form-control '}),
+            'Physical_Properties_Loss_In_USD': forms.NumberInput(attrs={'class': 'form-control '}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateDisaster, self).__init__(*args, **kwargs)
+
+        # Set the labels
+        self.fields['Disaster_Code'].label = 'Disaster Code'
+        self.fields['Human_Loss'].label = 'Human Loss'
+        self.fields['Animal_Loss'].label = 'Animal Loss'
+        self.fields['Physical_Properties_Loss_In_USD'].label = 'Physical Properties Loss In USD'
+
 class UploadDisasterForm(forms.Form):
     file = forms.FileField()
 
@@ -394,6 +412,23 @@ class UpdateHealthDisease(ModelForm):
         model = Health_disease
         fields='__all__'
 
+        widgets={
+            'Year': forms.NumberInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Disease_Code': forms.Select(attrs={'class': 'form-control '}),
+            'Unit': forms.Select(attrs={'class': 'form-control '}),
+            'Number_Of_Case': forms.NumberInput(attrs={'class': 'form-control '}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateHealthDisease, self).__init__(*args, **kwargs)
+
+        # Set the labels
+        self.fields['Disease_Code'].label = 'Disease Code'
+        self.fields['Number_Of_Case'].label = 'Number Of Case'
+
+
+
 class UploadHealthDiseaseForm(forms.Form):
     file = forms.FileField()
 
@@ -406,6 +441,27 @@ class UpdateMining(ModelForm):
     class Meta:
         model = Mining
         fields='__all__'
+        
+        widgets={
+            'Year': forms.NumberInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Code': forms.Select(attrs={'class': 'form-control '}),
+            'Unit': forms.Select(attrs={'class': 'form-control '}),
+            'Current_Production': forms.NumberInput(attrs={'class': 'form-control '}),
+            'Potential_Stock': forms.NumberInput(attrs={'class': 'form-control '}),
+            'Mining_Company_Name': forms.TextInput(attrs={'class': 'form-control '}),
+
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateMining, self).__init__(*args, **kwargs)
+
+        # Set the labels
+        self.fields['Current_Production'].label = 'Current Production'
+        self.fields['Potential_Stock'].label = 'Potential Stock'
+        self.fields['Mining_Company_Name'].label = 'Mining Company Name'
+
+
 
 class UploadMiningForm(forms.Form):
     file = forms.FileField()
@@ -421,6 +477,21 @@ class UpdateHousing(ModelForm):
         model = Housing
         fields='__all__'
 
+        widgets={
+                'Year': forms.NumberInput(attrs={'class': 'form-control '}),
+                'Country': forms.Select(attrs={'class': 'form-control '}),
+                'House_Code': forms.Select(attrs={'class': 'form-control '}),
+                'City': forms.TextInput(attrs={'class': 'form-control '}),
+                'Number': forms.NumberInput(attrs={'class': 'form-control '}),
+            }
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateHousing, self).__init__(*args, **kwargs)
+
+        # Set the labels
+        self.fields['House_Code'].label = 'House Code'
+        
+
 class UploadHousingForm(forms.Form):
     file = forms.FileField()
 
@@ -431,6 +502,25 @@ class UpdatePolitical(ModelForm):
         model = Political_Data
         fields='__all__'
 
+        widgets={
+            'Year': forms.NumberInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Political_Party_Name': forms.TextInput(attrs={'class': 'form-control '}),
+            'Number_Of_Member': forms.NumberInput(attrs={'class': 'form-control '}),
+            'Province': forms.TextInput(attrs={'class': 'form-control '}),
+            'District': forms.TextInput(attrs={'class': 'form-control '}),
+            'Municipality': forms.TextInput(attrs={'class': 'form-control '}),
+            'Wards': forms.TextInput(attrs={'class': 'form-control '}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UpdatePolitical, self).__init__(*args, **kwargs)
+
+        # Set the labels
+        self.fields['Political_Party_Name'].label = 'Political Party Name'
+        self.fields['Number_Of_Member'].label = 'Number Of Member'
+
+
 class UploadPoliticalForm(forms.Form):
     file = forms.FileField()
 
@@ -439,6 +529,25 @@ class UpdateActivity(ModelForm):
     class Meta:
         model = ActivityData
         fields='__all__'
+
+        widgets={
+            'Year': forms.NumberInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Activity_Code': forms.Select(attrs={'class': 'form-control '}),
+            'Person': forms.NumberInput(attrs={'class': 'form-control '}),
+            'Districts': forms.TextInput(attrs={'class': 'form-control '}),
+            'Text_Documents_Upload': forms.TextInput(attrs={'class': 'form-control '}),
+            'Wards': forms.TextInput(attrs={'class': 'form-control '}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateActivity, self).__init__(*args, **kwargs)
+
+        # Set the labels
+        self.fields['Activity_Code'].label = 'Activity Code'
+        self.fields['Text_Documents_Upload'].label = 'Text Documents Upload'
+
+
 
 class UploadActivityDataForm(forms.Form):
     file = forms.FileField()
@@ -455,6 +564,26 @@ class UpdateRoad(ModelForm):
     class Meta:
         model = Road
         fields='__all__'
+
+        widgets={
+           'Year': forms.NumberInput(attrs={'class': 'form-control '}),
+            'Country': forms.Select(attrs={'class': 'form-control '}),
+            'Highway_No': forms.TextInput(attrs={'class': 'form-control '}),
+            'Name_Of_The_Road': forms.TextInput(attrs={'class': 'form-control '}),
+            'Code_Type_Of_Road': forms.Select(attrs={'class': 'form-control '}),
+            'Length_Unit_Options': forms.TextInput(attrs={'class': 'form-control '}),
+            'Length': forms.NumberInput(attrs={'class': 'form-control '}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateRoad, self).__init__(*args, **kwargs)
+
+        # Set the labels
+        self.fields['Name_Of_The_Road'].label = 'Name Of The Road'
+        self.fields['Code_Type_Of_Road'].label = 'Code Type Of Road'
+        self.fields['Length_Unit_Options'].label = 'Length Unit Options'
+
+
 
 class UploadRoadForm(forms.Form):
     file = forms.FileField()
